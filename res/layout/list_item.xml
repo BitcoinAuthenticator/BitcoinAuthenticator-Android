@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    
+    android:padding="5dip" >
+    <!-- ListRow Left side Thumbnail image -->
+    <LinearLayout
+        android:id="@+id/thumbnail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_alignParentLeft="true"
+        android:layout_marginRight="5dip"
+        android:padding="3dip" >
+        </LinearLayout>
+        <ImageView
+            android:id="@+id/wallet_icon"
+            android:contentDescription="@string/app_name"
+            android:layout_width="60dip"
+            android:layout_height="60dip" />
+
+    <TextView
+        android:id="@+id/wallet_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/wallet_icon"
+        android:layout_marginLeft="5dip"
+        android:text=""
+        android:textColor="#FFFFFF"
+        android:textSize="25dip"
+        android:textStyle="bold"
+        android:typeface="sans" />
+
+    <TextView
+        android:id="@+id/wallet_fingerprint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/wallet_label"
+        android:layout_alignLeft="@+id/wallet_label"
+        android:paddingTop="2dip"
+        android:layout_centerHorizontal="true"
+        android:text=""
+        android:textColor="#848482"
+        android:textSize="18dip" />
+</RelativeLayout>  

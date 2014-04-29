@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="org.bitcoin.authenticator"
+    android:versionCode="1"
+    android:versionName="1.0" >
+    
+    <uses-permission android:name="android.permission.CAMERA" />
+	<uses-permission android:name="android.permission.FLASHLIGHT"/>
+	<uses-permission android:name="android.permission.INTERNET"/>
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+	
+
+    <uses-sdk
+        android:minSdkVersion="15"
+        android:targetSdkVersion="15" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@drawable/authenticator"
+        android:label="@string/app_name"
+        android:theme="@style/AppTheme" >
+        <activity
+            android:name="org.bitcoin.authenticator.Main"
+            android:label="@string/app_name" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="How_it_works"
+            android:label="@string/app_name" >
+        </activity>
+         <activity
+            android:name="Show_seed"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name="Pair_wallet"
+            android:label="@string/app_name"
+            android:theme="@style/default_activity_theme" >
+        </activity>
+        <activity
+            android:name="Wallet_list"
+            android:label="@string/app_name" 
+            android:theme="@style/default_activity_theme">
+        </activity>
+        <activity
+            android:name="TCPClient"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name="Welcome"
+            android:label="@string/app_name" > 
+        </activity>
+        <activity
+            android:name="Test"
+            android:label="@string/app_name" > 
+        </activity>
+        
+        <activity
+			android:name="com.google.zxing.client.android.CaptureActivity"
+			android:configChanges="orientation|keyboardHidden"
+			android:screenOrientation="landscape"
+			android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+			android:windowSoftInputMode="stateAlwaysHidden" >
+		<intent-filter>
+		<action android:name="android.intent.action.MAIN" />
+
+		<category android:name="android.intent.category.DEFAULT" />
+		</intent-filter>
+		<intent-filter>
+		<action android:name="com.google.zxing.client.android.SCAN" />
+
+		<category android:name="android.intent.category.DEFAULT" />
+		</intent-filter>
+		</activity>
+           
+    </application>
+
+</manifest>
