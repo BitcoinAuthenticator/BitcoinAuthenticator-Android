@@ -36,7 +36,7 @@ public class QRCode {
       NotFoundException {
 	  // Build the string to display in the QR.
 	  String qrCodeData = "AESKey=" + key + "&PublicIP=" + ip + "&LocalIP=" + localip + "&WalletType=" + wallettype ;
-	  String filePath = "res/PairingQRCode.png";
+	  String filePath = new java.io.File( "." ).getCanonicalPath() + "/PairingQRCode.png";
 	  String charset = "UTF-8"; // or "ISO-8859-1"
 	  Map<EncodeHintType, ErrorCorrectionLevel> hintMap = new HashMap<EncodeHintType, ErrorCorrectionLevel>();
 	  hintMap.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.L);
@@ -47,7 +47,7 @@ public class QRCode {
 			  + readQRCode(filePath, charset, hintMap));
 	  //Crop the QR Code so it looks better when displayed to the user.
 	  try {
-		  orig = ImageIO.read(new File("res/PairingQRCode.png"));
+		  orig = ImageIO.read(new File(filePath));
 	  } catch (IOException e2) {
 		  e2.printStackTrace();
 	  }
@@ -56,7 +56,7 @@ public class QRCode {
 	  bi.getGraphics().drawImage(orig, 0, 0, w, h, x, y, x + w, y + h, null);
 	  //Save the QR to file
 	  try {
-		  ImageIO.write(bi, "png", new File("res/PairingQRCode.png"));
+		  ImageIO.write(bi, "png", new File(filePath));
 	  } catch (IOException e1) {
 		  e1.printStackTrace();
 	  }
