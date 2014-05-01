@@ -1,5 +1,6 @@
 
 import java.awt.EventQueue;
+import java.io.IOException;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
@@ -35,10 +36,20 @@ public class DisplayQR extends JFrame {
 		contentPane = new JPanel();
 		contentPane.setFocusable(false);
 		setContentPane(contentPane);
-		ImageIcon image = new ImageIcon("res/PairingQRCode.png");
-		JLabel lblQRCode = new JLabel(image, JLabel.CENTER);
-		lblQRCode.setBounds(0, 0, 350, 350);
-		contentPane.add(lblQRCode);
+		String path = "";
+		try {
+			path = new java.io.File( "." ).getCanonicalPath() + "/PairingQRCode.png";
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		finally
+		{
+			ImageIcon image = new ImageIcon(path);
+			JLabel lblQRCode = new JLabel(image, JLabel.CENTER);
+			lblQRCode.setBounds(0, 0, 350, 350);
+			contentPane.add(lblQRCode);
+		}
 	}
 	
 	/**Closes the window displaying the QR code*/

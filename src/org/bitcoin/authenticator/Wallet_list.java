@@ -125,6 +125,9 @@ public class Wallet_list extends Activity {
 			Toast.makeText(getApplicationContext(), "Unable to connect to wallet", Toast.LENGTH_LONG).show();
 		}
 		else {
+			//Load walletID from Shared Preferences
+			SharedPreferences data = getSharedPreferences("WalletData1", 0);
+			String name = data.getString("ID", "null");
 			//Load AES Key from file
         	byte [] key = null;
     		String FILENAME = "AESKey1";
@@ -186,10 +189,16 @@ public class Wallet_list extends Activity {
 			final int index = new BigInteger(childkeyindex).intValue();
 			final Transaction unsignedTx = new Transaction(params, transaction);
 			//Get the output address and the amount from the transaction so we can display it to the user.
-			TransactionOutput multisigOutput = unsignedTx.getOutput(0);
-			String strOutput = multisigOutput.toString();
-			String addr = strOutput.substring(strOutput.indexOf("to ")+3, strOutput.indexOf(" script"));
-			String amount = strOutput.substring(9, strOutput.indexOf(" to"));
+			System.out.println("1");
+			List<TransactionOutput> outputs = unsignedTx.getOutputs();
+			String display = "";
+			for (int i = 0; i<outputs.size(); i++){
+				TransactionOutput multisigOutput = unsignedTx.getOutput(i);
+				String strOutput = multisigOutput.toString();
+				String addr = strOutput.substring(strOutput.indexOf("to ")+3, strOutput.indexOf(" script"));
+				String amount = strOutput.substring(9, strOutput.indexOf(" to"));
+				display = display + addr + " <font color='#009933'>" + amount + " BTC</font><br>";
+			}
 		//Create the dialog box
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
 				this);
@@ -197,7 +206,7 @@ public class Wallet_list extends Activity {
 			alertDialogBuilder.setTitle("Authorize Transaction");
 			//Set dialog message
 			alertDialogBuilder
-				.setMessage(Html.fromHtml("Bitcoin Authenticator has received a transaction<br><br>From: <br>Test Wallet<br><br>To:<br>" + addr + " <font color='#009933'>" + amount + " BTC</font>"))
+				.setMessage(Html.fromHtml("Bitcoin Authenticator has received a transaction<br><br>From: <br>" + name + "<br><br>To:<br>" + display))
 				.setCancelable(false)
 				.setPositiveButton("Authorize",new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog,int id) {

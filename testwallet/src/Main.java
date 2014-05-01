@@ -32,20 +32,20 @@ public class Main {
 			  String u = s;
 			  String command = s.substring(0,s.indexOf("("));
 			  //List of supported commands
-			  ArrayList<String> v = new ArrayList<String>();
-			  v.add("pairwallet");  
-			  v.add("send");  
-			  v.add("newaddress");   
-			  v.add("mktx");  
-			  v.add("openport");    
-			  v.add("help");  
+			  ArrayList<String> cmd = new ArrayList<String>();
+			  cmd.add("pairwallet");  
+			  cmd.add("send");  
+			  cmd.add("newaddress");   
+			  cmd.add("mktx");  
+			  cmd.add("openport");    
+			  cmd.add("help");  
 			  //Switch for executing the commands
 			  WalletOperation op = new WalletOperation();
-			  switch (v.indexOf(command)){
+			  switch (cmd.indexOf(command)){
 			  case 0:
 				  String walletType = s.substring(s.indexOf("(")+1, s.indexOf(")"));
 				  PairingProtocol pair = new PairingProtocol();
-				  pair.main(walletType);
+				  pair.run(walletType);
 				  break;
 			  case 1:
 				  op.sendTX();
@@ -54,12 +54,25 @@ public class Main {
 				  op.childPubKey();
 				  break;
 			  case 3:
-				  System.out.print("From: ");
+				  System.out.print("Input: ");
 				  String from = in.nextLine();
-				  System.out.print("To: ");
-				  String to = in.nextLine();
-				  System.out.print("Amount: ");
-				  String amount = in.nextLine();
+				  ArrayList<String> to = new ArrayList<String>();
+				  ArrayList<String> amount = new ArrayList<String>();
+				  String output = "";
+				  int count = 0;
+				  boolean stop = false;
+				  System.out.println("Enter outputs. Type 'done' to finish");
+				  while (!stop) {
+					  System.out.print("Output: ");
+					  output = in.nextLine();
+					  if (output.equals("done")){stop = true;}
+					  if (!stop){
+						  to.add(output);
+						  System.out.print("Amount: ");
+						  amount.add(in.nextLine());
+					  }
+					  count ++;
+				  }
 				  op.mktx(amount, from, to);  
 				  break;
 			  case 4:

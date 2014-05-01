@@ -22,7 +22,7 @@ public class UpNp {
 	static String localIPAddress;
 	static GatewayDevice activeGW;
 
-	public static void main(String[] args) throws Exception{
+	public static void run(String[] args) throws Exception{
 		addLogLine("Starting weupnp");
 		GatewayDiscover gatewayDiscover = new GatewayDiscover();
 		addLogLine("Looking for Gateway Devices...");
