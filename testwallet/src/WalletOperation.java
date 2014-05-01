@@ -12,6 +12,7 @@ import java.net.URLConnection;
 import java.nio.ByteBuffer;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Formatter;
 import java.util.List;
@@ -247,20 +248,23 @@ public class WalletOperation {
 	}
 	
 	/**Builds a raw unsigned transaction*/
-	void mktx(String MILLI, String from, String to) throws AddressFormatException, JSONException, IOException {
+	void mktx(ArrayList<String> MILLI, String from, ArrayList<String> to) throws AddressFormatException, JSONException, IOException {
 		//Gather the data needed to construct the inputs and outputs
 		UnspentOutput out = getUnspentOutputs(from);
 		int index = Integer.parseInt(out.getIndex());
   		Sha256Hash txhash = new Sha256Hash(out.getTxid());
   		NetworkParameters params = MainNetParams.get();
-  		Address outaddr = new Address(params, to);
   		spendtx = new Transaction(params);
   		byte[] script = hexStringToByteArray("");
   		//Creates the input which refrences a previous unspent output
   		TransactionOutPoint outpoint = new TransactionOutPoint(params, index, txhash);
 		input = new TransactionInput(params, null, script, outpoint);
-		//Adds the outputs and inputs to the transaction
-		spendtx.addOutput(BigInteger.valueOf(Integer.parseInt(MILLI)), outaddr);
+		//Add the outputs
+		for (int i=0; i<MILLI.size(); i++){
+			Address outaddr = new Address(params, to.get(i));
+			spendtx.addOutput(BigInteger.valueOf(Integer.parseInt(MILLI.get(i))), outaddr);
+		}
+		//Add the inputs
 		spendtx.addInput(input);
 		//Convert tx to byte array for sending.
 		final StringBuilder sb = new StringBuilder();

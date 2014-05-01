@@ -32,7 +32,7 @@ public class QRCode {
 	
 	static Image orig;
 
-  public static void main(String ip, String localip, String wallettype, String key) throws WriterException, IOException,
+  public QRCode (String ip, String localip, String wallettype, String key) throws WriterException, IOException,
       NotFoundException {
 	  // Build the string to display in the QR.
 	  String qrCodeData = "AESKey=" + key + "&PublicIP=" + ip + "&LocalIP=" + localip + "&WalletType=" + wallettype ;

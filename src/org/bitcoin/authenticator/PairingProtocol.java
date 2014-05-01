@@ -34,56 +34,56 @@ public class PairingProtocol {
      */
     public void run(byte[] seed, SecretKey AESKey) throws IOException, NoSuchAlgorithmException, InvalidKeyException  {
     	//Derive the key and chaincode from the seed.
-    			int num = 1;
-    	  		HDKeyDerivation HDKey = null;
-    	  		DeterministicKey masterkey = HDKey.createMasterPrivateKey(seed);
-    			DeterministicKey childkey = HDKey.deriveChildKey(masterkey,num);
-    	  		byte[] chaincode = childkey.getChainCode();
-    	  		byte[] mpubkey = childkey.getPubKeyBytes();
-    	  		ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
-    			outputStream.write(mpubkey);
-    			outputStream.write(chaincode);
-    			byte[] keychaincode = outputStream.toByteArray();
-    	  		//Calculate the HMAC
-    	  		Mac mac = Mac.getInstance("HmacSHA256");
-    			mac.init(AESKey);
-    			byte[] macbytes = mac.doFinal(keychaincode);
-    			//Concatenate with the Key and Chaincode
-    			outputStream.write(macbytes);
-    			byte payload[] = outputStream.toByteArray();
-    	  		//Encrypt the payload
-    	  	    Cipher cipher = null;
-    				try {
-    					cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-    				} catch (NoSuchAlgorithmException e) {
-    					e.printStackTrace();
-    				} catch (NoSuchPaddingException e) {
-    					e.printStackTrace();
-    				}
-    	            try {
-    					cipher.init(Cipher.ENCRYPT_MODE, AESKey);
-    				} catch (InvalidKeyException e) {
-    					e.printStackTrace();
-    				}
-    	        byte[] cipherBytes = null;
-    				try {
-    					cipherBytes = cipher.doFinal(payload);
-    				} catch (IllegalBlockSizeException e) {
-    					e.printStackTrace();
-    				} catch (BadPaddingException e) {
-    					e.printStackTrace();
-    				}
-    				//Send the payload over to the wallet
-    	            try {
-    					out.writeInt(cipherBytes.length);
-    				} catch (IOException e) {
-    					e.printStackTrace();
-    				}
-    	  	        try {
-    					out.write(cipherBytes);
-    				} catch (IOException e) {
-    					e.printStackTrace();
-    				}
+    	int num = 1;
+    	HDKeyDerivation HDKey = null;
+    	DeterministicKey masterkey = HDKey.createMasterPrivateKey(seed);
+    	DeterministicKey childkey = HDKey.deriveChildKey(masterkey,num);
+    	byte[] chaincode = childkey.getChainCode();
+    	byte[] mpubkey = childkey.getPubKeyBytes();
+   		ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
+   		outputStream.write(mpubkey);
+    	outputStream.write(chaincode);
+    	byte[] keychaincode = outputStream.toByteArray();
+    	//Calculate the HMAC
+    	Mac mac = Mac.getInstance("HmacSHA256");
+    	mac.init(AESKey);
+    	byte[] macbytes = mac.doFinal(keychaincode);
+    	//Concatenate with the Key and Chaincode
+    	outputStream.write(macbytes);
+    	byte payload[] = outputStream.toByteArray();
+    	//Encrypt the payload
+    	Cipher cipher = null;
+    		try {
+    			cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+    		} catch (NoSuchAlgorithmException e) {
+    			e.printStackTrace();
+    		} catch (NoSuchPaddingException e) {
+    			e.printStackTrace();
+    		}
+    	    try {
+    	    	cipher.init(Cipher.ENCRYPT_MODE, AESKey);
+    		} catch (InvalidKeyException e) {
+    			e.printStackTrace();
+    		}
+    	    byte[] cipherBytes = null;
+    		try {
+    			cipherBytes = cipher.doFinal(payload);
+    		} catch (IllegalBlockSizeException e) {
+    			e.printStackTrace();
+    		} catch (BadPaddingException e) {
+    			e.printStackTrace();
+    		}
+    		//Send the payload over to the wallet
+    	    try {
+    			out.writeInt(cipherBytes.length);
+    		} catch (IOException e) {
+    			e.printStackTrace();
+    		}
+    	  	try {
+    			out.write(cipherBytes);
+    		} catch (IOException e) {
+    			e.printStackTrace();
+    		}
 	  }
 	  
-	}
+}

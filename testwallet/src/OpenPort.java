@@ -12,7 +12,7 @@ public class OpenPort {
 	public static void main(String[] args) throws Exception {
 		final int port = 1234;
 		UpNp plugnplay = new UpNp();
-	    plugnplay.main(null);
+	    plugnplay.run(null);
 	    System.out.println("Listening for Alice on port "+port+"...");
 	    ServerSocket ss = new ServerSocket (port);
 	    socket = ss.accept();

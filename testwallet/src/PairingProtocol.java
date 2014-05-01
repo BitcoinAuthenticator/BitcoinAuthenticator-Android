@@ -15,14 +15,14 @@ public class PairingProtocol {
 	public static byte[] mPubKey;
 	public static SecretKey sharedsecret;
 	
-  public static void main (String args) throws Exception {
+  public static void run (String args) throws Exception {
 
 	  String walletType = args;
 	  final int port = 1234;
 
 	  // Open a port and wait for a connection
 	  UpNp plugnplay = new UpNp();
-	  plugnplay.main(null);
+	  plugnplay.run(null);
 	  ServerSocket ss = new ServerSocket (port);
 	  System.out.println("Listening for Alice on port "+port+"...");
 	  String ip = plugnplay.getExternalIP();
@@ -38,8 +38,7 @@ public class PairingProtocol {
       String key = bytesToHex(raw);
 	  
 	  //Display a QR code for the user to scan
-	  QRCode PairingQR = new QRCode();
-	  PairingQR.main(ip, localip, walletType, key);
+	  QRCode PairingQR = new QRCode(ip, localip, walletType, key);
 	  DisplayQR QR = new DisplayQR();
 	  QR.main(null);    
 	  Socket socket = ss.accept();
