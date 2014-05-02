@@ -189,7 +189,6 @@ public class Wallet_list extends Activity {
 			final int index = new BigInteger(childkeyindex).intValue();
 			final Transaction unsignedTx = new Transaction(params, transaction);
 			//Get the output address and the amount from the transaction so we can display it to the user.
-			System.out.println("1");
 			List<TransactionOutput> outputs = unsignedTx.getOutputs();
 			String display = "";
 			for (int i = 0; i<outputs.size(); i++){
@@ -197,7 +196,8 @@ public class Wallet_list extends Activity {
 				String strOutput = multisigOutput.toString();
 				String addr = strOutput.substring(strOutput.indexOf("to ")+3, strOutput.indexOf(" script"));
 				String amount = strOutput.substring(9, strOutput.indexOf(" to"));
-				display = display + addr + " <font color='#009933'>" + amount + " BTC</font><br>";
+				display = display + addr + " <font color='#009933'>" + amount + " BTC</font>";
+				if (i<outputs.size()-1){display = display + "<br>";}
 			}
 		//Create the dialog box
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(

@@ -105,7 +105,6 @@ public class Pair_wallet extends Activity {
 	 * This method executes the final step in pairing. It saves the following metadata to shared preferences: 
 	 * Wallet ID, Fingerprint of the AES key, Type (for wallet_list icon), External IP, Local IP
 	 * Saves the AES key to private internal storage.
-	 * Finally it calls the AsyncTask which sends the master public key to the wallet.
 	 */
 	private void completePairing() throws NoSuchAlgorithmException{
 		//Calculate the fingerprint of the AES key to serve as the wallet identifier.
@@ -170,7 +169,7 @@ public class Pair_wallet extends Activity {
 					IPAddress = QRInput.substring(QRInput.indexOf("&PublicIP=")+10, QRInput.indexOf("&LocalIP="));
 					LocalIP = QRInput.substring(QRInput.indexOf("&LocalIP=")+9, QRInput.indexOf("&WalletType="));
 					walletType = QRInput.substring(QRInput.indexOf("&WalletType=")+12, QRInput.length());
-				//Start the pairing protocol by first getting the device IP address.
+				//Display a spinner while the device is pairing.
 					mProgressDialog = new ProgressDialog(this, R.style.CustomDialogSpinner);
 					mProgressDialog.setIndeterminate(false);
 		            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
@@ -180,6 +179,7 @@ public class Pair_wallet extends Activity {
 				} catch (NoSuchAlgorithmException e) {
 					e.printStackTrace();
 				}
+				//Start the pairing protocol by first getting the device IP address.
 				new getIPtask().execute("");
 			} 
 			else if (resultCode == RESULT_CANCELED) {

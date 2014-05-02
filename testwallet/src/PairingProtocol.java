@@ -1,8 +1,13 @@
 import java.io.*;
 import java.net.*;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.crypto.*;
+
+import org.json.simple.JSONObject;
+import org.json.simple.JSONValue;
 
 /**
  * This is the wallet side of the Pairing Protocol. It uses UpNp to map a port on the router if there is one,
@@ -66,6 +71,9 @@ public class PairingProtocol {
 		  mPubKey = hexStringToByteArray(payload.substring(0,66));
 		  chaincode = hexStringToByteArray(payload.substring(66,payload.length()-64));
 		  System.out.println("Received Master Public Key: " + bytesToHex(mPubKey));
+		  //Save mPubKey and the Chaincode to file
+		  WalletFile file = new WalletFile();
+		  file.writePairingData(bytesToHex(mPubKey), bytesToHex(chaincode));
 	  }
 	  else {
 		  System.out.println("Message authentication code is invalid");
