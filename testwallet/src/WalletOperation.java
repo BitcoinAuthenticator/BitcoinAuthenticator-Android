@@ -2,9 +2,13 @@ import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -15,7 +19,9 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Formatter;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -206,8 +212,9 @@ public class WalletOperation {
 		System.out.println("txid: " + response.substring(response.indexOf("string(64) ")+12, response.indexOf("string(64) ")+76));
 	}
 	
-	/**Derive a child public key from the master public key*/
-	void childPubKey() throws NoSuchAlgorithmException{
+	/**Derive a child public key from the master public key
+	 * @throws JSONException */
+	void childPubKey() throws NoSuchAlgorithmException, JSONException{
 		Main.childkeyindex += 1;
 		HDKeyDerivation HDKey = null;
   		DeterministicKey mPubKey = HDKey.createMasterPubKeyFromBytes(PairingProtocol.mPubKey, PairingProtocol.chaincode);
@@ -217,11 +224,12 @@ public class WalletOperation {
   	}
 	
 	/**Generate a new P2SH address using the master public key from the Authenticator*/
-	void genMultiSigAddr(byte[] childkey) throws NoSuchAlgorithmException{
+	void genMultiSigAddr(byte[] childkey) throws NoSuchAlgorithmException, JSONException{
 		NetworkParameters params = MainNetParams.get();
 		childPubKey = new ECKey(null, childkey);
 		//Create a new key pair which will kept in the wallet.
 		walletKey = new ECKey();
+		byte[] privkey = walletKey.getPrivKeyBytes();
 		byte[] pkey = walletKey.getPubKey();
 		List<ECKey> keys = ImmutableList.of(childPubKey, walletKey);
 		//Create a 2-of-2 multisig output script.
@@ -233,6 +241,9 @@ public class WalletOperation {
 		System.out.println("Wallet Public Key: " + bytesToHex(pkey));
 		System.out.println(" ");
 		System.out.println("Address: " + multisigaddr.toString());
+		//Save keys to file
+		WalletFile file = new WalletFile();
+		file.writeToFile(bytesToHex(privkey),multisigaddr.toString());
 	}
 	
 	/**Gets the unspent outputs JSON for an address from blockchain.info*/
