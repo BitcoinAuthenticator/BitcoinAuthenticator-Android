@@ -28,6 +28,11 @@
       	</exclusion>
       </exclusions>
     </dependency>
+    <dependency>
+        <groupId>com.google.zxing</groupId>
+        <artifactId>android-integration</artifactId>
+        <version>2.3.0</version>
+    </dependency>
   </dependencies>
 
   <build>

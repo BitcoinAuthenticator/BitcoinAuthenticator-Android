@@ -12,6 +12,8 @@ import java.security.NoSuchAlgorithmException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import com.google.zxing.integration.android.IntentIntegrator;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -20,6 +22,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -87,18 +90,32 @@ public class Pair_wallet extends Activity {
 				//If a name has been entered then open the QR code scanner.
 				else {
 					try {
-						Intent intent = new Intent(
+						/*Intent intent = new Intent(
 								"com.google.zxing.client.android.SCAN");
 						intent.putExtra("SCAN_MODE", "QR_CODE_MODE,PRODUCT_MODE");
-						startActivityForResult(intent, 0);
+						startActivityForResult(intent, 0);*/
+						launchScanActivity();
 						walletID = txtID.getText().toString();  
 					} catch (Exception e) {
 						e.printStackTrace();
 						Toast.makeText(getApplicationContext(), "ERROR:" + e, 1).show();
 					}
+					catch (Error e)
+					{
+						/* Download zxing */
+						Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
+						Intent marketIntent = new Intent(Intent.ACTION_VIEW,marketUri);
+						startActivity(marketIntent);
+					}
 				}
 			}
 		});
+	}
+	
+	public void launchScanActivity()
+	{
+		IntentIntegrator z = new IntentIntegrator(this);
+		z.initiateScan();
 	}
 	
 	/**
