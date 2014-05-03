@@ -29,7 +29,6 @@ public class Main extends Activity {
 		 * 3) in BitoinAuthenticator, right click properties -> android -> library (add)
 		 * 4) you are done !
 		 * */
-		
 		{ /*  */
 			GCMRegister regClass = new GCMRegister(this);
 			try {
