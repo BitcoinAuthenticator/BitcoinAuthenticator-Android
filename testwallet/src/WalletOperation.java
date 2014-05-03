@@ -254,19 +254,31 @@ public class WalletOperation {
 	}
 	
 	/**
-	 * Gets the unspent outputs JSON for an address from blockchain.info
+	 * Gets the unspent outputs JSON for an address from blockr.io
 	 * Note, at the moment this only gets the data for the first transaction the address receives. 
 	 * It needs to be adjusted to handle multiple transactions from a single address.
 	 */
 	UnspentOutput getUnspentOutputs(String addr) throws JSONException, IOException{
-	    JSONObject json = readJsonFromUrl("http://blockchain.info/address/" + addr + "?format=json");
-	    JSONArray array = json.getJSONArray("txs");
-	    JSONObject output = array.getJSONObject(0);
-	    JSONObject json2 = readJsonFromUrl("http://blockchain.info/unspent?address=" + addr);
-	    JSONArray array2 = json2.getJSONArray("unspent_outputs");
-	  	JSONObject output2 = array2.getJSONObject(0);
-	    UnspentOutput out = new UnspentOutput(output.get("hash").toString(), output2.get("tx_output_n").toString());
-		return out;
+		JSONObject json;
+		UnspentOutput out = null;
+		//First see if the unspent output is unconfirmed, if so, get it
+		json = readJsonFromUrl("http://btc.blockr.io/api/v1/address/unconfirmed/" + addr);
+		JSONObject data1 = json.getJSONObject("data");
+		JSONArray unconfirmed = data1.getJSONArray("unconfirmed");
+		if (unconfirmed.length()!=0){
+			JSONObject tx = unconfirmed.getJSONObject(0);
+			out = new UnspentOutput(tx.get("tx").toString(), tx.get("n").toString());
+			return out;
+		}
+		//Otherwise get it from the list of confirmed unspent outputs
+		else {
+			json = readJsonFromUrl("http://btc.blockr.io/api/v1/address/unspent/" + addr);
+			JSONObject data = json.getJSONObject("data");
+			JSONArray unspent = data.getJSONArray("unspent");
+			JSONObject txinfo = unspent.getJSONObject(0);
+			out = new UnspentOutput(txinfo.get("tx").toString(), txinfo.get("n").toString());
+			return out;
+			}
 	}
 	
 	/**Builds a raw unsigned transaction*/
@@ -313,26 +325,52 @@ public class WalletOperation {
 		}
 	}
 	
-	/**Returns the balance of the addresses in the wallet*/
-	public int getBalance(ArrayList<String> addresses){
-		int balance = 0;
+	/**Returns the balance of the addresses in the wallet using blockr api*/
+	public long getBalance(ArrayList<String> addresses) throws JSONException, IOException{
+		//Get confirmed Balance
+		long balance = 0;
+		String addr = "";
 		for (int i=0; i<addresses.size(); i++){
-			String addr = addresses.get(i);
-			JSONObject json = null;
-			try {
-				json = readJsonFromUrl("http://blockchain.info/address/" + addr + "?format=json");
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-			try {
-				balance = balance + (int) json.get("final_balance");
-			} catch (JSONException e) {
-				e.printStackTrace();
+			addr = addr + addresses.get(i) + ",";
+		}
+		JSONObject json = readJsonFromUrl("http://btc.blockr.io/api/v1/address/balance/" + addr);
+		JSONArray data = json.getJSONArray("data");
+		double addrbalance=0;
+		for (int i=0; i<data.length(); i++){
+			JSONObject info = data.getJSONObject(i);
+			addrbalance = (double) info.getDouble("balance");
+			balance = (long) (balance + (addrbalance)*100000000);
+		}
+		//Get unconfirmed balance
+		long unconfirmedbalance = 0;
+		json = readJsonFromUrl("http://btc.blockr.io/api/v1/address/unconfirmed/" + addr);
+		if (addresses.size()==1){
+			JSONObject data1 = json.getJSONObject("data");
+			JSONArray unconfirmed = data1.getJSONArray("unconfirmed");
+			if (unconfirmed!=null){
+				for (int x=0; x<unconfirmed.length(); x++){
+					JSONObject tx = unconfirmed.getJSONObject(x);
+					addrbalance = (double) tx.getDouble("amount");
+					unconfirmedbalance = (long) (unconfirmedbalance + (addrbalance)*100000000);
+				}
 			}
 		}
-		return balance;
+		else {
+			data = json.getJSONArray("data");
+			addrbalance=0;
+			for (int i=0; i<data.length(); i++){
+				JSONObject info = data.getJSONObject(i);
+				JSONArray unconfirmed = info.getJSONArray("unconfirmed");
+				if (unconfirmed!=null){
+					for (int x=0; x<unconfirmed.length(); x++){
+						JSONObject tx = unconfirmed.getJSONObject(x);
+						addrbalance = (double) tx.getDouble("amount");
+						unconfirmedbalance = (long) (unconfirmedbalance + (addrbalance)*100000000);
+					}
+				}
+			}	
+		}
+		return balance + unconfirmedbalance;
 	}
     
 	/**For reading the JSON*/

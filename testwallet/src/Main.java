@@ -25,7 +25,7 @@ public class Main {
 			for (int i=0; i<addrs2.size(); i++){
 				addrs2.get(i);
 			}
-			int balance = wallet.getBalance(addrs2);
+			long balance = wallet.getBalance(addrs2);
 			System.out.println("Wallet loaded successfully. Balance = " + balance + " satoshi");
 		}
 		else {
@@ -105,7 +105,7 @@ public class Main {
 				  for (int i=0; i<addrs2.size(); i++){
 					  addrs2.get(i);
 				  }
-				  int balance = op.getBalance(addrs2);
+				  long balance = op.getBalance(addrs2);
 				  System.out.println(balance + " Satoshi");
 				  break;
 			  case 7:
