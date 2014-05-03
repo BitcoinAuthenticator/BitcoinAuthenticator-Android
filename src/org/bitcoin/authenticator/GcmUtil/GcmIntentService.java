@@ -3,6 +3,7 @@ package org.bitcoin.authenticator.GcmUtil;
 import java.util.Date;
 
 import org.bitcoin.authenticator.Main;
+import org.bitcoin.authenticator.R;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
@@ -92,6 +93,7 @@ public class GcmIntentService extends IntentService {
 
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
+        .setSmallIcon(R.drawable.authenticator_logo)
         .setContentTitle("TEST")
         .setStyle(new NotificationCompat.BigTextStyle()
         .bigText(msg))

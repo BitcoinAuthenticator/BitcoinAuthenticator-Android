@@ -17,7 +17,7 @@ public class GCMSender {
 		    Sender sender = new Sender(GCM_API_KEY);
 		    ArrayList<String> devicesList = new ArrayList<String>();
 		    devicesList.add("APA91bGr1kYu7L6oKUfyCEhg0ofuGoFYdRbqj1QHBFAMVI_eFkYSp2NU3u01MfQ92jhBUVY4qhCYKO-xERCq3t52yKih671fEkNPHS_YIVfrvuj9PcD8_ETAoKdhHAnWpNZkofbFjOzdD0uMamTOQ0_xIoRymcm8DjeZ5zi6sfXryJ-bykS4nd0");
-		    String data = "<data>";
+		    String data = "{Data:Hello World}";
 			Message message = new Message.Builder()
 			                .collapseKey("1")
 			                .timeToLive(3)
