@@ -18,14 +18,17 @@ public class Main {
 		//Gets the balance of the wallet if a wallet file exists
 		String filePath = new java.io.File( "." ).getCanonicalPath() + "/wallet.json";
 		File f = new File(filePath);
+		long balance = 0;
 		if(f.exists() && !f.isDirectory()) {
 			WalletOperation wallet = new WalletOperation();
 			WalletFile file2 = new WalletFile();
+			if (file2.getKeyNum()!=0){
 			ArrayList<String> addrs2 = file2.getAddresses();
 			for (int i=0; i<addrs2.size(); i++){
 				addrs2.get(i);
 			}
-			long balance = wallet.getBalance(addrs2);
+			balance = wallet.getBalance(addrs2);
+			}
 			System.out.println("Wallet loaded successfully. Balance = " + balance + " satoshi");
 		}
 		else {

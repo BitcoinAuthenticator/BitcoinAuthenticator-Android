@@ -327,40 +327,28 @@ public class WalletOperation {
 	
 	/**Returns the balance of the addresses in the wallet using blockr api*/
 	public long getBalance(ArrayList<String> addresses) throws JSONException, IOException{
-		//Get confirmed Balance
-		long balance = 0;
-		String addr = "";
-		for (int i=0; i<addresses.size(); i++){
-			addr = addr + addresses.get(i) + ",";
-		}
-		JSONObject json = readJsonFromUrl("http://btc.blockr.io/api/v1/address/balance/" + addr);
-		JSONArray data = json.getJSONArray("data");
-		double addrbalance=0;
-		for (int i=0; i<data.length(); i++){
-			JSONObject info = data.getJSONObject(i);
-			addrbalance = (double) info.getDouble("balance");
-			balance = (long) (balance + (addrbalance)*100000000);
-		}
-		//Get unconfirmed balance
-		long unconfirmedbalance = 0;
-		json = readJsonFromUrl("http://btc.blockr.io/api/v1/address/unconfirmed/" + addr);
-		if (addresses.size()==1){
-			JSONObject data1 = json.getJSONObject("data");
-			JSONArray unconfirmed = data1.getJSONArray("unconfirmed");
-			if (unconfirmed!=null){
-				for (int x=0; x<unconfirmed.length(); x++){
-					JSONObject tx = unconfirmed.getJSONObject(x);
-					addrbalance = (double) tx.getDouble("amount");
-					unconfirmedbalance = (long) (unconfirmedbalance + (addrbalance)*100000000);
-				}
+		WalletFile file = new WalletFile();
+		if (file.getKeyNum()!=0){
+			//Get confirmed Balance
+			long balance = 0;
+			String addr = "";
+			for (int i=0; i<addresses.size(); i++){
+				addr = addr + addresses.get(i) + ",";
 			}
-		}
-		else {
-			data = json.getJSONArray("data");
-			addrbalance=0;
+			JSONObject json = readJsonFromUrl("http://btc.blockr.io/api/v1/address/balance/" + addr);
+			JSONArray data = json.getJSONArray("data");
+			double addrbalance=0;
 			for (int i=0; i<data.length(); i++){
 				JSONObject info = data.getJSONObject(i);
-				JSONArray unconfirmed = info.getJSONArray("unconfirmed");
+				addrbalance = (double) info.getDouble("balance");
+				balance = (long) (balance + (addrbalance)*100000000);
+			}
+			//Get unconfirmed balance
+			long unconfirmedbalance = 0;
+			json = readJsonFromUrl("http://btc.blockr.io/api/v1/address/unconfirmed/" + addr);
+			if (addresses.size()==1){
+				JSONObject data1 = json.getJSONObject("data");
+				JSONArray unconfirmed = data1.getJSONArray("unconfirmed");
 				if (unconfirmed!=null){
 					for (int x=0; x<unconfirmed.length(); x++){
 						JSONObject tx = unconfirmed.getJSONObject(x);
@@ -368,9 +356,27 @@ public class WalletOperation {
 						unconfirmedbalance = (long) (unconfirmedbalance + (addrbalance)*100000000);
 					}
 				}
-			}	
+			}
+			else {
+				data = json.getJSONArray("data");
+				addrbalance=0;
+				for (int i=0; i<data.length(); i++){
+					JSONObject info = data.getJSONObject(i);
+					JSONArray unconfirmed = info.getJSONArray("unconfirmed");
+					if (unconfirmed!=null){
+						for (int x=0; x<unconfirmed.length(); x++){
+							JSONObject tx = unconfirmed.getJSONObject(x);
+							addrbalance = (double) tx.getDouble("amount");
+							unconfirmedbalance = (long) (unconfirmedbalance + (addrbalance)*100000000);
+						}
+					}
+				}	
+			}
+			return balance + unconfirmedbalance;
+			}
+		else {
+			return 0;
 		}
-		return balance + unconfirmedbalance;
 	}
     
 	/**For reading the JSON*/

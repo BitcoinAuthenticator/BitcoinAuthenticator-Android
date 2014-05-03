@@ -56,7 +56,6 @@ public class PairingProtocol {
 	  int keysize = in.readInt();
 	  byte[] cipherKeyBytes = new byte[keysize];
 	  in.read(cipherKeyBytes);
-	  System.out.println("Fingerprint verified.");
 	  Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
 	  cipher.init(Cipher.DECRYPT_MODE, sharedsecret);
 	  String payload = bytesToHex(cipher.doFinal(cipherKeyBytes));

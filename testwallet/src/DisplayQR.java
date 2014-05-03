@@ -28,10 +28,9 @@ public class DisplayQR extends JFrame {
 			}
 		});
 	}
-		
+
 	/**Loads the QR code image from file and creates the frame.*/
-	public DisplayQR() 
-	{
+	public DisplayQR() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 310, 310);
 		contentPane = new JPanel();
@@ -53,10 +52,9 @@ public class DisplayQR extends JFrame {
 		}
 	}
 	
-	
 	/**Closes the window displaying the QR code*/
 	public void CloseWindow(){
-		this.setVisible(false);
+		frame.setVisible(false);
 	}
 
 }
