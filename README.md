@@ -1,9 +1,6 @@
 BitcoinAuthenticator
 ====================
 
-<<<<<<< HEAD
-under development
-=======
 We use Apache Maven as the build system. If you don't have it already, you can [download it](http://maven.apache.org) and follow the installation instructions. 
 
 Get yourself a copy of Bitcoinj 0.12 which can be found in the master branch.
@@ -43,8 +40,3 @@ This app is maybe 50% of the way to an alpha release at the moment. Here is a TO
 Finally, Bitcoinj has a fully functioning demo wallet in the wallettemplate directory. I would like to eventually migrate the test wallet over to that and use it for what would essentially be a reference implementation for plugin support. 
 
 If you have any questions feel free to contact me: ctpacia@gmail.com
->>>>>>> d1e688f... updated readme
-
-contact me with questions
-
-ctpacia@gmail.com
