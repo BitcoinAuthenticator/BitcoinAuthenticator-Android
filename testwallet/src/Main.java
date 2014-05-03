@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
+import GCM.GCMSender;
+
 /**
  * This the main class for the test wallet. You can execute commands from the command line. 
  * At the moment you can't do multi-in/multi-out transactions.
@@ -57,9 +59,14 @@ public class Main {
 			  cmd.add("send");  
 			  cmd.add("newaddress");   
 			  cmd.add("mktx");  
+<<<<<<< HEAD
 			  cmd.add("openport");  
 			  cmd.add("listaddresses");
 			  cmd.add("getbalance");
+=======
+			  cmd.add("openport");   
+			  cmd.add("sendtest");
+>>>>>>> added gcm send test
 			  cmd.add("help");  
 			  //Switch for executing the commands
 			  WalletOperation op = new WalletOperation();
@@ -96,6 +103,7 @@ public class Main {
 				  OpenPort.main(null);
 				  break;
 			  case 5:
+<<<<<<< HEAD
 				  WalletFile file = new WalletFile();
 				  ArrayList<String> addrs = file.getAddresses();
 				  for (int i=0; i<addrs.size(); i++){
@@ -123,6 +131,13 @@ public class Main {
 				  System.out.println("  getbalance()               Returns the balance of the wallet in satoshi.");
 				  System.out.println("  mktx()                     Builds a new unsigned raw transaction. Inputs are add in cronological order until inputs >= outputs. A fee of .1 mbtc is applied.");
 				  System.out.println("  send()                     Sends the raw transaction over to the authenticator for signing.");
+=======
+				  GCMSender sender = new GCMSender();
+				  sender.sender();
+				  break;
+			  case 6:
+				  System.out.println("Help menu to be implemented later");
+>>>>>>> added gcm send test
 				  break;
 			  }
 		   }

@@ -4,6 +4,16 @@
   <artifactId>testwallet</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   
+<<<<<<< HEAD
+=======
+  <repositories>
+      <repository>
+          <id>gcm-server-repository</id>
+          <url>https://raw.github.com/slorber/gcm-server-repository/master/releases/</url>
+      </repository>
+  </repositories>
+  
+>>>>>>> added gcm send test
   <dependencies>
       <dependency>
       <groupId>com.google</groupId>
@@ -17,6 +27,7 @@
       	</exclusion>
       </exclusions>
     </dependency>
+<<<<<<< HEAD
     
   <dependency>
     <groupId>org.json</groupId>
@@ -64,6 +75,39 @@
 
 >>>>>>> fixed zxing and json-simple integration
   </dependencies>
+=======
+    <dependency>
+    <groupId>org.bitlet</groupId>
+    <artifactId>weupnp</artifactId>
+    <version>0.1.2</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.zxing</groupId>
+      <artifactId>core</artifactId>
+      <version>2.2</version>
+    </dependency>
+    <dependency>
+      <groupId>com.google.zxing</groupId>
+      <artifactId>javase</artifactId>
+      <version>2.2</version>
+    </dependency>
+    <dependency>
+        <groupId>org.json</groupId>
+        <artifactId>json</artifactId>
+        <version>20080701</version>
+    </dependency>
+    <dependency>
+        <groupId>com.googlecode.json-simple</groupId>
+        <artifactId>json-simple</artifactId>
+        <version>1.1</version>
+    </dependency>
+    <dependency>
+        <groupId>com.google.android.gcm</groupId>
+        <artifactId>gcm-server</artifactId>
+        <version>1.0.2</version>
+    </dependency>
+</dependencies>
+>>>>>>> added gcm send test
   
   <build>
     <sourceDirectory>src</sourceDirectory>
