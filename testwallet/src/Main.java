@@ -1,3 +1,4 @@
+import java.io.File;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -8,14 +9,28 @@ import java.util.Scanner;
  * At the moment you can't do multi-in/multi-out transactions.
  */
 public class Main {
-	public static int childkeyindex;
 
 	/**Launches the application*/
 	public static void main(String[] args) throws Exception {
-		childkeyindex = 0;
 		Date dNow = new Date(0);
 		SimpleDateFormat ft =  new SimpleDateFormat ("E yyyy.MM.dd 'at' hh:mm:ss a zzz");
 		System.out.println("Testwallet v. 0.01 (" + ft.format(dNow) + ")");
+		//Gets the balance of the wallet if a wallet file exists
+		String filePath = new java.io.File( "." ).getCanonicalPath() + "/wallet.json";
+		File f = new File(filePath);
+		if(f.exists() && !f.isDirectory()) {
+			WalletOperation wallet = new WalletOperation();
+			WalletFile file2 = new WalletFile();
+			ArrayList<String> addrs2 = file2.getAddresses();
+			for (int i=0; i<addrs2.size(); i++){
+				addrs2.get(i);
+			}
+			int balance = wallet.getBalance(addrs2);
+			System.out.println("Wallet loaded successfully. Balance = " + balance + " satoshi");
+		}
+		else {
+			System.out.println("No wallet file exists. Pair a new wallet.");
+		}
 		System.out.println("Type 'help()' for a list of commands");
 		inputCommand();
 	}
@@ -37,7 +52,9 @@ public class Main {
 			  cmd.add("send");  
 			  cmd.add("newaddress");   
 			  cmd.add("mktx");  
-			  cmd.add("openport");    
+			  cmd.add("openport");  
+			  cmd.add("listaddresses");
+			  cmd.add("getbalance");
 			  cmd.add("help");  
 			  //Switch for executing the commands
 			  WalletOperation op = new WalletOperation();
@@ -61,17 +78,14 @@ public class Main {
 				  String output = "";
 				  int count = 0;
 				  boolean stop = false;
-				  System.out.println("Enter outputs. Type 'done' to finish");
 				  while (!stop) {
 					  System.out.print("Output: ");
-					  output = in.nextLine();
-					  if (output.equals("done")){stop = true;}
-					  if (!stop){
-						  to.add(output);
-						  System.out.print("Amount: ");
-						  amount.add(in.nextLine());
-					  }
-					  count ++;
+					  to.add(in.nextLine());
+					  System.out.print("Amount: ");
+					  amount.add(in.nextLine());
+					  System.out.print("Add another output? (y/n): ");
+					  String response = in.nextLine().toLowerCase();
+					  if (response.equals("n")){stop = true;}
 				  }
 				  op.mktx(amount, from, to);  
 				  break;
@@ -79,6 +93,22 @@ public class Main {
 				  OpenPort.main(null);
 				  break;
 			  case 5:
+				  WalletFile file = new WalletFile();
+				  ArrayList<String> addrs = file.getAddresses();
+				  for (int i=0; i<addrs.size(); i++){
+					  System.out.println(addrs.get(i));
+				  }
+				  break;
+			  case 6:
+				  WalletFile file2 = new WalletFile();
+				  ArrayList<String> addrs2 = file2.getAddresses();
+				  for (int i=0; i<addrs2.size(); i++){
+					  addrs2.get(i);
+				  }
+				  int balance = op.getBalance(addrs2);
+				  System.out.println(balance + " Satoshi");
+				  break;
+			  case 7:
 				  System.out.println("Help menu to be implemented later");
 				  break;
 			  }
