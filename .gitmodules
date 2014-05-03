@@ -1,0 +1,3 @@
+[submodule "libs/google_play_services_froyo"]
+	path = libs/google_play_services_froyo
+	url = https://github.com/negedzuregal/google_play_services_froyo.git
