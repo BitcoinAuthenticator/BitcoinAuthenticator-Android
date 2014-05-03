@@ -1,3 +1,6 @@
+BitcoinAuthenticator
+====================
+
 This project is under developement. If you would like to contribute here's how you can get started:
 
 We use Apache Maven as the build system. If you don't have it already, you can [download it](http://maven.apache.org) and follow the installation instructions. 
