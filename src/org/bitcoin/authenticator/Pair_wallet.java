@@ -178,7 +178,8 @@ public class Pair_wallet extends Activity {
 	 */
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		String QRInput;
-		if (requestCode == 0) {
+		//TODO
+		//if (requestCode == ZXING_QR_SCANNER_REQUEST) {
 			if (resultCode == RESULT_OK) {
 				QRInput = intent.getStringExtra("SCAN_RESULT");
 				//Checking to see what type of data was included in the QR code.
@@ -202,7 +203,7 @@ public class Pair_wallet extends Activity {
 			else if (resultCode == RESULT_CANCELED) {
 				QRInput = "Scan cancelled.";
 			}
-		}
+		//}
 	}
 
 	/**
