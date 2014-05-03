@@ -73,7 +73,7 @@ public class PairingProtocol {
 		  System.out.println("Received Master Public Key: " + bytesToHex(mPubKey));
 		  //Save mPubKey and the Chaincode to file
 		  WalletFile file = new WalletFile();
-		  file.writePairingData(bytesToHex(mPubKey), bytesToHex(chaincode));
+		  file.writePairingData(bytesToHex(mPubKey), bytesToHex(chaincode), key);
 	  }
 	  else {
 		  System.out.println("Message authentication code is invalid");
