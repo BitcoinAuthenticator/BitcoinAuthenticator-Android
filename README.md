@@ -25,7 +25,9 @@ The test wallet included in this repo (also using Maven) has a few more dependen
 
 
 [Bitcoinj](https://code.google.com/p/bitcoinj/) again.
+
 [ZXing ("Zebra Crossing")](https://code.google.com/p/zxing/) for the QR code.
+
 [weupnp](https://code.google.com/p/weupnp/) for universal plug and play.
 
 
@@ -42,5 +44,3 @@ This app is maybe 50% of the way to an alpha release at the moment. Here is a TO
 Finally, Bitcoinj has a fully functioning demo wallet in the wallettemplate directory. I would like to eventually migrate the test wallet over to that and use it for what would essentially be a reference implementation for plugin support. 
 
 If you have any questions feel free to contact me: ctpacia@gmail.com
-
-
