@@ -18,6 +18,7 @@ public class PairingProtocol {
 	public static DataOutputStream out;
 	public static byte[] chaincode;
 	public static byte[] mPubKey;
+	public static byte[] gcmRegId;
 	public static SecretKey sharedsecret;
 	
   public static void run (String args) throws Exception {
@@ -68,8 +69,11 @@ public class PairingProtocol {
 	  byte[] macbytes = mac.doFinal(testpayload);
 	  if (Arrays.equals(macbytes, hash)){
 		  mPubKey = hexStringToByteArray(payload.substring(0,66));
-		  chaincode = hexStringToByteArray(payload.substring(66,payload.length()-64));
-		  System.out.println("Received Master Public Key: " + bytesToHex(mPubKey));
+		  chaincode = hexStringToByteArray(payload.substring(66,130));
+		  gcmRegId = hexStringToByteArray(payload.substring(130,payload.length()-64));
+		  System.out.println("Received Master Public Key: " + bytesToHex(mPubKey) + "\n" +
+				  			 "chaincode: " +  bytesToHex(chaincode) + "\n" +
+				  			 "gcmRegId: " +  new String(gcmRegId));
 		  //Save mPubKey and the Chaincode to file
 		  WalletFile file = new WalletFile();
 		  file.writePairingData(bytesToHex(mPubKey), bytesToHex(chaincode), key);
