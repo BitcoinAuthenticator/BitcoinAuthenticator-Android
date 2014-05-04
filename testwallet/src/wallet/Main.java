@@ -1,10 +1,18 @@
+<<<<<<< HEAD:testwallet/src/Main.java
 import java.io.File;
 import java.nio.ByteBuffer;
+=======
+package wallet;
+
+>>>>>>> reordering and dipacher:testwallet/src/wallet/Main.java
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
+
+import dispacher.MessageBuilder;
+import dispacher.MessageType;
 
 import GCM.GCMSender;
 
@@ -65,24 +73,32 @@ public class Main {
 			  cmd.add("getbalance");
 =======
 			  cmd.add("openport");   
+<<<<<<< HEAD:testwallet/src/Main.java
 			  cmd.add("sendtest");
 >>>>>>> added gcm send test
+=======
+			  cmd.add("testgcm");
+>>>>>>> reordering and dipacher:testwallet/src/wallet/Main.java
 			  cmd.add("help");  
 			  //Switch for executing the commands
 			  WalletOperation op = new WalletOperation();
 			  switch (cmd.indexOf(command)){
+			  // pairwallet
 			  case 0:
 				  String walletType = s.substring(s.indexOf("(")+1, s.indexOf(")"));
 				  PairingProtocol pair = new PairingProtocol();
 				  pair.run(walletType);
 				  break;
+			  // send
 			  case 1:
 				  op.sendTX();
 				  break;
+			  // newaddress
 			  case 2:
 				  String addr = op.genAddress();
 				  System.out.println(addr);
 				  break;
+			  // mktx
 			  case 3:
 				  ArrayList<String> to = new ArrayList<String>();
 				  ArrayList<String> amount = new ArrayList<String>();
@@ -99,9 +115,11 @@ public class Main {
 				  }
 				  op.mktx(amount, to);  
 				  break;
+			  // openport
 			  case 4:
 				  OpenPort.main(null);
 				  break;
+			  // testgcm
 			  case 5:
 <<<<<<< HEAD
 				  WalletFile file = new WalletFile();
@@ -133,8 +151,12 @@ public class Main {
 				  System.out.println("  send()                     Sends the raw transaction over to the authenticator for signing.");
 =======
 				  GCMSender sender = new GCMSender();
-				  sender.sender();
+				  ArrayList<String> devicesList = new ArrayList<String>();
+				  devicesList.add("APA91bGr1kYu7L6oKUfyCEhg0ofuGoFYdRbqj1QHBFAMVI_eFkYSp2NU3u01MfQ92jhBUVY4qhCYKO-xERCq3t52yKih671fEkNPHS_YIVfrvuj9PcD8_ETAoKdhHAnWpNZkofbFjOzdD0uMamTOQ0_xIoRymcm8DjeZ5zi6sfXryJ-bykS4nd0");
+				  MessageBuilder msg = new MessageBuilder(MessageType.test);
+				  sender.sender(devicesList,msg);
 				  break;
+			  // help
 			  case 6:
 				  System.out.println("Help menu to be implemented later");
 >>>>>>> added gcm send test

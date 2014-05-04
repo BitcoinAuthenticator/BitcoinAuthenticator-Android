@@ -1,4 +1,4 @@
-
+package wallet;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -104,10 +104,10 @@ public class UpNp {
 	}
 	
 	/**These two methods return the external and local IP address*/
-	String getExternalIP(){
+	public String getExternalIP(){
 		return externalIPAddress;
 	}
-	String getLocalIP(){
+	public String getLocalIP(){
 		return localIPAddress;
 	}
 

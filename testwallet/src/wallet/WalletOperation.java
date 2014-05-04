@@ -1,3 +1,5 @@
+package wallet;
+
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -46,6 +48,10 @@ import com.google.bitcoin.params.MainNetParams;
 import com.google.bitcoin.script.Script;
 import com.google.bitcoin.script.ScriptBuilder;
 import com.google.common.collect.ImmutableList;
+
+import dispacher.Device;
+import dispacher.Dispacher;
+import dispacher.MessageType;
 
 
 /**
@@ -118,26 +124,40 @@ public class WalletOperation {
 		} catch (BadPaddingException e) {
 			e.printStackTrace();
 		}
-		//Send the encrypted payload over to the Authenticator and wait for the response.
+		
+		// Init dispacher
 		byte[] cipherKeyBytes;
+		Dispacher disp;
 		if (PairingProtocol.out == null){
 			DataOutputStream out = new DataOutputStream(OpenPort.socket.getOutputStream());
 			DataInputStream in = new DataInputStream(OpenPort.socket.getInputStream());
-			out.writeInt(cipherBytes.length);
+			disp = new Dispacher(out,in);
+			/*out.writeInt(cipherBytes.length);
 			out.write(cipherBytes);
 			System.out.println("Sent transaction");
 			int keysize = in.readInt();
 		    cipherKeyBytes = new byte[keysize];
-		    in.read(cipherKeyBytes);
+		    in.read(cipherKeyBytes);*/
 		}
 		else {
-			PairingProtocol.out.writeInt(cipherBytes.length);
+			disp = new Dispacher(PairingProtocol.out,PairingProtocol.in);
+			/*PairingProtocol.out.writeInt(cipherBytes.length);
 			PairingProtocol.out.write(cipherBytes);
 			System.out.println("Sent transaction");
 			int keysize = PairingProtocol.in.readInt();
 		    cipherKeyBytes = new byte[keysize];
-		    PairingProtocol.in.read(cipherKeyBytes);
+		    PairingProtocol.in.read(cipherKeyBytes);*/
 		}
+		
+		//Send the encrypted payload over to the Authenticator and wait for the response.
+		//disp.write(cipherBytes.length, cipherBytes);
+		Device d = new Device(PairingProtocol.chaincode,PairingProtocol.mPubKey,PairingProtocol.gcmRegId,PairingProtocol.sharedsecret);
+		disp.dispachMessage(MessageType.signTx, cipherBytes, d);
+		System.out.println("Sent transaction");
+		int keysize = disp.readInt();
+		cipherKeyBytes = new byte[keysize];
+		disp.read(cipherKeyBytes);
+		
 		//Decrypt the response
 	    cipher.init(Cipher.DECRYPT_MODE, secretkey);
 	    String message = bytesToHex(cipher.doFinal(cipherKeyBytes));

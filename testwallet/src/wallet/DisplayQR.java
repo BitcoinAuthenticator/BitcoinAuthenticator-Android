@@ -1,3 +1,4 @@
+package wallet;
 
 import java.awt.EventQueue;
 import java.io.IOException;
