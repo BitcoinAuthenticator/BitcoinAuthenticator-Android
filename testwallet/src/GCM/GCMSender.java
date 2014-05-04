@@ -24,7 +24,7 @@ public class GCMSender {
 			                .collapseKey("1")
 			                .timeToLive(3)
 			                .delayWhileIdle(true)
-			                .addData("message",data)
+			                .addData("data",data)
 			                .build();
 		    MulticastResult result;
 			try {

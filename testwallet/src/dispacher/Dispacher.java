@@ -20,6 +20,7 @@ public class Dispacher {
 	DataOutputStream outStream;
 	DataInputStream inStream;
 	
+	public Dispacher(){}
 	public Dispacher(DataOutputStream out,DataInputStream in)
 	{
 		outStream = out;
@@ -35,21 +36,34 @@ public class Dispacher {
 				final int port = 1234;
 				
 				UpNp plugnplay = new UpNp();
-				MessageBuilder msgGCM = new MessageBuilder(MessageType.signTx,new String[]{plugnplay.getExternalIP(),
-																						   plugnplay.getLocalIP().substring(1)});
-				ArrayList<String> devicesList = new ArrayList<String>();
-				devicesList.add(new String(device.gcmRegId));
-				GCMSender sender = new GCMSender();
-				sender.sender(devicesList,msgGCM);
 				
-				//wait for user response
-				ServerSocket ss = new ServerSocket (port);
-				Socket socket = ss.accept();
-				
-				//send tx for signing 
-				inStream = new DataInputStream(socket.getInputStream());
-				outStream = new DataOutputStream(socket.getOutputStream());
-				write(payload.length,payload);
+				try {
+					if (!plugnplay.isPortMapped(port)) // TODO - move port to singelton
+						plugnplay.run(null);
+					assert(plugnplay.isPortMapped(port));
+					MessageBuilder msgGCM = new MessageBuilder(MessageType.signTx,new String[]{plugnplay.getExternalIP(),
+							   plugnplay.getLocalIP().substring(1)});
+					ArrayList<String> devicesList = new ArrayList<String>();
+					devicesList.add(new String(device.gcmRegId));
+					GCMSender sender = new GCMSender();
+					sender.sender(devicesList,msgGCM);
+					
+					//wait for user response
+					ServerSocket ss = new ServerSocket (port);
+					Socket socket = ss.accept();
+					//send tx for signing 
+					inStream = new DataInputStream(socket.getInputStream());
+					outStream = new DataOutputStream(socket.getOutputStream());
+					write(payload.length,payload);
+					
+					// dispose
+					outStream.close();
+					inStream.close();
+					
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 			else
 				;//TODO

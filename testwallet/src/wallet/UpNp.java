@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.bitlet.weupnp.GatewayDevice;
@@ -101,6 +102,16 @@ public class UpNp {
         } else {
 			addLogLine("Port mapping removal FAILED");
         }
+	}
+	
+	public boolean isPortMapped(int port) throws IOException, SAXException
+	{
+		if (activeGW != null)
+		{
+			PortMappingEntry portMapping = new PortMappingEntry();
+			return activeGW.getSpecificPortMappingEntry(port,"TCP",portMapping);
+		}
+		return false;
 	}
 	
 	/**These two methods return the external and local IP address*/
