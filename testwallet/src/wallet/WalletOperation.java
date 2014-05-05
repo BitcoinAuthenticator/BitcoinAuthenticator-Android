@@ -151,7 +151,11 @@ public class WalletOperation {
 		
 		//Send the encrypted payload over to the Authenticator and wait for the response.
 		//disp.write(cipherBytes.length, cipherBytes);
-		Device d = new Device(PairingProtocol.chaincode,PairingProtocol.mPubKey,PairingProtocol.gcmRegId,PairingProtocol.sharedsecret);
+		Device d = new Device(PairingProtocol.chaincode,
+				PairingProtocol.mPubKey,
+				PairingProtocol.gcmRegId,
+				PairingProtocol.pairingID,
+				PairingProtocol.sharedsecret);
 		disp.dispachMessage(MessageType.signTx, cipherBytes, d);
 		System.out.println("Sent transaction");
 		int keysize = disp.readInt();

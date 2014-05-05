@@ -276,7 +276,7 @@ public class Pair_wallet extends Activity {
 			}}
             SecretKey secretkey = new SecretKeySpec(Utils.hexStringToByteArray(AESKey), "AES");
 			try {
-				pair2wallet.run(seed, secretkey);
+				pair2wallet.run(seed, secretkey,num);
 			} catch (InvalidKeyException e) {
 				e.printStackTrace();
 			} catch (NoSuchAlgorithmException e) {
@@ -292,7 +292,8 @@ public class Pair_wallet extends Activity {
         }
         protected void onPostExecute(PairingProtocol result) {
             super.onPostExecute(result);
-            mProgressDialog.dismiss();
+           // if(mProgressDialog != null)
+           // 	mProgressDialog.dismiss();
             //Open the wallet_list activity.
     		startActivity(new Intent(Pair_wallet.this, Wallet_list.class));
         }

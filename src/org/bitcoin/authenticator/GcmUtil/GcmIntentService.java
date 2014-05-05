@@ -4,6 +4,8 @@ import java.util.Date;
 
 import org.bitcoin.authenticator.Main;
 import org.bitcoin.authenticator.R;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
@@ -53,7 +55,7 @@ public class GcmIntentService extends IntentService {
             } else if (GoogleCloudMessaging.
                     MESSAGE_TYPE_MESSAGE.equals(messageType)) {
                 alertUserOnNotification(extras);
-                Log.v(GcmUtilGlobal.TAG, "Received: " + extras.toString());
+                Log.v(GcmUtilGlobal.TAG, "Received: " + extras.getString("data"));
             }
         }
         // Release the wake lock provided by the WakefulBroadcastReceiver.
@@ -62,7 +64,7 @@ public class GcmIntentService extends IntentService {
 
     private void alertUserOnNotification(Bundle extras)
     {
-    	sendNotification(extras.getString("message"));
+    	sendNotification(extras.getString("data"));
     	// Example - Bundle[{message=Test bulk notification, android.support.content.wakelockid=1, collapse_key=message, from=204673947609}]
     }
     
@@ -76,22 +78,37 @@ public class GcmIntentService extends IntentService {
     	mNotificationManager = (NotificationManager)
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
 
+    	Intent intent = new Intent(this, Main.class);
+    	JSONObject obj;
+    	String customMsg = "";
+		try {
+			obj = new JSONObject(msg);
+			intent.putExtra("pairingReq", msg);
+			intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			customMsg = obj.getString("CustomMsg");
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+  
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                new Intent(this, Main.class), 0);
-
+                intent, PendingIntent.FLAG_UPDATE_CURRENT);
+         
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
         .setSmallIcon(R.drawable.authenticator_logo)
-        .setContentTitle("TEST")
+        .setContentTitle("New Message To Sign")
         .setStyle(new NotificationCompat.BigTextStyle()
-        .bigText(msg))
-        .setContentText(msg)
+        .bigText(customMsg))
+        .setContentText(customMsg)
         .setDefaults(Notification.DEFAULT_SOUND)
         .setDefaults(Notification.DEFAULT_VIBRATE)
-        .setTicker(msg).setWhen(System.currentTimeMillis());
+        .setTicker(customMsg).setWhen(System.currentTimeMillis());
 
         mBuilder.setContentIntent(contentIntent);
-        mNotificationManager.notify((int)uniqueId, mBuilder.build());
+        Notification notif = mBuilder.build();
+        notif.flags |= Notification.FLAG_AUTO_CANCEL;
+        mNotificationManager.notify((int)uniqueId, notif);
     }
    
 }

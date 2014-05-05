@@ -96,7 +96,7 @@ public class UpNp {
 	}
 	
 	/**This method removes the mapping*/
-	void removeMapping() throws IOException, SAXException{
+	public void removeMapping() throws IOException, SAXException{
 		if (activeGW.deletePortMapping(SAMPLE_PORT,"TCP")) {
 			addLogLine("Port mapping removed, test SUCCESSFUL");
         } else {

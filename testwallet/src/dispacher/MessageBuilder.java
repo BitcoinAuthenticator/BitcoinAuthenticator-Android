@@ -15,11 +15,11 @@ public class MessageBuilder extends JSONObject{
 				break;
 			case signTx:
 				this.put("tmp", new Timestamp( new java.util.Date().getTime() ));
-				this.put("PairingID", 1); // TODO
+				this.put("PairingID", arg[0][0]); 
 				this.put("RequestID", 1); // TODO
 				JSONObject reqPayload = new JSONObject();
-				reqPayload.put("ExternalIP", arg[0][0]);
-				reqPayload.put("LocalIP", arg[0][1]);
+				reqPayload.put("ExternalIP", arg[0][1]);
+				reqPayload.put("LocalIP", arg[0][2]);
 				this.put("ReqPayload", reqPayload.toString());
 				this.put("CustomMsg", "Hello");
 				break;

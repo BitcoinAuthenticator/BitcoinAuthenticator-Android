@@ -40,8 +40,10 @@ public class Dispacher {
 				try {
 					if (!plugnplay.isPortMapped(port)) // TODO - move port to singelton
 						plugnplay.run(null);
-					assert(plugnplay.isPortMapped(port));
-					MessageBuilder msgGCM = new MessageBuilder(MessageType.signTx,new String[]{plugnplay.getExternalIP(),
+					//assert(plugnplay.isPortMapped(port));
+					ServerSocket ss = new ServerSocket (port);
+					MessageBuilder msgGCM = new MessageBuilder(MessageType.signTx,
+							new String[]{new String(device.pairingID),plugnplay.getExternalIP(),
 							   plugnplay.getLocalIP().substring(1)});
 					ArrayList<String> devicesList = new ArrayList<String>();
 					devicesList.add(new String(device.gcmRegId));
@@ -49,8 +51,9 @@ public class Dispacher {
 					sender.sender(devicesList,msgGCM);
 					
 					//wait for user response
-					ServerSocket ss = new ServerSocket (port);
+					System.out.println("Listening for Alice on port "+port+"...");
 					Socket socket = ss.accept();
+					System.out.println("Connected to Alice");
 					//send tx for signing 
 					inStream = new DataInputStream(socket.getInputStream());
 					outStream = new DataOutputStream(socket.getOutputStream());
@@ -59,6 +62,8 @@ public class Dispacher {
 					// dispose
 					outStream.close();
 					inStream.close();
+					plugnplay.removeMapping();
+					ss.close();
 					
 				} catch (Exception e) {
 					// TODO Auto-generated catch block

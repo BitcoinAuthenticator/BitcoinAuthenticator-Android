@@ -16,10 +16,43 @@ import android.util.Log;
 public class Main extends Activity {
 
 	@Override
+	public void onNewIntent(Intent intent){
+		gcmInit();
+		
+		SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
+	    Boolean paired = settings.getBoolean("paired", false);
+	    Boolean pendingReq = false;
+	    
+		{
+			if(intent.getStringExtra("pairingReq") != null){ // TODO - currently works for only one request
+				pendingReq = true;
+				Log.v("ASDF", "Found a new pending request via GCM");
+			}
+		}
+		
+	    if (paired==true){
+	    	Intent in = new Intent(Main.this, Wallet_list.class);
+	    	if(pendingReq)
+	    	{
+	    		in.putExtra("pairingReq", intent.getStringExtra("pairingReq"));
+	    	}
+	    	startActivity (in);
+	    }
+	    else {
+	    	startActivity (new Intent(Main.this, Welcome.class));
+	    }
+	}
+	
+	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
+		onNewIntent(getIntent());
+	}
+	
+	private void gcmInit()
+	{
 		/* GCM Registration 
 		 * GCM depends on google play services library.
 		 * Build Instructions - 
@@ -39,15 +72,5 @@ public class Main extends Activity {
 				GcmUtilGlobal.gcmRegistrationToken = "";
 			}
 		}
-		
-		SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
-	    Boolean paired = settings.getBoolean("paired", false);
-	    if (paired==true){
-	    	startActivity (new Intent(Main.this, Wallet_list.class));
-	    }
-	    else {
-	    	startActivity (new Intent(Main.this, Welcome.class));
-	    }		
 	}
-	
 }

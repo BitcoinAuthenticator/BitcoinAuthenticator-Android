@@ -16,6 +16,9 @@ import java.util.List;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.google.bitcoin.core.ECKey;
 import com.google.bitcoin.core.NetworkParameters;
 import com.google.bitcoin.core.Transaction;
@@ -37,6 +40,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -62,6 +66,9 @@ public class Wallet_list extends Activity {
 	public static String LocalIP;
 	public static String IPAddress;
 	Connection conn = null;
+	
+	JSONObject req;
+	Boolean hasPendingReq;
  
 	/**Creates the listview component and defines behavior to a long press on a list item.*/
 	public void onCreate(Bundle savedInstanceState) {
@@ -83,6 +90,20 @@ public class Wallet_list extends Activity {
         SharedPreferences prefs = getSharedPreferences("WalletData1", 0);	
         IPAddress = prefs.getString("ExternalIP", "null");
         LocalIP = prefs.getString("LocalIP","null");
+        
+        // handle pending requests from GCM
+        Bundle extra = getIntent().getExtras();
+        if(extra != null && extra.containsKey("pairingReq")){ // TODO - currently works for only one request
+        	try {
+				req = new JSONObject (extra.getString("pairingReq"));
+				hasPendingReq = true;
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		}
+        else
+        	hasPendingReq = false;
+        
         //Launch task to get public IP to determine if the device is on the same network as the wallet.
         new getIPtask().execute("");
     }
@@ -447,6 +468,21 @@ public class Wallet_list extends Activity {
     		}
     		final byte[] AESKey = key;
     		SecretKey sharedsecret = new SecretKeySpec(AESKey, "AES");
+    		
+    		//Check pending requests via GCM
+    		if(hasPendingReq)
+    		{
+    			//TODO - add multiple wallet handling
+    			try {
+					IPAddress =  req.getString("ExternalIP");
+					LocalIP = req.getString("LocalIP");
+					Log.v("ASDF", "Changed wallet ip address from GCM to: " + IPAddress + "\n" +
+							"Changed wallet local ip address from GCM to: " + LocalIP);
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+    		}
+    		
         	//Decide which IP to use for the connection
         	String IP = null;
         	if (IPAddress.equals(PublicIP)){IP = LocalIP;}
@@ -456,25 +492,27 @@ public class Wallet_list extends Activity {
         	if (PairingProtocol.conn==null){
         		try {
 					conn = new Connection(IP);
+					
+					//Create a new message object for receiving the transaction.
+		        	Message msg = null;
+					msg = new Message(conn);
+					tx = msg.receiveTX(sharedsecret);
+		    		
 				} catch (IOException e) {
-					Toast.makeText(getApplicationContext(), "Unable to connect to wallet", Toast.LENGTH_LONG).show();
+					runOnUiThread(new Runnable() {
+						  public void run() {
+							  Toast.makeText(getApplicationContext(), "Unable to connect to wallet", Toast.LENGTH_LONG).show();
+						  }
+						});
+				}
+        		catch (Exception e) {
+					e.printStackTrace();
 				}
         	}
         	else {
         		conn = PairingProtocol.conn;
         	}
-        	//Create a new message object for receiving the transaction.
-        	Message msg = null;
-    		try {
-				msg = new Message(conn);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-    		try {
-				tx = msg.receiveTX(sharedsecret);
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
+        	
 			return null;
         }
  	

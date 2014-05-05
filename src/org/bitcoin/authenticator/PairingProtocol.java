@@ -3,6 +3,7 @@ package org.bitcoin.authenticator;
 
 
 import java.io.*;
+import java.nio.ByteBuffer;
 import java.security.*;
 
 import javax.crypto.*;
@@ -36,7 +37,7 @@ public class PairingProtocol {
      * Uses the AES key to calculate the message authentication code for the payload and concatenates 
      * it with the master public key and chaincode. The payload is encrypted and sent over to the wallet.
      */
-    public void run(byte[] seed, SecretKey AESKey) throws IOException, NoSuchAlgorithmException, InvalidKeyException  {
+    public void run(byte[] seed, SecretKey AESKey,int pairingID) throws IOException, NoSuchAlgorithmException, InvalidKeyException  {
     	//Derive the key and chaincode from the seed.
     	int num = 1;
     	HDKeyDerivation HDKey = null;
@@ -48,14 +49,19 @@ public class PairingProtocol {
 =======
     	byte[] chaincode = childkey.getChainCode(); // 32 bytes
     	byte[] mpubkey = childkey.getPubKeyBytes(); // 32 bytes
+    	byte[] pairID = ByteBuffer.allocate(4).putInt(pairingID).array(); // 4bytes
     	byte[] regID = GcmUtilGlobal.gcmRegistrationToken.getBytes();
+<<<<<<< HEAD
     	Log.v("ASDF","chaincode length byte[] - " + chaincode.length);
     	Log.v("ASDF","mpubkey length byte[] - " + mpubkey.length);
     	Log.v("ASDF","regID length byte[] - " + regID.length);
 >>>>>>> added gcm reg id to pairing process
+=======
+>>>>>>> fixed a bunch of bugs
    		ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
    		outputStream.write(mpubkey);
     	outputStream.write(chaincode);
+    	outputStream.write(pairID);
     	outputStream.write(regID);
     	byte[] keychaincode = outputStream.toByteArray();
     	//Calculate the HMAC
@@ -66,10 +72,10 @@ public class PairingProtocol {
     	outputStream.write(macbytes);
     	//TODO - format message in a json or protopub
     	/**
-    	 * 			---33B-- + ---32B--- + -------->4kb----- + --32B--
-    	 * PAYLOAD = mpubkey + chaincode + GCMRegistrationID + macbytes
-    	 * 			|_______________________________________|    |
-    	 * 				           HmacSHA256 --------------------
+    	 * 			---33B-- + ---32B--- + --4B----- + -------->4kb----- + --32B--
+    	 * PAYLOAD = mpubkey + chaincode + pairingID + GCMRegistrationID + macbytes
+    	 * 			|___________________________________________________|    |
+    	 * 				           HmacSHA256 -------------------------------
     	 */
     	byte payload[] = outputStream.toByteArray();
     	Log.v("ASDF","payload length byte[] - " + payload.length);

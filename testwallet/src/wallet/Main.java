@@ -164,6 +164,7 @@ public class Main {
 				  Device d = new Device(PairingProtocol.chaincode,
 						  PairingProtocol.mPubKey,
 						  "APA91bEwbGCjr1T-bNkiB1tdERfzOGChTHnjFHA9JizMJNs7D6dinCHUv86MWUOW-IchY3o7nVZwM2s3VCpDmYyWvlVAQ1lo1jnmnbP550uczJSPrYGmBxwlFvfa1poWIxReiIS5Nsm-fPAv2iiaKgT5eacr470RBJE3sxYkFtSi1svVfiJTGig".getBytes(),
+						  "-1".getBytes(),
 						  PairingProtocol.sharedsecret);
 				  disp.dispachMessage(MessageType.signTx, "{data:hello}".getBytes(), d);
 				  

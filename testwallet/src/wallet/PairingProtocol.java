@@ -21,6 +21,7 @@ public class PairingProtocol {
 	public static byte[] chaincode;
 	public static byte[] mPubKey;
 	public static byte[] gcmRegId;
+	public static byte[] pairingID;
 	public static SecretKey sharedsecret;
 	
   public static void run (String args) throws Exception {
@@ -72,10 +73,12 @@ public class PairingProtocol {
 	  if (Arrays.equals(macbytes, hash)){
 		  mPubKey = hexStringToByteArray(payload.substring(0,66));
 		  chaincode = hexStringToByteArray(payload.substring(66,130));
-		  gcmRegId = hexStringToByteArray(payload.substring(130,payload.length()-64));
+		  pairingID = hexStringToByteArray(payload.substring(130,138));
+		  gcmRegId = hexStringToByteArray(payload.substring(138,payload.length()-64));
 		  System.out.println("Received Master Public Key: " + bytesToHex(mPubKey) + "\n" +
 				  			 "chaincode: " +  bytesToHex(chaincode) + "\n" +
-				  			 "gcmRegId: " +  new String(gcmRegId));
+				  			 "gcmRegId: " +  new String(gcmRegId) + "\n" + 
+				  			 "pairing ID: " + new String(pairingID));
 		  //Save mPubKey and the Chaincode to file
 		  WalletFile file = new WalletFile();
 		  file.writePairingData(bytesToHex(mPubKey), bytesToHex(chaincode), key);
@@ -83,7 +86,12 @@ public class PairingProtocol {
 	  else {
 		  System.out.println("Message authentication code is invalid");
 	  }
-
+	  
+	  //dispose
+	  in.close();
+	  out.close();
+	  plugnplay.removeMapping();
+	  ss.close();
 	  // Return to main
 	  Main.inputCommand();
 
