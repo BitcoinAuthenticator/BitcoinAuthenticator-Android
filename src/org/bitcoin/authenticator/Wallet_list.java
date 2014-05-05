@@ -67,8 +67,8 @@ public class Wallet_list extends Activity {
 	public static String IPAddress;
 	Connection conn = null;
 	
-	JSONObject req;
-	Boolean hasPendingReq;
+	public static JSONObject req;
+	public static Boolean hasPendingReq;
  
 	/**Creates the listview component and defines behavior to a long press on a list item.*/
 	public void onCreate(Bundle savedInstanceState) {
@@ -468,14 +468,15 @@ public class Wallet_list extends Activity {
     		}
     		final byte[] AESKey = key;
     		SecretKey sharedsecret = new SecretKeySpec(AESKey, "AES");
-    		
+    		Log.v("ASDF", "hasPendingReq " + hasPendingReq.toString());
     		//Check pending requests via GCM
     		if(hasPendingReq)
     		{
     			//TODO - add multiple wallet handling
     			try {
-					IPAddress =  req.getString("ExternalIP");
-					LocalIP = req.getString("LocalIP");
+    				JSONObject reqPayload = new JSONObject(req.getString("ReqPayload"));
+					IPAddress =  reqPayload.getString("ExternalIP");
+					LocalIP = reqPayload.getString("LocalIP");
 					Log.v("ASDF", "Changed wallet ip address from GCM to: " + IPAddress + "\n" +
 							"Changed wallet local ip address from GCM to: " + LocalIP);
 				} catch (JSONException e) {

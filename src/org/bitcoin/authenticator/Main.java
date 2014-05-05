@@ -26,7 +26,6 @@ public class Main extends Activity {
 		{
 			if(intent.getStringExtra("pairingReq") != null){ // TODO - currently works for only one request
 				pendingReq = true;
-				Log.v("ASDF", "Found a new pending request via GCM");
 			}
 		}
 		
