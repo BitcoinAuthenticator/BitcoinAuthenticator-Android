@@ -7,3 +7,4 @@ bin/
 gen/
 target/
 proguard/
+libs/google_play_services_froyo
