@@ -1,13 +1,16 @@
 package org.bitcoin.authenticator;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.crypto.SecretKey;
@@ -120,7 +123,7 @@ public class Wallet_list extends Activity {
 	 * Loads the seed from internal storage to derive the private key needed for signing.
 	 * Asks user for authorization. If yes, it signs the transaction and sends it back to the wallet.
 	 */
-	public void showDialogBox(String tx) throws InterruptedException{
+	public void showDialogBox(final TxData tx) throws InterruptedException{
 		if (tx.equals("error")){
 			Toast.makeText(getApplicationContext(), "Unable to connect to wallet", Toast.LENGTH_LONG).show();
 		}
@@ -183,10 +186,7 @@ public class Wallet_list extends Activity {
     		final byte[] authseed = seed;
 			//Parse through the transaction message and rebuild the transaction.
 			NetworkParameters params = MainNetParams.get();
-			byte[] transaction = Utils.hexStringToByteArray(tx.substring(74, tx.length()));
-			final byte[] walletkey = Utils.hexStringToByteArray(tx.substring(8,74));
-			byte[] childkeyindex = Utils.hexStringToByteArray(tx.substring(0,8));
-			final int index = new BigInteger(childkeyindex).intValue();
+			byte[] transaction = tx.getTransaction();
 			final Transaction unsignedTx = new Transaction(params, transaction);
 			//Get the output address and the amount from the transaction so we can display it to the user.
 			List<TransactionOutput> outputs = unsignedTx.getOutputs();
@@ -213,21 +213,53 @@ public class Wallet_list extends Activity {
 						//Close the dialog box first since the signature operations will create a little lag
 						//and we can do them in the background.
 						dialog.cancel();
-						//Derive the private key needed to sign the transaction
-						HDKeyDerivation HDKey = null;
-				  		DeterministicKey masterKey = HDKey.createMasterPrivateKey(authseed);
-				  		DeterministicKey walletMasterKey = HDKey.deriveChildKey(masterKey,1);
-				  		DeterministicKey childKey = HDKey.deriveChildKey(walletMasterKey,index);
-				  		byte[] privKey = childKey.getPrivKeyBytes();
-				  		byte[] pubKey = childKey.getPubKeyBytes();
-				  		ECKey authenticatorKey = new ECKey(privKey, pubKey);
-				  		ECKey walletPubKey = new ECKey(null, walletkey);
-						List<ECKey> keys = ImmutableList.of(authenticatorKey, walletPubKey);
-						//Create the multisig script we will be using for signing. 
-						Script scriptpubkey = ScriptBuilder.createMultiSigOutputScript(2,keys);
-						//Create the signature.
-						TransactionSignature sig2 = unsignedTx.calculateSignature(0, authenticatorKey, scriptpubkey, Transaction.SigHash.ALL, false);
-						byte[] signature = sig2.encodeToBitcoin();
+						//Prep the byte array we will fill with the signatures.
+						ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+						byte[] tempArr = ByteBuffer.allocate(4).putInt(tx.numInputs).array();
+						byte[] numSigs = Arrays.copyOfRange(tempArr, 2, 4);
+						try {
+							outputStream.write(numSigs);
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						}
+						//Loop creating a signature for each input
+						for (int j=0; j<tx.numInputs; j++){
+							//Derive the private key needed to sign the transaction
+							ArrayList<Integer> index = tx.getIndexes();
+							ArrayList<byte[]> walpubkeys = tx.getPublicKeys();
+							HDKeyDerivation HDKey = null;
+							DeterministicKey masterKey = HDKey.createMasterPrivateKey(authseed);
+							DeterministicKey walletMasterKey = HDKey.deriveChildKey(masterKey,1);
+							DeterministicKey childKey = HDKey.deriveChildKey(walletMasterKey,index.get(j));
+							byte[] privKey = childKey.getPrivKeyBytes();
+							byte[] pubKey = childKey.getPubKey();
+							ECKey authenticatorKey = new ECKey(privKey, pubKey);
+							ECKey walletPubKey = new ECKey(null, walpubkeys.get(j)); 
+							
+							//Print keys used to create signature
+							System.out.println("Index: " + index.get(j));
+							System.out.println("wallet pubkey: " + Utils.bytesToHex(walletPubKey.getPubKey()));
+							System.out.println("Auth pubkey: " + Utils.bytesToHex(authenticatorKey.getPubKey()));
+							System.out.println("Auth privkey: " + Utils.bytesToHex(authenticatorKey.getPrivKeyBytes()));
+							
+							List<ECKey> keys = ImmutableList.of(authenticatorKey, walletPubKey);
+							//Create the multisig script we will be using for signing. 
+							Script scriptpubkey = ScriptBuilder.createMultiSigOutputScript(2,keys);
+							//Create the signature.
+							TransactionSignature sig2 = unsignedTx.calculateSignature(j, authenticatorKey, scriptpubkey, Transaction.SigHash.ALL, false);
+							byte[] signature = sig2.encodeToBitcoin();
+							byte[] tempArr2 = ByteBuffer.allocate(4).putInt(signature.length).array();
+							byte[] sigLen = Arrays.copyOfRange(tempArr2, 3, 4);
+							System.out.println(signature.length);
+							try {
+								outputStream.write(sigLen);
+								outputStream.write(signature);
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						}
+						byte[] sigArray = outputStream.toByteArray();
+						System.out.println(Utils.bytesToHex(sigArray));
 						//Select which connection to use
 						Message msg = null;
 			        	if (PairingProtocol.conn==null){
@@ -246,7 +278,7 @@ public class Wallet_list extends Activity {
 			        	}
 			        	//Send the signature
 							try {
-								msg.sendSig(signature, sharedsecret);
+								msg.sendSig(sigArray, sharedsecret);
 							} catch (InvalidKeyException e) {
 								e.printStackTrace();
 							} catch (NoSuchAlgorithmException e) {
@@ -394,7 +426,7 @@ public class Wallet_list extends Activity {
      * When one is received, it loads the dialog box.
      */
     public class ConnectToWallets extends AsyncTask<String,String,Connection> {
-    	String tx;
+    	TxData tx;
         @Override
         protected Connection doInBackground(String... message) {
         	//Load AES Key from file

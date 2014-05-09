@@ -39,7 +39,7 @@ public class PairingProtocol {
     	DeterministicKey masterkey = HDKey.createMasterPrivateKey(seed);
     	DeterministicKey childkey = HDKey.deriveChildKey(masterkey,num);
     	byte[] chaincode = childkey.getChainCode();
-    	byte[] mpubkey = childkey.getPubKeyBytes();
+    	byte[] mpubkey = childkey.getPubKey();
    		ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
    		outputStream.write(mpubkey);
     	outputStream.write(chaincode);

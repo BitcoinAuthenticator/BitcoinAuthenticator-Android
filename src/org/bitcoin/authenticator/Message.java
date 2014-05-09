@@ -31,10 +31,11 @@ public class Message {
 	
 	/**
 	 * Method to receive a transaction from the wallet. It decrypts the message and verifies the HMAC.
-	 * Returns a string containing the child key index, public key from the wallet, and raw unsighed transaction.
+	 * Returns a TxData object containing the number of inputs, child key indexes, public keys from the wallet, and 
+	 * raw unsigned transaction.
 	 */
-	public String receiveTX(SecretKey sharedsecret) throws Exception {
-		//Recieve the encrypted payload
+	public TxData receiveTX(SecretKey sharedsecret) throws Exception {
+		//Receive the encrypted payload
 	  	byte[] cipherBytes;
 	  	int size = in.readInt();
 		cipherBytes = new byte[size];
@@ -45,11 +46,9 @@ public class Message {
 	    //Split the payload into it's parts.
 	    String message = Utils.bytesToHex(cipher.doFinal(cipherBytes));
 	    String payload = message.substring(0,message.length()-64);
-	    String version = message.substring(0, 2);
-	    String childkeyindex = message.substring(2,10);
-	    String pubkey = message.substring(10,76);
-	    String transaction = message.substring(76, message.length()-64);
+	    TxData data = new TxData(payload);
 	    String HMAC = message.substring(message.length()-64,message.length());
+	    System.out.println("#2");
 	    //Verify the HMAC
 	    Mac mac = Mac.getInstance("HmacSHA256");
 		mac.init(sharedsecret);
@@ -58,14 +57,14 @@ public class Message {
 		byte[] macbytes = mac.doFinal(testmsg);
 		if (Arrays.equals(macbytes, hash)){
 			//Return the payload as a string
-			return (childkeyindex + pubkey + transaction);
+			return data;
 		}
 		else {
 			System.out.println("Message authentication code is invalid");
-			return ("error");
+			return null;
 		}
 	}
-	
+
 	/**
 	 * Method to send the transaction signature back to the wallet.
 	 * It calculates the HMAC of the signature, concatentates it, and encypts it with AES.
