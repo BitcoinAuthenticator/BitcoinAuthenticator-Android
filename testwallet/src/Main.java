@@ -1,7 +1,9 @@
 import java.io.File;
+import java.nio.ByteBuffer;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 
 /**
@@ -71,18 +73,16 @@ public class Main {
 				  op.sendTX();
 				  break;
 			  case 2:
-				  op.childPubKey();
+				  String addr = op.genAddress();
+				  System.out.println(addr);
 				  break;
 			  case 3:
-				  System.out.print("Input: ");
-				  String from = in.nextLine();
 				  ArrayList<String> to = new ArrayList<String>();
 				  ArrayList<String> amount = new ArrayList<String>();
 				  String output = "";
-				  int count = 0;
 				  boolean stop = false;
 				  while (!stop) {
-					  System.out.print("Output: ");
+					  System.out.print("Output Address: ");
 					  to.add(in.nextLine());
 					  System.out.print("Amount: ");
 					  amount.add(in.nextLine());
@@ -90,7 +90,7 @@ public class Main {
 					  String response = in.nextLine().toLowerCase();
 					  if (response.equals("n")){stop = true;}
 				  }
-				  op.mktx(amount, from, to);  
+				  op.mktx(amount, to);  
 				  break;
 			  case 4:
 				  OpenPort.main(null);
@@ -100,7 +100,7 @@ public class Main {
 				  ArrayList<String> addrs = file.getAddresses();
 				  for (int i=0; i<addrs.size(); i++){
 					  System.out.println(addrs.get(i));
-				  }
+				  }				  
 				  break;
 			  case 6:
 				  WalletFile file2 = new WalletFile();
@@ -112,7 +112,17 @@ public class Main {
 				  System.out.println(balance + " Satoshi");
 				  break;
 			  case 7:
-				  System.out.println("Help menu to be implemented later");
+				  System.out.println("Usage:");
+				  System.out.println("  command(parameter)");
+				  System.out.println("");
+				  System.out.println("Commands:");
+				  System.out.println("  pairwallet(logo)           Displays QR code to scan with the Authenticator. Supported logos include: bitcoincore, electrum, armory, blockchain, multibit, hive, and darkwallet.");
+				  System.out.println("  openport()                 If the connection between devices is lost. Run this first, then open the Authenticator to reestablish connection.");
+				  System.out.println("  newaddress()               Generates a new multisig address using a key from the wallet and a public key derived from the Authenticator Master Public Key.");            
+				  System.out.println("  listaddresses()            Lists all the addresses in the wallet.");
+				  System.out.println("  getbalance()               Returns the balance of the wallet in satoshi.");
+				  System.out.println("  mktx()                     Builds a new unsigned raw transaction. Inputs are add in cronological order until inputs >= outputs. A fee of .1 mbtc is applied.");
+				  System.out.println("  send()                     Sends the raw transaction over to the authenticator for signing.");
 				  break;
 			  }
 		   }

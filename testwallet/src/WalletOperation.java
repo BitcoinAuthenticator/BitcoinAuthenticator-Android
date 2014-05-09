@@ -54,31 +54,42 @@ import com.google.common.collect.ImmutableList;
 public class WalletOperation {
 	
 	static String unsignedTx;
-	static ECKey walletKey;
 	static Transaction spendtx;
-	static int addressIndex;
-	static TransactionInput input;
-	static byte[] addressPublicKey;
-
+	static int numInputs;
+	static ArrayList<byte[]> publickeys;
+	static ArrayList<Integer> childkeyindex;
+	
 	/**
 	 * Sends a transaction message over to the Authenticator.
 	 * The message form is as follows:
 	 * 1 Byte -- Version (01 is the only version right now)
+	 * 2 Byes -- Number of inputs
+	 * <---For Each Input --->
 	 * 4 Bytes -- Child key index
-	 * 33 Bytes -- Public key wallet used to create the P2SH address
+	 * 33 Bytes -- Public key the wallet used to create the P2SH address
+	 * <---End For Each --->
 	 * ? Bytes -- Raw unsigned transaction
 	 * 32 Bytes -- HMAC-SHA256 of the above
 	 * */
 	void sendTX() throws Exception {
 		//Create the payload
-		byte[] version = hexStringToByteArray("01");
-		byte[] childkeyindex = ByteBuffer.allocate(4).putInt(addressIndex).array();
-		byte[] pubkey = addressPublicKey;
-		byte[] transaction = hexStringToByteArray(unsignedTx);
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
+		byte[] version = hexStringToByteArray("01");
 		outputStream.write(version);
-		outputStream.write(childkeyindex);
-		outputStream.write(pubkey);
+		System.out.println(bytesToHex(version));
+		byte[] tempArr = ByteBuffer.allocate(4).putInt(numInputs).array();
+		byte[] numIns = Arrays.copyOfRange(tempArr, 2, 4);
+		outputStream.write(numIns);
+		System.out.println(bytesToHex(numIns));
+		for (int a=0; a<numInputs; a++){
+			byte[] index = ByteBuffer.allocate(4).putInt(childkeyindex.get(a)).array();
+			outputStream.write(index);
+			System.out.println(bytesToHex(index));
+			byte[] pubkey = publickeys.get(a);
+			outputStream.write(pubkey);
+			System.out.println(bytesToHex(pubkey));
+		}
+		byte[] transaction = hexStringToByteArray(unsignedTx);
 		outputStream.write(transaction);
 		byte payload[] = outputStream.toByteArray( );
 		//Calculate the HMAC and concatenate it to the payload
@@ -151,20 +162,48 @@ public class WalletOperation {
 		ArrayList<String> keyandchain = file.getPubAndChain();
 		byte[] key = hexStringToByteArray(keyandchain.get(0));
 		byte[] chain = hexStringToByteArray(keyandchain.get(1));
-		HDKeyDerivation HDKey = null;
-  		DeterministicKey mPubKey = HDKey.createMasterPubKeyFromBytes(key, chain);
-  		DeterministicKey childKey = HDKey.deriveChildKey(mPubKey, addressIndex);
-  		byte[] childpublickey = childKey.getPubKeyBytes();
-  		ECKey authKey = new ECKey(null, childpublickey);
-  		//Create second signature and build the final transaction
-	    List<ECKey> keys = ImmutableList.of(authKey, walletKey);
-		Script scriptpubkey = ScriptBuilder.createMultiSigOutputScript(2,keys);
-		byte[] program = scriptpubkey.getProgram();
-		TransactionSignature sig1 = TransactionSignature.decodeFromBitcoin(testsig, true);
-		TransactionSignature sig2 = spendtx.calculateSignature(0, walletKey, scriptpubkey, Transaction.SigHash.ALL, false);
-		List<TransactionSignature> sigs = ImmutableList.of(sig1, sig2);
-	    Script inputScript = ScriptBuilder.createP2SHMultiSigInputScript(sigs, program);
-		input.setScriptSig(inputScript);
+		List<TransactionInput> inputs = spendtx.getInputs();
+		//Break apart the signature array sent over from the authenticator
+		String sigstr = bytesToHex(testsig);
+		ArrayList<byte[]> AuthSigs =  new ArrayList<byte[]>();
+		int pos = 4;
+		for (int b=0; b<numInputs; b++){
+			String strlen = sigstr.substring(pos, pos+2);
+			int intlen = Integer.parseInt(strlen, 16)*2;
+			System.out.println(intlen);
+			pos = pos + 2;
+			AuthSigs.add(hexStringToByteArray(sigstr.substring(pos, pos+intlen)));
+			System.out.println(sigstr.substring(pos, pos+intlen));
+			pos = pos + intlen;
+		}
+		//Loop to create a signature for each input
+		for (int z=0; z<numInputs; z++){
+			HDKeyDerivation HDKey = null;
+			DeterministicKey mPubKey = HDKey.createMasterPubKeyFromBytes(key, chain);
+			DeterministicKey childKey = HDKey.deriveChildKey(mPubKey, childkeyindex.get(z));
+			byte[] childpublickey = childKey.getPubKey();
+			ECKey authKey = new ECKey(null, childpublickey);
+			//Create second signature and build the final transaction
+			BigInteger privatekey = new BigInteger(1, hexStringToByteArray(file.getPrivKeyFromIndex(childkeyindex.get(z))));
+			byte[] addressPublicKey = ECKey.publicKeyFromPrivate(privatekey, true);
+			ECKey walletKey = new ECKey(privatekey, addressPublicKey, true);
+			
+			//Print keys used to create signature
+			System.out.println("Index: " + childkeyindex.get(z));
+			System.out.println("wallet pubkey: " + bytesToHex(walletKey.getPubKey()));
+			System.out.println("wallet privkey: " + bytesToHex(walletKey.getPrivKeyBytes()));
+			System.out.println("Auth pubkey: " + bytesToHex(authKey.getPubKey()));
+			
+			List<ECKey> keys = ImmutableList.of(authKey, walletKey);
+			Script scriptpubkey = ScriptBuilder.createMultiSigOutputScript(2,keys);
+			byte[] program = scriptpubkey.getProgram();
+			TransactionSignature sig1 = TransactionSignature.decodeFromBitcoin(AuthSigs.get(z), true);
+			TransactionSignature sig2 = spendtx.calculateSignature(0, walletKey, scriptpubkey, Transaction.SigHash.ALL, false);
+			List<TransactionSignature> sigs = ImmutableList.of(sig1, sig2);
+			Script inputScript = ScriptBuilder.createP2SHMultiSigInputScript(sigs, program);
+			TransactionInput input = inputs.get(z);
+			input.setScriptSig(inputScript);
+		}
 		//Convert tx to byte array for sending.
 		final StringBuilder sb = new StringBuilder();
 		Formatter formatter = new Formatter(sb);
@@ -178,11 +217,11 @@ public class WalletOperation {
 				System.out.println("Signed Transaction: " + sb.toString());
 				//Push the transaction to the network
 				pushTx(sb.toString());
-				}catch (IOException e) {
-					System.out.println("Couldn't serialize to hex string.");
-				} finally {
-				    formatter.close();
-				}
+			}catch (IOException e) {
+				System.out.println("Couldn't serialize to hex string.");
+			} finally {
+				   formatter.close();
+			}
 	}
 	
 	/**Pushes the raw transaction the the Eligius mining pool*/
@@ -220,8 +259,12 @@ public class WalletOperation {
 		System.out.println("txid: " + response.substring(response.indexOf("string(64) ")+12, response.indexOf("string(64) ")+76));
 	}
 	
-	/**Derive a child public key from the master public key*/
-	void childPubKey() throws NoSuchAlgorithmException, JSONException{
+	/**
+	 * Derives a child public key from the master public key. Generates a new local key pair.
+	 * Uses the two public keys to create a 2of2 multisig address. Saves key and address to json file.
+	 */
+	String genAddress() throws NoSuchAlgorithmException, JSONException{
+		//Derive the child public key from the master public key.
 		WalletFile file = new WalletFile();
 		ArrayList<String> keyandchain = file.getPubAndChain();
 		byte[] key = hexStringToByteArray(keyandchain.get(0));
@@ -230,16 +273,11 @@ public class WalletOperation {
 		HDKeyDerivation HDKey = null;
   		DeterministicKey mPubKey = HDKey.createMasterPubKeyFromBytes(key, chain);
   		DeterministicKey childKey = HDKey.deriveChildKey(mPubKey, index);
-  		byte[] childpublickey = childKey.getPubKeyBytes();
-  		genMultiSigAddr(childpublickey);
-  	}
-	
-	/**Generate a new P2SH address using the master public key from the Authenticator*/
-	void genMultiSigAddr(byte[] childkey) throws NoSuchAlgorithmException, JSONException{
+  		byte[] childpublickey = childKey.getPubKey();
 		NetworkParameters params = MainNetParams.get();
-		ECKey childPubKey = new ECKey(null, childkey);
+		ECKey childPubKey = new ECKey(null, childpublickey);
 		//Create a new key pair which will kept in the wallet.
-		walletKey = new ECKey();
+		ECKey walletKey = new ECKey();
 		byte[] privkey = walletKey.getPrivKeyBytes();
 		List<ECKey> keys = ImmutableList.of(childPubKey, walletKey);
 		//Create a 2-of-2 multisig output script.
@@ -247,65 +285,120 @@ public class WalletOperation {
 		Script script = ScriptBuilder.createP2SHOutputScript(Utils.sha256hash160(scriptpubkey));
 		//Create the address
 		Address multisigaddr = Address.fromP2SHScript(params, script);
-		System.out.println(multisigaddr.toString());
 		//Save keys to file
-		WalletFile file = new WalletFile();
 		file.writeToFile(bytesToHex(privkey),multisigaddr.toString());
+		return multisigaddr.toString();
 	}
 	
 	/**
-	 * Gets the unspent outputs JSON for an address from blockr.io
-	 * Note, at the moment this only gets the data for the first transaction the address receives. 
-	 * It needs to be adjusted to handle multiple transactions from a single address.
+	 * Gets the unspent outputs JSON for the wallet from blockr.io. Returns enough unspent outputs to 
+	 * cover the total transaction output. There is a problem here with the way blockr handles unspent outputs. 
+	 * It only shows unspent outputs for confirmed txs. For unconfirmed you can only get all transactions. 
+	 * So if all unconfirmed outputs are unspent, it will work correctly, but if you spent an unconfirmed output, 
+	 * and try to make another transaction before it confirms, you could get an error. 
 	 */
-	UnspentOutput getUnspentOutputs(String addr) throws JSONException, IOException{
-		JSONObject json;
-		UnspentOutput out = null;
-		//First see if the unspent output is unconfirmed, if so, get it
-		json = readJsonFromUrl("http://btc.blockr.io/api/v1/address/unconfirmed/" + addr);
-		JSONObject data1 = json.getJSONObject("data");
-		JSONArray unconfirmed = data1.getJSONArray("unconfirmed");
-		if (unconfirmed.length()!=0){
-			JSONObject tx = unconfirmed.getJSONObject(0);
-			out = new UnspentOutput(tx.get("tx").toString(), tx.get("n").toString());
-			return out;
-		}
-		//Otherwise get it from the list of confirmed unspent outputs
-		else {
-			json = readJsonFromUrl("http://btc.blockr.io/api/v1/address/unspent/" + addr);
-			JSONObject data = json.getJSONObject("data");
-			JSONArray unspent = data.getJSONArray("unspent");
-			JSONObject txinfo = unspent.getJSONObject(0);
-			out = new UnspentOutput(txinfo.get("tx").toString(), txinfo.get("n").toString());
-			return out;
+	ArrayList<UnspentOutput> getUnspentOutputs(long outAmount) throws JSONException, IOException{
+		numInputs=0;
+		childkeyindex = new ArrayList<Integer>();
+		ArrayList<UnspentOutput> outList = new ArrayList<UnspentOutput>();
+		publickeys = new ArrayList<byte[]>();
+		WalletFile file = new WalletFile();
+		ArrayList<String> addrs = file.getAddresses();
+		long inAmount = 0;
+		//First add the confirmed unspent outputs
+		for (int i=0; i<addrs.size(); i++){
+			if (inAmount < (outAmount + 10000)){
+				JSONObject json;
+				UnspentOutput out = null;
+				json = readJsonFromUrl("http://btc.blockr.io/api/v1/address/unspent/" + addrs.get(i));
+				JSONObject data = json.getJSONObject("data");
+				JSONArray unspent = data.getJSONArray("unspent");
+				if (unspent.length()!=0){
+					for (int x=0; x<unspent.length(); x++){
+						if (inAmount < outAmount + 10000){
+							JSONObject txinfo = unspent.getJSONObject(x);
+							double amount = Double.parseDouble((String) txinfo.get("amount"));
+							out = new UnspentOutput(txinfo.get("tx").toString(), txinfo.get("n").toString(), (long)(amount*100000000));
+							outList.add(out);
+							inAmount = (long) (inAmount + (amount*100000000));
+							//Add the public key and index for this address to the respective ArrayLists
+							BigInteger privatekey = new BigInteger(1, hexStringToByteArray(file.getPrivKey(addrs.get(i))));
+							byte[] publickey = ECKey.publicKeyFromPrivate(privatekey, true);
+							publickeys.add(publickey);
+							childkeyindex.add((int) file.getAddrIndex(addrs.get(i)));
+							numInputs++;
+						}
+					}
+				}
 			}
+		}		
+		//If we still don't have enough outputs move on to adding the unconfirmed
+		for (int j=0; j<addrs.size(); j++){
+			if (inAmount < (outAmount + 10000)){
+				JSONObject json;
+				UnspentOutput out = null;
+				json = readJsonFromUrl("http://btc.blockr.io/api/v1/address/unconfirmed/" + addrs.get(j));
+				JSONObject data1 = json.getJSONObject("data");
+				JSONArray unconfirmed = data1.getJSONArray("unconfirmed");
+				if (unconfirmed.length()!=0){
+					for (int x=0; x<unconfirmed.length(); x++){
+						if (inAmount < outAmount + 10000){
+							JSONObject tx = unconfirmed.getJSONObject(x);
+							double amount = (double) tx.get("amount");
+							out = new UnspentOutput(tx.get("tx").toString(), tx.get("n").toString(), (long)(amount*100000000));
+							outList.add(out);
+							inAmount = (long) (inAmount + amount*100000000);
+							//Add the public key and index for this address to the respective ArrayLists
+							BigInteger privatekey = new BigInteger(1, hexStringToByteArray(file.getPrivKey(addrs.get(j))));
+							byte[] publickey = ECKey.publicKeyFromPrivate(privatekey, true);
+							publickeys.add(publickey);
+							numInputs++;
+							childkeyindex.add((int) file.getAddrIndex(addrs.get(j)));
+						}
+					}
+				}
+			}
+		}
+		if (inAmount < outAmount + 10000) System.out.println("Insufficient funds");
+		System.out.println(numInputs);
+		System.out.println(inAmount);
+		return outList;
 	}
 	
 	/**Builds a raw unsigned transaction*/
-	void mktx(ArrayList<String> MILLI, String from, ArrayList<String> to) throws AddressFormatException, JSONException, IOException {
+	void mktx(ArrayList<String> MILLI, ArrayList<String> to) throws AddressFormatException, JSONException, IOException, NoSuchAlgorithmException {
 		//Gather the data needed to construct the inputs and outputs
-		UnspentOutput out = getUnspentOutputs(from);
-		int index = Integer.parseInt(out.getIndex());
-  		Sha256Hash txhash = new Sha256Hash(out.getTxid());
+		long totalouts=0; 
+		for (int i=0; i<MILLI.size(); i++){
+			totalouts = totalouts + Long.parseLong(MILLI.get(i));
+		}
+		ArrayList<UnspentOutput> out = getUnspentOutputs(totalouts); 
   		NetworkParameters params = MainNetParams.get();
   		spendtx = new Transaction(params);
   		byte[] script = hexStringToByteArray("");
-  		//Creates the input which refrences a previous unspent output
-  		TransactionOutPoint outpoint = new TransactionOutPoint(params, index, txhash);
-		input = new TransactionInput(params, null, script, outpoint);
+  		//Creates the inputs which reference a previous unspent output
+  		long totalins = 0;
+  		for (int x=0; x<out.size(); x++){
+  			totalins = totalins + out.get(x).getAmount();
+  			int index = Integer.parseInt(out.get(x).getIndex());
+  	  		Sha256Hash txhash = new Sha256Hash(out.get(x).getTxid());
+  			TransactionOutPoint outpoint = new TransactionOutPoint(params, index, txhash);
+  			TransactionInput input = new TransactionInput(params, null, script, outpoint);
+  			//Add the inputs
+  			spendtx.addInput(input);
+		}
 		//Add the outputs
 		for (int i=0; i<MILLI.size(); i++){
 			Address outaddr = new Address(params, to.get(i));
-			spendtx.addOutput(BigInteger.valueOf(Integer.parseInt(MILLI.get(i))), outaddr);
+			spendtx.addOutput(BigInteger.valueOf(Long.parseLong(MILLI.get(i))), outaddr);
 		}
-		//Add the inputs
-		spendtx.addInput(input);
-		//Save the key data to memory so we can use it later when sending the transaction. 
-		WalletFile file = new WalletFile();
-		addressIndex = (int) file.getAddrIndex(from);
-		BigInteger privatekey = new BigInteger(1, hexStringToByteArray(file.getPrivKey(from)));
-		addressPublicKey = ECKey.publicKeyFromPrivate(privatekey, true);
-		walletKey = new ECKey(privatekey, addressPublicKey, true);
+		//Add the change
+		if (totalins > (totalouts + 10000)){
+			Long changetotal = (totalins - (totalouts+10000));
+			String changeaddr = genAddress();
+			Address change = new Address(params, changeaddr);
+			spendtx.addOutput(BigInteger.valueOf(changetotal), change);
+		}
 		//Convert tx to byte array for sending.
 		final StringBuilder sb = new StringBuilder();
 		Formatter formatter = new Formatter(sb);
@@ -407,7 +500,7 @@ public class WalletOperation {
 
 	/**Hex encodes a DeterministicKey object*/
 	private static String hexEncodePub(DeterministicKey pubKey) {
-        return hexEncode(pubKey.getPubKeyBytes());
+        return hexEncode(pubKey.getPubKey());
     }
     private static String hexEncode(byte[] bytes) {
         return new String(Hex.encode(bytes));
@@ -440,10 +533,12 @@ public class WalletOperation {
     class UnspentOutput {
     	String txid;
     	String index;
+    	long amount;
     	
-    	public UnspentOutput(String id, String in){
+    	public UnspentOutput(String id, String in, long amt){
     		this.txid = id;
     		this.index = in;
+    		this.amount = amt;
     	}
     	
     	public String getTxid(){
@@ -452,6 +547,10 @@ public class WalletOperation {
     	
     	public String getIndex(){
     		return index;
+    	}
+    	
+    	public long getAmount(){
+    		return amount;
     	}
     }
     

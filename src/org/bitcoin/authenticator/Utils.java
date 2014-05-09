@@ -14,7 +14,7 @@ import org.json.JSONObject;
 import android.util.Log;
 
 public class Utils {
-
+	
     /** Takes byte array and turns it into a hex string*/
     public static String bytesToHex(byte[] bytes) {
         StringBuilder sbuf = new StringBuilder();

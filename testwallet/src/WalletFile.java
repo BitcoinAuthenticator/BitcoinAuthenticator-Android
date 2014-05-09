@@ -234,4 +234,31 @@ public class WalletFile {
 		return null;
 	}
 	
+	/**Returns the private key using an index as the input*/
+	public String getPrivKeyFromIndex(long index){
+		ArrayList<String> arr = new ArrayList<String>();
+		JSONParser parser = new JSONParser();
+		Object obj = null;
+		try {
+			obj = parser.parse(new FileReader(filePath));
+		} catch (IOException | ParseException e) {
+			e.printStackTrace();
+		}
+		JSONObject jsonObject = (JSONObject) obj;
+		JSONArray msg = (JSONArray) jsonObject.get("keys");
+		Iterator<JSONObject> iterator = msg.iterator();
+		JSONArray jsonlist = new JSONArray();
+		while (iterator.hasNext()) {
+			jsonlist.add(iterator.next());
+		}
+		JSONObject jsonAddr = (JSONObject) obj;
+		for(int i=0; i<jsonlist.size(); i++){
+			jsonAddr = (JSONObject) jsonlist.get(i);
+			long jIndex = (Long) jsonAddr.get("index");
+			String pkey = (String) jsonAddr.get("priv_key");
+			if (jIndex==index){return pkey;}	
+		}
+		return null;
+	}
+	
 }
