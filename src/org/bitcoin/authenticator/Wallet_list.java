@@ -246,7 +246,7 @@ public class Wallet_list extends Activity {
 							//Create the multisig script we will be using for signing. 
 							Script scriptpubkey = ScriptBuilder.createMultiSigOutputScript(2,keys);
 							//Create the signature.
-							TransactionSignature sig2 = unsignedTx.calculateSignature(0, authenticatorKey, scriptpubkey, Transaction.SigHash.ALL, false);
+							TransactionSignature sig2 = unsignedTx.calculateSignature(j, authenticatorKey, scriptpubkey, Transaction.SigHash.ALL, false);
 							byte[] signature = sig2.encodeToBitcoin();
 							byte[] tempArr2 = ByteBuffer.allocate(4).putInt(signature.length).array();
 							byte[] sigLen = Arrays.copyOfRange(tempArr2, 3, 4);

@@ -198,7 +198,7 @@ public class WalletOperation {
 			Script scriptpubkey = ScriptBuilder.createMultiSigOutputScript(2,keys);
 			byte[] program = scriptpubkey.getProgram();
 			TransactionSignature sig1 = TransactionSignature.decodeFromBitcoin(AuthSigs.get(z), true);
-			TransactionSignature sig2 = spendtx.calculateSignature(0, walletKey, scriptpubkey, Transaction.SigHash.ALL, false);
+			TransactionSignature sig2 = spendtx.calculateSignature(z, walletKey, scriptpubkey, Transaction.SigHash.ALL, false);
 			List<TransactionSignature> sigs = ImmutableList.of(sig1, sig2);
 			Script inputScript = ScriptBuilder.createP2SHMultiSigInputScript(sigs, program);
 			TransactionInput input = inputs.get(z);
