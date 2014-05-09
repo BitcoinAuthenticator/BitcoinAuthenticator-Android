@@ -76,18 +76,14 @@ public class WalletOperation {
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
 		byte[] version = hexStringToByteArray("01");
 		outputStream.write(version);
-		System.out.println(bytesToHex(version));
 		byte[] tempArr = ByteBuffer.allocate(4).putInt(numInputs).array();
 		byte[] numIns = Arrays.copyOfRange(tempArr, 2, 4);
 		outputStream.write(numIns);
-		System.out.println(bytesToHex(numIns));
 		for (int a=0; a<numInputs; a++){
 			byte[] index = ByteBuffer.allocate(4).putInt(childkeyindex.get(a)).array();
 			outputStream.write(index);
-			System.out.println(bytesToHex(index));
 			byte[] pubkey = publickeys.get(a);
 			outputStream.write(pubkey);
-			System.out.println(bytesToHex(pubkey));
 		}
 		byte[] transaction = hexStringToByteArray(unsignedTx);
 		outputStream.write(transaction);
@@ -170,10 +166,8 @@ public class WalletOperation {
 		for (int b=0; b<numInputs; b++){
 			String strlen = sigstr.substring(pos, pos+2);
 			int intlen = Integer.parseInt(strlen, 16)*2;
-			System.out.println(intlen);
 			pos = pos + 2;
 			AuthSigs.add(hexStringToByteArray(sigstr.substring(pos, pos+intlen)));
-			System.out.println(sigstr.substring(pos, pos+intlen));
 			pos = pos + intlen;
 		}
 		//Loop to create a signature for each input
@@ -187,13 +181,6 @@ public class WalletOperation {
 			BigInteger privatekey = new BigInteger(1, hexStringToByteArray(file.getPrivKeyFromIndex(childkeyindex.get(z))));
 			byte[] addressPublicKey = ECKey.publicKeyFromPrivate(privatekey, true);
 			ECKey walletKey = new ECKey(privatekey, addressPublicKey, true);
-			
-			//Print keys used to create signature
-			System.out.println("Index: " + childkeyindex.get(z));
-			System.out.println("wallet pubkey: " + bytesToHex(walletKey.getPubKey()));
-			System.out.println("wallet privkey: " + bytesToHex(walletKey.getPrivKeyBytes()));
-			System.out.println("Auth pubkey: " + bytesToHex(authKey.getPubKey()));
-			
 			List<ECKey> keys = ImmutableList.of(authKey, walletKey);
 			Script scriptpubkey = ScriptBuilder.createMultiSigOutputScript(2,keys);
 			byte[] program = scriptpubkey.getProgram();
@@ -421,51 +408,40 @@ public class WalletOperation {
 	/**Returns the balance of the addresses in the wallet using blockr api*/
 	public long getBalance(ArrayList<String> addresses) throws JSONException, IOException{
 		WalletFile file = new WalletFile();
+		JSONObject json;
+		JSONArray data;
+		double addrbalance;
+		long unconfirmedbalance = 0;
+		String addr = "";
 		if (file.getKeyNum()!=0){
 			//Get confirmed Balance
 			long balance = 0;
-			String addr = "";
-			for (int i=0; i<addresses.size(); i++){
-				addr = addr + addresses.get(i) + ",";
-			}
-			JSONObject json = readJsonFromUrl("http://btc.blockr.io/api/v1/address/balance/" + addr);
-			JSONArray data = json.getJSONArray("data");
-			double addrbalance=0;
-			for (int i=0; i<data.length(); i++){
-				JSONObject info = data.getJSONObject(i);
-				addrbalance = (double) info.getDouble("balance");
-				balance = (long) (balance + (addrbalance)*100000000);
-			}
-			//Get unconfirmed balance
-			long unconfirmedbalance = 0;
-			json = readJsonFromUrl("http://btc.blockr.io/api/v1/address/unconfirmed/" + addr);
-			if (addresses.size()==1){
-				JSONObject data1 = json.getJSONObject("data");
-				JSONArray unconfirmed = data1.getJSONArray("unconfirmed");
-				if (unconfirmed!=null){
-					for (int x=0; x<unconfirmed.length(); x++){
-						JSONObject tx = unconfirmed.getJSONObject(x);
-						addrbalance = (double) tx.getDouble("amount");
-						unconfirmedbalance = (long) (unconfirmedbalance + (addrbalance)*100000000);
+			int num = 0;
+			int count = addresses.size();
+			for (int a=0; a<(addresses.size()/19)+1; a++){	
+				addr = "";
+				if (((count/19)+1)>1){
+					for (int i=num; i<num+19; i++){
+						addr = addr + addresses.get(i) + ",";
+					}
+				num=num+19;
+				count=count-19;
+				}
+				else {
+					for (int i=num; i<num+count; i++){
+						addr = addr + addresses.get(i) + ",";
 					}
 				}
-			}
-			else {
+				json = readJsonFromUrl("http://btc.blockr.io/api/v1/address/balance/" + addr);
 				data = json.getJSONArray("data");
 				addrbalance=0;
 				for (int i=0; i<data.length(); i++){
 					JSONObject info = data.getJSONObject(i);
-					JSONArray unconfirmed = info.getJSONArray("unconfirmed");
-					if (unconfirmed!=null){
-						for (int x=0; x<unconfirmed.length(); x++){
-							JSONObject tx = unconfirmed.getJSONObject(x);
-							addrbalance = (double) tx.getDouble("amount");
-							unconfirmedbalance = (long) (unconfirmedbalance + (addrbalance)*100000000);
-						}
-					}
-				}	
+					addrbalance = (double) info.getDouble("balance");
+					balance = (long) (balance + (addrbalance)*100000000);
+				}
 			}
-			return balance + unconfirmedbalance;
+			return balance;
 			}
 		else {
 			return 0;

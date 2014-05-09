@@ -234,14 +234,7 @@ public class Wallet_list extends Activity {
 							byte[] privKey = childKey.getPrivKeyBytes();
 							byte[] pubKey = childKey.getPubKey();
 							ECKey authenticatorKey = new ECKey(privKey, pubKey);
-							ECKey walletPubKey = new ECKey(null, walpubkeys.get(j)); 
-							
-							//Print keys used to create signature
-							System.out.println("Index: " + index.get(j));
-							System.out.println("wallet pubkey: " + Utils.bytesToHex(walletPubKey.getPubKey()));
-							System.out.println("Auth pubkey: " + Utils.bytesToHex(authenticatorKey.getPubKey()));
-							System.out.println("Auth privkey: " + Utils.bytesToHex(authenticatorKey.getPrivKeyBytes()));
-							
+							ECKey walletPubKey = new ECKey(null, walpubkeys.get(j)); 							
 							List<ECKey> keys = ImmutableList.of(authenticatorKey, walletPubKey);
 							//Create the multisig script we will be using for signing. 
 							Script scriptpubkey = ScriptBuilder.createMultiSigOutputScript(2,keys);
@@ -250,7 +243,6 @@ public class Wallet_list extends Activity {
 							byte[] signature = sig2.encodeToBitcoin();
 							byte[] tempArr2 = ByteBuffer.allocate(4).putInt(signature.length).array();
 							byte[] sigLen = Arrays.copyOfRange(tempArr2, 3, 4);
-							System.out.println(signature.length);
 							try {
 								outputStream.write(sigLen);
 								outputStream.write(signature);
@@ -259,7 +251,6 @@ public class Wallet_list extends Activity {
 							}
 						}
 						byte[] sigArray = outputStream.toByteArray();
-						System.out.println(Utils.bytesToHex(sigArray));
 						//Select which connection to use
 						Message msg = null;
 			        	if (PairingProtocol.conn==null){
