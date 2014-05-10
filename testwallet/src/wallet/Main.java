@@ -1,15 +1,9 @@
-<<<<<<< HEAD:testwallet/src/Main.java
-import java.io.File;
-import java.nio.ByteBuffer;
-=======
 package wallet;
 
-<<<<<<< HEAD
->>>>>>> reordering and dipacher:testwallet/src/wallet/Main.java
-=======
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
->>>>>>> fixed gcm sending and multiple notification problem
+import java.io.File;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -74,18 +68,10 @@ public class Main {
 			  cmd.add("send");  
 			  cmd.add("newaddress");   
 			  cmd.add("mktx");  
-<<<<<<< HEAD
 			  cmd.add("openport");  
 			  cmd.add("listaddresses");
 			  cmd.add("getbalance");
-=======
-			  cmd.add("openport");   
-<<<<<<< HEAD:testwallet/src/Main.java
-			  cmd.add("sendtest");
->>>>>>> added gcm send test
-=======
 			  cmd.add("testgcm");
->>>>>>> reordering and dipacher:testwallet/src/wallet/Main.java
 			  cmd.add("help");  
 			  //Switch for executing the commands
 			  WalletOperation op = new WalletOperation();
@@ -126,16 +112,15 @@ public class Main {
 			  case 4:
 				  OpenPort.main(null);
 				  break;
-			  // testgcm
+			  // listaddresses
 			  case 5:
-<<<<<<< HEAD
-<<<<<<< HEAD
 				  WalletFile file = new WalletFile();
 				  ArrayList<String> addrs = file.getAddresses();
 				  for (int i=0; i<addrs.size(); i++){
 					  System.out.println(addrs.get(i));
 				  }				  
 				  break;
+			  // getbalance
 			  case 6:
 				  WalletFile file2 = new WalletFile();
 				  ArrayList<String> addrs2 = file2.getAddresses();
@@ -145,7 +130,19 @@ public class Main {
 				  long balance = op.getBalance(addrs2);
 				  System.out.println(balance + " Satoshi (confirmed)");
 				  break;
+			//testgcm
 			  case 7:
+				  GCMSender sender = new GCMSender();
+				  Dispacher disp = new Dispacher();
+				  Device d = new Device(PairingProtocol.chaincode,
+						  PairingProtocol.mPubKey,
+						  "APA91bEwbGCjr1T-bNkiB1tdERfzOGChTHnjFHA9JizMJNs7D6dinCHUv86MWUOW-IchY3o7nVZwM2s3VCpDmYyWvlVAQ1lo1jnmnbP550uczJSPrYGmBxwlFvfa1poWIxReiIS5Nsm-fPAv2iiaKgT5eacr470RBJE3sxYkFtSi1svVfiJTGig".getBytes(),
+						  "-1".getBytes(),
+						  PairingProtocol.sharedsecret);
+				  disp.dispachMessage(MessageType.signTx, "{data:hello}".getBytes(), d);
+				  break;
+			// help
+			  case 8:
 				  System.out.println("Usage:");
 				  System.out.println("  command(parameter)");
 				  System.out.println("");
@@ -157,28 +154,7 @@ public class Main {
 				  System.out.println("  getbalance()               Returns the balance of the wallet in satoshi.");
 				  System.out.println("  mktx()                     Builds a new unsigned raw transaction. Inputs are add in cronological order until inputs >= outputs. A fee of .1 mbtc is applied.");
 				  System.out.println("  send()                     Sends the raw transaction over to the authenticator for signing.");
-=======
-				  GCMSender sender = new GCMSender();
-=======
-				  Dispacher disp = new Dispacher();
-				  Device d = new Device(PairingProtocol.chaincode,
-						  PairingProtocol.mPubKey,
-						  "APA91bEwbGCjr1T-bNkiB1tdERfzOGChTHnjFHA9JizMJNs7D6dinCHUv86MWUOW-IchY3o7nVZwM2s3VCpDmYyWvlVAQ1lo1jnmnbP550uczJSPrYGmBxwlFvfa1poWIxReiIS5Nsm-fPAv2iiaKgT5eacr470RBJE3sxYkFtSi1svVfiJTGig".getBytes(),
-						  "-1".getBytes(),
-						  PairingProtocol.sharedsecret);
-				  disp.dispachMessage(MessageType.signTx, "{data:hello}".getBytes(), d);
-				  
-				  /*GCMSender sender = new GCMSender();
->>>>>>> fixed gcm sending and multiple notification problem
-				  ArrayList<String> devicesList = new ArrayList<String>();
-				  devicesList.add("APA91bGr1kYu7L6oKUfyCEhg0ofuGoFYdRbqj1QHBFAMVI_eFkYSp2NU3u01MfQ92jhBUVY4qhCYKO-xERCq3t52yKih671fEkNPHS_YIVfrvuj9PcD8_ETAoKdhHAnWpNZkofbFjOzdD0uMamTOQ0_xIoRymcm8DjeZ5zi6sfXryJ-bykS4nd0");
-				  MessageBuilder msg = new MessageBuilder(MessageType.test);
-				  sender.sender(devicesList,msg);*/
-				  break;
-			  // help
-			  case 6:
 				  System.out.println("Help menu to be implemented later");
->>>>>>> added gcm send test
 				  break;
 			  }
 		   }

@@ -4,8 +4,6 @@
   <artifactId>testwallet</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   
-<<<<<<< HEAD
-=======
   <repositories>
       <repository>
           <id>gcm-server-repository</id>
@@ -13,7 +11,6 @@
       </repository>
   </repositories>
   
->>>>>>> added gcm send test
   <dependencies>
       <dependency>
       <groupId>com.google</groupId>
@@ -27,8 +24,6 @@
       	</exclusion>
       </exclusions>
     </dependency>
-<<<<<<< HEAD
-    
   <dependency>
     <groupId>org.json</groupId>
     <artifactId>json</artifactId>
@@ -57,10 +52,6 @@
   <artifactId>javase</artifactId>
   <version>2.2</version>
 </dependency>
-<<<<<<< HEAD
-  
-=======
-
 <dependency>
     <groupId>org.json</groupId>
     <artifactId>json</artifactId>
@@ -73,9 +64,6 @@
 	<version>1.1</version>
 </dependency>
 
->>>>>>> fixed zxing and json-simple integration
-  </dependencies>
-=======
     <dependency>
     <groupId>org.bitlet</groupId>
     <artifactId>weupnp</artifactId>
@@ -107,7 +95,6 @@
         <version>1.0.2</version>
     </dependency>
 </dependencies>
->>>>>>> added gcm send test
   
   <build>
     <sourceDirectory>src</sourceDirectory>

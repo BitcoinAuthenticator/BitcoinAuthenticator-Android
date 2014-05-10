@@ -43,21 +43,15 @@ public class PairingProtocol {
     	HDKeyDerivation HDKey = null;
     	DeterministicKey masterkey = HDKey.createMasterPrivateKey(seed);
     	DeterministicKey childkey = HDKey.deriveChildKey(masterkey,num);
-<<<<<<< HEAD
-    	byte[] chaincode = childkey.getChainCode();
-    	byte[] mpubkey = childkey.getPubKey();
-=======
     	byte[] chaincode = childkey.getChainCode(); // 32 bytes
     	byte[] mpubkey = childkey.getPubKeyBytes(); // 32 bytes
     	byte[] pairID = ByteBuffer.allocate(4).putInt(pairingID).array(); // 4bytes
     	byte[] regID = GcmUtilGlobal.gcmRegistrationToken.getBytes();
-<<<<<<< HEAD
+
     	Log.v("ASDF","chaincode length byte[] - " + chaincode.length);
     	Log.v("ASDF","mpubkey length byte[] - " + mpubkey.length);
     	Log.v("ASDF","regID length byte[] - " + regID.length);
->>>>>>> added gcm reg id to pairing process
-=======
->>>>>>> fixed a bunch of bugs
+
    		ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
    		outputStream.write(mpubkey);
     	outputStream.write(chaincode);
