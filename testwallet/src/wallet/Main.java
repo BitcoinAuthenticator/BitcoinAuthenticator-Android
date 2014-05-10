@@ -1,14 +1,20 @@
 package wallet;
 
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.File;
+import java.nio.ByteBuffer;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
+
+import javax.crypto.Mac;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 
 import dispacher.Device;
 import dispacher.Dispacher;
@@ -132,13 +138,18 @@ public class Main {
 				  break;
 			//testgcm
 			  case 7:
+				  System.out.print("Android Device Registration ID: ");
+				  //"APA91bEwbGCjr1T-bNkiB1tdERfzOGChTHnjFHA9JizMJNs7D6dinCHUv86MWUOW-IchY3o7nVZwM2s3VCpDmYyWvlVAQ1lo1jnmnbP550uczJSPrYGmBxwlFvfa1poWIxReiIS5Nsm-fPAv2iiaKgT5eacr470RBJE3sxYkFtSi1svVfiJTGig"
+				  String regID = in.nextLine();
 				  GCMSender sender = new GCMSender();
 				  Dispacher disp = new Dispacher();
 				  Device d = new Device(PairingProtocol.chaincode,
 						  PairingProtocol.mPubKey,
-						  "APA91bEwbGCjr1T-bNkiB1tdERfzOGChTHnjFHA9JizMJNs7D6dinCHUv86MWUOW-IchY3o7nVZwM2s3VCpDmYyWvlVAQ1lo1jnmnbP550uczJSPrYGmBxwlFvfa1poWIxReiIS5Nsm-fPAv2iiaKgT5eacr470RBJE3sxYkFtSi1svVfiJTGig".getBytes(),
+						  regID.getBytes(),
 						  "-1".getBytes(),
 						  PairingProtocol.sharedsecret);
+				  
+				  // TODO - send a real message
 				  disp.dispachMessage(MessageType.signTx, "{data:hello}".getBytes(), d);
 				  break;
 			// help

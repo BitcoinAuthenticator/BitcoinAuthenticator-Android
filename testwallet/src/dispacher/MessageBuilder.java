@@ -21,7 +21,7 @@ public class MessageBuilder extends JSONObject{
 				reqPayload.put("ExternalIP", arg[0][1]);
 				reqPayload.put("LocalIP", arg[0][2]);
 				this.put("ReqPayload", reqPayload);
-				this.put("CustomMsg", "Hello");
+				this.put("CustomMsg", "New Tx For Signing");
 				break;
 		}
 	}

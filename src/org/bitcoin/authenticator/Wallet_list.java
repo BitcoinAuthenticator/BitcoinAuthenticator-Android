@@ -253,7 +253,7 @@ public class Wallet_list extends Activity {
 							DeterministicKey walletMasterKey = HDKey.deriveChildKey(masterKey,1);
 							DeterministicKey childKey = HDKey.deriveChildKey(walletMasterKey,index.get(j));
 							byte[] privKey = childKey.getPrivKeyBytes();
-							byte[] pubKey = childKey.getPubKey();
+							byte[] pubKey = childKey.getPubKeyBytes();
 							ECKey authenticatorKey = new ECKey(privKey, pubKey);
 							ECKey walletPubKey = new ECKey(null, walpubkeys.get(j)); 							
 							List<ECKey> keys = ImmutableList.of(authenticatorKey, walletPubKey);

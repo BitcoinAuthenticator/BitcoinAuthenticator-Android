@@ -57,7 +57,8 @@ public class Dispacher {
 					//send tx for signing 
 					inStream = new DataInputStream(socket.getInputStream());
 					outStream = new DataOutputStream(socket.getOutputStream());
-					write(payload.length,payload);
+					
+					//write(payload.length,payload);
 					
 					// dispose
 					outStream.close();
