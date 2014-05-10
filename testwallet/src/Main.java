@@ -31,7 +31,7 @@ public class Main {
 			}
 			balance = wallet.getBalance(addrs2);
 			}
-			System.out.println("Wallet loaded successfully. Balance = " + balance + " satoshi");
+			System.out.println("Wallet loaded successfully. Balance = " + balance + " Satoshi (confirmed)");
 		}
 		else {
 			System.out.println("No wallet file exists. Pair a new wallet.");
@@ -109,7 +109,7 @@ public class Main {
 					  addrs2.get(i);
 				  }
 				  long balance = op.getBalance(addrs2);
-				  System.out.println(balance + " Satoshi");
+				  System.out.println(balance + " Satoshi (confirmed)");
 				  break;
 			  case 7:
 				  System.out.println("Usage:");
