@@ -199,7 +199,7 @@ public class WalletOperation {
 			HDKeyDerivation HDKey = null;
 			DeterministicKey mPubKey = HDKey.createMasterPubKeyFromBytes(key, chain);
 			DeterministicKey childKey = HDKey.deriveChildKey(mPubKey, childkeyindex.get(z));
-			byte[] childpublickey = childKey.getPubKeyBytes();
+			byte[] childpublickey = childKey.getPubKey();
 			ECKey authKey = new ECKey(null, childpublickey);
 			//Create second signature and build the final transaction
 			BigInteger privatekey = new BigInteger(1, hexStringToByteArray(file.getPrivKeyFromIndex(childkeyindex.get(z))));
@@ -284,7 +284,7 @@ public class WalletOperation {
 		HDKeyDerivation HDKey = null;
   		DeterministicKey mPubKey = HDKey.createMasterPubKeyFromBytes(key, chain);
   		DeterministicKey childKey = HDKey.deriveChildKey(mPubKey, index);
-  		byte[] childpublickey = childKey.getPubKeyBytes();
+  		byte[] childpublickey = childKey.getPubKey();
 		NetworkParameters params = MainNetParams.get();
 		ECKey childPubKey = new ECKey(null, childpublickey);
 		//Create a new key pair which will kept in the wallet.
@@ -500,7 +500,7 @@ public class WalletOperation {
 
 	/**Hex encodes a DeterministicKey object*/
 	private static String hexEncodePub(DeterministicKey pubKey) {
-        return hexEncode(pubKey.getPubKeyBytes());
+        return hexEncode(pubKey.getPubKey());
     }
     private static String hexEncode(byte[] bytes) {
         return new String(Hex.encode(bytes));

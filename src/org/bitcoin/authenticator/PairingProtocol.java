@@ -44,7 +44,7 @@ public class PairingProtocol {
     	DeterministicKey masterkey = HDKey.createMasterPrivateKey(seed);
     	DeterministicKey childkey = HDKey.deriveChildKey(masterkey,num);
     	byte[] chaincode = childkey.getChainCode(); // 32 bytes
-    	byte[] mpubkey = childkey.getPubKeyBytes(); // 32 bytes
+    	byte[] mpubkey = childkey.getPubKey(); // 32 bytes
     	byte[] pairID = ByteBuffer.allocate(4).putInt(pairingID).array(); // 4bytes
     	byte[] regID = GcmUtilGlobal.gcmRegistrationToken.getBytes();
 

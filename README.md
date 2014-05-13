@@ -33,30 +33,44 @@ The test wallet included in this repo (also using Maven) has a few more dependen
 [weupnp](https://code.google.com/p/weupnp/) for universal plug and play.
 
 ## Importing BitcoinAuthenticator Into Eclipse 
-1. Get a copy of the project and its submoodules 
+1. Get a copy of the project and its submoodules
+
    ```
    git clone --recursive https://github.com/cpacia/BitcoinAuthenticator.git
    ```
+
 2. In Eclipse:
+
   ```
   File -> Import -> existing maven project
    ```
+
 3. Install Google Play Services
   In Eclipse:
+
   ```
   Android SDK Manager -> 
   -Extras -> Install Google Play Services, Google Play Services for Froyo
   -Anroid 4.x -> Install Google API
   ```
+
 4. Import the google play services for froyo project, in Eclipse: 
+
    ```
   File -> Import -> existing android code into workspace -> 
   search the project under <your sdk folder>extras/google_play_services_froyo/libproject/google-play-services_lib 
    ```
    
-4. ``` Right click on the BitcoinAuthenticator project in Package Explorer -> Properties -> Android -> under Library -> Add      google_play_services_froyo ```
+4. Right click on the BitcoinAuthenticator project:
 
-5. ``` Rick click on the BitcoinAuthenticator project in Package Explorer -> Properties -> Java Build Path -> Order and Export -> check Android Private Libraries and move it (by clicking up) to the top of the list
+ ```
+Package Explorer -> Properties -> Android -> under Library -> Add      google_play_services_froyo 
+```
+
+5. Rick click on the BitcoinAuthenticator project:
+	
+ ```Package Explorer -> Properties -> Java Build Path -> Order and Export -> check Android Private Libraries and move it (by clicking up) to the top of the list
+```
 
 
 ## TODO

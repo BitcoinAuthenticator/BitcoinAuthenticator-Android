@@ -128,6 +128,9 @@ public class Wallet_list extends Activity {
 		if (id == R.id.action_show_seed){
 			startActivity (new Intent(Wallet_list.this, Show_seed.class));
 		}
+		if (id == R.id.action_settings){
+			startActivity (new Intent(Wallet_list.this, Settings.class));
+		}
 		return super.onOptionsItemSelected(item);
 	}
 	
@@ -253,7 +256,7 @@ public class Wallet_list extends Activity {
 							DeterministicKey walletMasterKey = HDKey.deriveChildKey(masterKey,1);
 							DeterministicKey childKey = HDKey.deriveChildKey(walletMasterKey,index.get(j));
 							byte[] privKey = childKey.getPrivKeyBytes();
-							byte[] pubKey = childKey.getPubKeyBytes();
+							byte[] pubKey = childKey.getPubKey();
 							ECKey authenticatorKey = new ECKey(privKey, pubKey);
 							ECKey walletPubKey = new ECKey(null, walpubkeys.get(j)); 							
 							List<ECKey> keys = ImmutableList.of(authenticatorKey, walletPubKey);
