@@ -31,6 +31,52 @@ public class WalletFile {
 		}
 	}
 	
+	/** Saves the network paraments to the JSON file */
+	void writeNetworkParams(Boolean testnet){
+		//Load the existing json file
+		JSONParser parser = new JSONParser();
+		Object obj = null;
+		try {
+			obj = parser.parse(new FileReader(filePath));
+		} catch (IOException | ParseException e) {
+			e.printStackTrace();
+		}
+		JSONObject jsonObject = (JSONObject) obj;
+		String aeskey = (String) jsonObject.get("aes_key");
+		String mpubkey = (String) jsonObject.get("master_public_key");
+		String chaincode = (String) jsonObject.get("chain_code");
+		long numkeys = (Long) jsonObject.get("keys_n");
+		JSONArray msg = (JSONArray) jsonObject.get("keys");
+		Iterator<JSONObject> iterator = msg.iterator();
+		JSONArray jsonlist = new JSONArray();
+		while (iterator.hasNext()) {
+			jsonlist.add(iterator.next());
+		}		
+		//Save the new json file
+		Map newobj=new LinkedHashMap();
+		newobj.put("aes_key", aeskey);
+		newobj.put("master_public_key", mpubkey);
+		newobj.put("chain_code", chaincode);
+		newobj.put("testnet", testnet);
+		newobj.put("keys_n", numkeys);
+		newobj.put("keys", jsonlist);
+		StringWriter jsonOut = new StringWriter();
+		try {
+			JSONValue.writeJSONString(newobj, jsonOut);
+		} catch (IOException e1) {
+			e1.printStackTrace();
+		}
+		String jsonText = jsonOut.toString();
+		try {
+			FileWriter file = new FileWriter(filePath);
+			file.write(jsonText);
+			file.flush();
+			file.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
 	/**
 	 * This method is used to save a new address and private key to file. It loads the existing .json file,
 	 * adds a new wallet object to it, then saves it back to file.  
@@ -48,6 +94,7 @@ public class WalletFile {
 		String aeskey = (String) jsonObject.get("aes_key");
 		String mpubkey = (String) jsonObject.get("master_public_key");
 		String chaincode = (String) jsonObject.get("chain_code");
+		Boolean testnet = (Boolean) jsonObject.get("testnet");
 		long numkeys = (Long) jsonObject.get("keys_n");
 		JSONArray msg = (JSONArray) jsonObject.get("keys");
 		Iterator<JSONObject> iterator = msg.iterator();
@@ -68,6 +115,7 @@ public class WalletFile {
 		newobj.put("aes_key", aeskey);
 		newobj.put("master_public_key", mpubkey);
 		newobj.put("chain_code", chaincode);
+		newobj.put("testnet", testnet);
 		newobj.put("keys_n", numkeys);
 		newobj.put("keys", jsonlist);
 		StringWriter jsonOut = new StringWriter();
@@ -88,12 +136,14 @@ public class WalletFile {
 	}
 	
 	/**This method is used during pairing. It saves the data from the Autheticator to file*/
-	void writePairingData(String mpubkey, String chaincode, String key){
+	void writePairingData(String mpubkey, String chaincode, String key, String GCM){
 		JSONArray jsonlist = new JSONArray();
 		Map obj=new LinkedHashMap();
 		obj.put("aes_key", key);
 		obj.put("master_public_key", mpubkey);
 		obj.put("chain_code", chaincode);
+		obj.put("GCM", GCM);
+		obj.put("testnet", false);
 		obj.put("keys_n", new Integer(0));
 		obj.put("keys", jsonlist);
 		StringWriter jsonOut = new StringWriter();
@@ -261,6 +311,32 @@ public class WalletFile {
 			if (jIndex==index){return pkey;}	
 		}
 		return null;
+	}
+	
+	public Boolean getTestnet(){
+		JSONParser parser = new JSONParser();
+		Object obj = null;
+		try {
+			obj = parser.parse(new FileReader(filePath));
+		} catch (IOException | ParseException e) {
+			e.printStackTrace();
+		}
+		JSONObject jsonObject = (JSONObject) obj;
+		Boolean testnet = (Boolean) jsonObject.get("testnet");
+		return testnet;
+	}
+	
+	public String getGCMRegID(){
+		JSONParser parser = new JSONParser();
+		Object obj = null;
+		try {
+			obj = parser.parse(new FileReader(filePath));
+		} catch (IOException | ParseException e) {
+			e.printStackTrace();
+		}
+		JSONObject jsonObject = (JSONObject) obj;
+		String GCM = (String) jsonObject.get("GCM");
+		return GCM;
 	}
 	
 }

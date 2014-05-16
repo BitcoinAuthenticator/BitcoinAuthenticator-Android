@@ -81,17 +81,17 @@ public class PairingProtocol {
 				  			 "pairing ID: " + new String(pairingID));
 		  //Save mPubKey and the Chaincode to file
 		  WalletFile file = new WalletFile();
-		  file.writePairingData(bytesToHex(mPubKey), bytesToHex(chaincode), key);
+		  file.writePairingData(bytesToHex(mPubKey), bytesToHex(chaincode), key, bytesToHex(gcmRegId));
 	  }
 	  else {
 		  System.out.println("Message authentication code is invalid");
 	  }
 	  
 	  //dispose
-	  in.close();
-	  out.close();
-	  plugnplay.removeMapping();
-	  ss.close();
+	  //in.close();
+	  //out.close();
+	  //plugnplay.removeMapping();
+	  //ss.close();
 	  // Return to main
 	  Main.inputCommand();
 

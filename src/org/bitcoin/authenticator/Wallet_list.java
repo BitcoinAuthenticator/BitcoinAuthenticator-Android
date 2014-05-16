@@ -27,6 +27,7 @@ import com.google.bitcoin.crypto.DeterministicKey;
 import com.google.bitcoin.crypto.HDKeyDerivation;
 import com.google.bitcoin.crypto.TransactionSignature;
 import com.google.bitcoin.params.MainNetParams;
+import com.google.bitcoin.params.TestNet3Params;
 import com.google.bitcoin.script.Script;
 import com.google.bitcoin.script.ScriptBuilder;
 import com.google.common.collect.ImmutableList;
@@ -91,21 +92,30 @@ public class Wallet_list extends Activity {
         IPAddress = prefs.getString("ExternalIP", "null");
         LocalIP = prefs.getString("LocalIP","null");
         
-        // handle pending requests from GCM
-        Bundle extra = getIntent().getExtras();
-        if(extra != null && extra.containsKey("pairingReq")){ // TODO - currently works for only one request
-        	try {
-				req = new JSONObject (extra.getString("pairingReq"));
-				hasPendingReq = true;
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		}
-        else
-        	hasPendingReq = false;
+        //Load the GCM settings from shared preferences
+        SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
+        Boolean GCM = settings.getBoolean("GCM", true);
         
-        //Launch task to get public IP to determine if the device is on the same network as the wallet.
-        new getIPtask().execute("");
+        //Handle pending requests from GCM
+        if(GCM){
+        	Bundle extra = getIntent().getExtras();
+        	if(extra != null && extra.containsKey("pairingReq")){ // TODO - currently works for only one request
+        		try {
+        			req = new JSONObject (extra.getString("pairingReq"));
+        			hasPendingReq = true;
+        			new ConnectToWallets().execute("");
+        		} catch (JSONException e) {
+        			e.printStackTrace();
+        		}
+        	}
+        	else {
+        		hasPendingReq = false;
+        	}
+        }
+        else {
+        	//Launch task to get public IP to determine if the device is on the same network as the wallet.
+    		new getIPtask().execute("");	
+        }
     }
 	
 	/**Inflates the menu and adds it to the action bar*/
@@ -208,8 +218,17 @@ public class Wallet_list extends Activity {
     			}
     		}
     		final byte[] authseed = seed;
+    		//Load network parameters from shared preferences
+    		SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
+            Boolean testnet = settings.getBoolean("testnet", false);
+            NetworkParameters params = null;
+            if (testnet==false){
+            	params = MainNetParams.get();
+            } 
+            else {
+            	params = TestNet3Params.get();
+            }
 			//Parse through the transaction message and rebuild the transaction.
-			NetworkParameters params = MainNetParams.get();
 			byte[] transaction = tx.getTransaction();
 			final Transaction unsignedTx = new Transaction(params, transaction);
 			//Get the output address and the amount from the transaction so we can display it to the user.
@@ -472,21 +491,26 @@ public class Wallet_list extends Activity {
     		final byte[] AESKey = key;
     		SecretKey sharedsecret = new SecretKeySpec(AESKey, "AES");
     		Log.v("ASDF", "hasPendingReq " + hasPendingReq.toString());
-    		//Check pending requests via GCM
+    		//Check pending requests via GCM}
     		if(hasPendingReq)
     		{
     			//TODO - add multiple wallet handling
     			try {
     				JSONObject reqPayload = new JSONObject(req.getString("ReqPayload"));
-					IPAddress =  reqPayload.getString("ExternalIP");
-					LocalIP = reqPayload.getString("LocalIP");
-					Log.v("ASDF", "Changed wallet ip address from GCM to: " + IPAddress + "\n" +
-							"Changed wallet local ip address from GCM to: " + LocalIP);
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
+    				IPAddress =  reqPayload.getString("ExternalIP");
+    				LocalIP = reqPayload.getString("LocalIP");
+    				SharedPreferences prefs = getSharedPreferences("WalletData1", 0);
+    				SharedPreferences.Editor editor = prefs.edit();
+    				editor.putString("ExternalIP", IPAddress);
+    				editor.putString("LocalIP", LocalIP);
+    				editor.commit();
+    				Log.v("ASDF", "Changed wallet ip address from GCM to: " + IPAddress + "\n" +
+    						"Changed wallet local ip address from GCM to: " + LocalIP);
+    			} catch (JSONException e) {
+    				e.printStackTrace();
+    			}
     		}
-    		
+ 
         	//Decide which IP to use for the connection
         	String IP = null;
         	if (IPAddress.equals(PublicIP)){IP = LocalIP;}
@@ -496,26 +520,25 @@ public class Wallet_list extends Activity {
         	if (PairingProtocol.conn==null){
         		try {
 					conn = new Connection(IP);
-					
-					//Create a new message object for receiving the transaction.
-		        	Message msg = null;
-					msg = new Message(conn);
-					tx = msg.receiveTX(sharedsecret);
-		    		
 				} catch (IOException e) {
 					runOnUiThread(new Runnable() {
 						  public void run() {
 							  Toast.makeText(getApplicationContext(), "Unable to connect to wallet", Toast.LENGTH_LONG).show();
 						  }
 						});
-				}
-        		catch (Exception e) {
-					e.printStackTrace();
-				}
+				}catch (Exception e) {e.printStackTrace();}
         	}
         	else {
         		conn = PairingProtocol.conn;
         	}
+        	//Create a new message object for receiving the transaction.
+        	Message msg = null;
+			try {
+				msg = new Message(conn);
+			} catch (IOException e) {e.printStackTrace();}
+			try {
+				tx = msg.receiveTX(sharedsecret);
+			} catch (Exception e) {e.printStackTrace();}
         	
 			return null;
         }

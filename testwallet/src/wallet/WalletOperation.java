@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -45,6 +46,7 @@ import com.google.bitcoin.crypto.DeterministicKey;
 import com.google.bitcoin.crypto.HDKeyDerivation;
 import com.google.bitcoin.crypto.TransactionSignature;
 import com.google.bitcoin.params.MainNetParams;
+import com.google.bitcoin.params.TestNet3Params;
 import com.google.bitcoin.script.Script;
 import com.google.bitcoin.script.ScriptBuilder;
 import com.google.common.collect.ImmutableList;
@@ -64,6 +66,16 @@ public class WalletOperation {
 	static int numInputs;
 	static ArrayList<byte[]> publickeys;
 	static ArrayList<Integer> childkeyindex;
+	static Boolean testnet;
+	
+	public WalletOperation() throws IOException{
+		String filePath = new java.io.File( "." ).getCanonicalPath() + "/wallet.json";
+		File f = new File(filePath);
+		if(f.exists() && !f.isDirectory()) {
+			WalletFile file = new WalletFile();
+			testnet = file.getTestnet();
+		}
+	}
 	
 	/**
 	 * Sends a transaction message over to the Authenticator.
@@ -151,11 +163,13 @@ public class WalletOperation {
 		
 		//Send the encrypted payload over to the Authenticator and wait for the response.
 		//disp.write(cipherBytes.length, cipherBytes);
-		Device d = new Device(PairingProtocol.chaincode,
-				PairingProtocol.mPubKey,
-				PairingProtocol.gcmRegId,
-				PairingProtocol.pairingID,
-				PairingProtocol.sharedsecret);
+		ArrayList<String> keyandchain = file.getPubAndChain();
+		byte[] gcmID = file.getGCMRegID().getBytes();
+		Device d = new Device(keyandchain.get(1).getBytes(),
+				keyandchain.get(0).getBytes(),
+				gcmID,
+				hexStringToByteArray("00000001"),
+				secretkey);
 		disp.dispachMessage(MessageType.signTx, cipherBytes, d);
 		System.out.println("Sent transaction");
 		int keysize = disp.readInt();
@@ -179,7 +193,6 @@ public class WalletOperation {
 			System.out.println("Message authentication code is invalid");
 		}
 		//Prep the keys needed for signing
-		ArrayList<String> keyandchain = file.getPubAndChain();
 		byte[] key = hexStringToByteArray(keyandchain.get(0));
 		byte[] chain = hexStringToByteArray(keyandchain.get(1));
 		List<TransactionInput> inputs = spendtx.getInputs();
@@ -285,7 +298,14 @@ public class WalletOperation {
   		DeterministicKey mPubKey = HDKey.createMasterPubKeyFromBytes(key, chain);
   		DeterministicKey childKey = HDKey.deriveChildKey(mPubKey, index);
   		byte[] childpublickey = childKey.getPubKey();
-		NetworkParameters params = MainNetParams.get();
+  		//Select network parameters
+  		NetworkParameters params = null;
+        if (testnet==false){
+        	params = MainNetParams.get();
+        } 
+        else {
+        	params = TestNet3Params.get();
+        }
 		ECKey childPubKey = new ECKey(null, childpublickey);
 		//Create a new key pair which will kept in the wallet.
 		ECKey walletKey = new ECKey();
@@ -321,7 +341,8 @@ public class WalletOperation {
 			if (inAmount < (outAmount + 10000)){
 				JSONObject json;
 				UnspentOutput out = null;
-				json = readJsonFromUrl("http://btc.blockr.io/api/v1/address/unspent/" + addrs.get(i));
+				if (testnet){json = readJsonFromUrl("http://tbtc.blockr.io/api/v1/address/unspent/" + addrs.get(i));}
+				else {json = readJsonFromUrl("http://btc.blockr.io/api/v1/address/unspent/" + addrs.get(i));}
 				JSONObject data = json.getJSONObject("data");
 				JSONArray unspent = data.getJSONArray("unspent");
 				if (unspent.length()!=0){
@@ -348,7 +369,8 @@ public class WalletOperation {
 			if (inAmount < (outAmount + 10000)){
 				JSONObject json;
 				UnspentOutput out = null;
-				json = readJsonFromUrl("http://btc.blockr.io/api/v1/address/unconfirmed/" + addrs.get(j));
+				if (testnet){json = readJsonFromUrl("http://tbtc.blockr.io/api/v1/address/unconfirmed/" + addrs.get(j));}
+				else {json = readJsonFromUrl("http://btc.blockr.io/api/v1/address/unconfirmed/" + addrs.get(j));}
 				JSONObject data1 = json.getJSONObject("data");
 				JSONArray unconfirmed = data1.getJSONArray("unconfirmed");
 				if (unconfirmed.length()!=0){
@@ -384,7 +406,14 @@ public class WalletOperation {
 			totalouts = totalouts + Long.parseLong(MILLI.get(i));
 		}
 		ArrayList<UnspentOutput> out = getUnspentOutputs(totalouts); 
-  		NetworkParameters params = MainNetParams.get();
+		//Set the network parameters
+		NetworkParameters params = null;
+        if (testnet==false){
+        	params = MainNetParams.get();
+        } 
+        else {
+        	params = TestNet3Params.get();
+        }
   		spendtx = new Transaction(params);
   		byte[] script = hexStringToByteArray("");
   		//Creates the inputs which reference a previous unspent output
@@ -456,7 +485,8 @@ public class WalletOperation {
 						addr = addr + addresses.get(i) + ",";
 					}
 				}
-				json = readJsonFromUrl("http://btc.blockr.io/api/v1/address/balance/" + addr);
+				if (testnet){json = readJsonFromUrl("http://tbtc.blockr.io/api/v1/address/balance/" + addr);}
+				else {json = readJsonFromUrl("http://btc.blockr.io/api/v1/address/balance/" + addr);}
 				data = json.getJSONArray("data");
 				addrbalance=0;
 				for (int i=0; i<data.length(); i++){

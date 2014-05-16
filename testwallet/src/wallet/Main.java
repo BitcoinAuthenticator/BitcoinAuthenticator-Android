@@ -78,6 +78,7 @@ public class Main {
 			  cmd.add("listaddresses");
 			  cmd.add("getbalance");
 			  cmd.add("testgcm");
+			  cmd.add("testnet");
 			  cmd.add("help");  
 			  //Switch for executing the commands
 			  WalletOperation op = new WalletOperation();
@@ -152,8 +153,17 @@ public class Main {
 				  // TODO - send a real message
 				  disp.dispachMessage(MessageType.signTx, "{data:hello}".getBytes(), d);
 				  break;
-			// help
+			// testnet	  
 			  case 8:
+				  Boolean testnet = false;
+				  String params = s.substring(s.indexOf("(")+1, s.indexOf(")"));
+				  if (params.equals("false")){testnet=false;}
+				  else if (params.equals("true")){testnet=true;}
+				  WalletFile file3 = new WalletFile();
+				  file3.writeNetworkParams(testnet);
+				  break;
+			// help
+			  case 9:
 				  System.out.println("Usage:");
 				  System.out.println("  command(parameter)");
 				  System.out.println("");
@@ -170,5 +180,4 @@ public class Main {
 			  }
 		   }
 	}
-	
 }

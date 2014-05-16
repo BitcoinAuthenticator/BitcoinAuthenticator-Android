@@ -77,11 +77,6 @@
             android:label="@string/app_name" > 
         </activity>
         <activity
-            android:name="Test"
-            android:label="@string/app_name" > 
-        </activity>
-        
-        <activity
 			android:name="com.google.zxing.client.android.CaptureActivity"
 			android:configChanges="orientation|keyboardHidden"
 			android:screenOrientation="landscape"
