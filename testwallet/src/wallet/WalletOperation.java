@@ -10,6 +10,8 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.ByteBuffer;
@@ -248,11 +250,17 @@ public class WalletOperation {
 			}
 	}
 	
-	/**Pushes the raw transaction the the Eligius mining pool*/
+	/**Pushes the raw transaction to Blockr.io*/
 	void pushTx(String tx) throws IOException{
 		System.out.println("Broadcasting to network...");
-		String urlParameters = "transaction="+ tx + "&send=Push";
-		String request = "http://eligius.st/~wizkid057/newstats/pushtxn.php";
+		String urlParameters = "hex="+ tx;
+		String request = "";
+		if (testnet){
+			request = "http://tbtc.blockr.io/api/v1/tx/push";
+		}
+		else {
+			request = "http://btc.blockr.io/api/v1/tx/push";
+			}
 		URL url = new URL(request); 
 		HttpURLConnection connection = (HttpURLConnection) url.openConnection();           
 		connection.setDoOutput(true);
@@ -279,8 +287,7 @@ public class WalletOperation {
 		in.close();
 		connection.disconnect();
 		//Print txid
-		System.out.println("Success!");
-		System.out.println("txid: " + response.substring(response.indexOf("string(64) ")+12, response.indexOf("string(64) ")+76));
+		System.out.println(response.toString());
 	}
 	
 	/**
