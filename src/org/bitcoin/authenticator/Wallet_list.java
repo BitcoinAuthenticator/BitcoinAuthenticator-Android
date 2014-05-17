@@ -5,7 +5,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -40,16 +39,19 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.text.Editable;
 import android.text.Html;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.BaseAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -71,34 +73,31 @@ public class Wallet_list extends Activity {
 	public static JSONObject req;
 	public static Boolean hasPendingReq;
  
-	/**Creates the listview component and defines behavior to a long press on a list item.*/
+	
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wallet_list);
-        //Get the wallet metadata and add it to a listview.
-        ArrayList walletList = getListData();
-        final ListView lv1 = (ListView) findViewById(R.id.custom_list);
-        lv1.setAdapter(new CustomListAdapter(this, walletList));
-        //Click listener for list items.
-        lv1.setOnItemClickListener(new OnItemClickListener() {
-            public void onItemClick(AdapterView<?> a, View v, int position, long id) {
-                Object o = lv1.getItemAtPosition(position);
-                WalletItem newsData = (WalletItem) o;
-                Toast.makeText(Wallet_list.this, "Selected :" + " " + newsData, Toast.LENGTH_LONG).show();
-            }
-        });
+        //Create the list view
+        setListView();
         //Load the IPs for each wallet from shared preferences.
         SharedPreferences prefs = getSharedPreferences("WalletData1", 0);	
         IPAddress = prefs.getString("ExternalIP", "null");
         LocalIP = prefs.getString("LocalIP","null");
-        
         //Load pending request Boolean
         SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
         hasPendingReq = settings.getBoolean("request", false);
-
+        //Start the AsyncTask which waits for new transactions
 		new getIPtask().execute("");
-
     }
+	
+	/**Creates the listview component and defines behavior to a long press on a list item.*/
+	void setListView(){
+        ArrayList walletList = getListData();
+        final ListView lv1 = (ListView) findViewById(R.id.custom_list);
+        lv1.setLongClickable(true);
+        lv1.setAdapter(new CustomListAdapter(this, walletList));
+        registerForContextMenu(lv1);
+	}
 	
 	/**Inflates the menu and adds it to the action bar*/
 	@Override
@@ -124,6 +123,52 @@ public class Wallet_list extends Activity {
 			startActivity (new Intent(Wallet_list.this, Settings.class));
 		}
 		return super.onOptionsItemSelected(item);
+	}
+	
+	/**Creates the context menu that pops up on a long click in the list view*/
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,ContextMenuInfo menuInfo) {
+	super.onCreateContextMenu(menu, v, menuInfo);
+		menu.setHeaderTitle("Select Action");
+		menu.add(0, v.getId(), 0, "Re-pair with wallet");
+		menu.add(0, v.getId(), 0, "Rename");
+		menu.add(0, v.getId(), 0, "Delete");
+	}
+    
+    /**Handles the clicks in the context menu*/
+    @Override
+	public boolean onContextItemSelected(MenuItem item) {
+    	AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+        final int index = info.position;
+       	if(item.getTitle()=="Re-pair with wallet"){}//menu actions go here. Should use switch.
+    	else if(item.getTitle()=="Rename"){
+    		AlertDialog.Builder alert = new AlertDialog.Builder(this);
+    		alert.setTitle("Rename");
+    		alert.setMessage("Enter a name for this wallet:");
+    		// Set an EditText view to get user input 
+    		final EditText input = new EditText(this);
+    		alert.setView(input);
+    		alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+    		public void onClick(DialogInterface dialog, int whichButton) {
+    			String value = input.getText().toString();
+    			String wdata = "WalletData" + (index+1);
+    			SharedPreferences data = getSharedPreferences(wdata, 0);
+    			SharedPreferences.Editor editor = data.edit();	
+    			editor.putString("ID", value);
+    			editor.commit();
+    			setListView();
+    			}
+    		});
+    		alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+    			public void onClick(DialogInterface dialog, int whichButton) {
+    		    // Canceled.
+    			}
+    		});
+    		alert.show();
+    	}
+    	else if(item.getTitle()=="Delete"){}
+    	else {return false;}
+	return true;
 	}
 	
 	/**
