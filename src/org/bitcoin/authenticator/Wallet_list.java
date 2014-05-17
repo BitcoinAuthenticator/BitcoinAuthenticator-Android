@@ -92,31 +92,12 @@ public class Wallet_list extends Activity {
         IPAddress = prefs.getString("ExternalIP", "null");
         LocalIP = prefs.getString("LocalIP","null");
         
-        //Load the GCM settings from shared preferences
+        //Load pending request Boolean
         SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
-        Boolean GCM = settings.getBoolean("GCM", true);
-        
-        //Handle pending requests from GCM
-        if(GCM){
-        	Bundle extra = getIntent().getExtras();
-        	if(extra != null && extra.containsKey("pairingReq")){ // TODO - currently works for only one request
-        		try {
-        			req = new JSONObject (extra.getString("pairingReq"));
-        			hasPendingReq = true;
-        			new getIPtask().execute("");	
-        			System.out.println("#1");
-        		} catch (JSONException e) {
-        			e.printStackTrace();
-        		}
-        	}
-        	else {
-        		hasPendingReq = false;
-        	}
-        }
-        else {
-        	//Launch task to get public IP to determine if the device is on the same network as the wallet.
-    		new getIPtask().execute("");	
-        }
+        hasPendingReq = settings.getBoolean("request", false);
+
+		new getIPtask().execute("");
+
     }
 	
 	/**Inflates the menu and adds it to the action bar*/
@@ -493,7 +474,33 @@ public class Wallet_list extends Activity {
     		final byte[] AESKey = key;
     		SecretKey sharedsecret = new SecretKeySpec(AESKey, "AES");
     		Log.v("ASDF", "hasPendingReq " + hasPendingReq.toString());
-    		//Check pending requests via GCM}
+    		//Check pending requests via GCM
+    		while (hasPendingReq==false){
+    			SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
+    	        hasPendingReq = settings.getBoolean("request", false);
+    		}
+    		
+    		//Load the GCM settings from shared preferences
+            SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
+            Boolean GCM = settings.getBoolean("GCM", true);
+    		
+    		//Handle pending requests from GCM
+            if(GCM){
+            	Bundle extra = getIntent().getExtras();
+            	if(extra != null && extra.containsKey("pairingReq")){ // TODO - currently works for only one request
+            		try {
+            			req = new JSONObject (extra.getString("pairingReq"));
+            			hasPendingReq = true;	
+            			System.out.println("#1");
+            		} catch (JSONException e) {
+            			e.printStackTrace();
+            		}
+            	}
+            	else {
+            		hasPendingReq = false;
+            	}
+            }
+    		
     		if(hasPendingReq)
     		{
     			//TODO - add multiple wallet handling
@@ -513,6 +520,11 @@ public class Wallet_list extends Activity {
     				e.printStackTrace();
     			}
     		}
+    		hasPendingReq=false;
+    		SharedPreferences.Editor editor = settings.edit();	
+        	editor.putBoolean("request", false);
+        	editor.commit();
+
         	//Decide which IP to use for the connection
         	String IP = null;
         	if (IPAddress.equals(PublicIP)){IP = LocalIP;}

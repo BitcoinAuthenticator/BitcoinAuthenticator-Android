@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.bitcoin.authenticator.Main;
 import org.bitcoin.authenticator.R;
+import org.bitcoin.authenticator.Wallet_list;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -15,6 +16,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
@@ -72,6 +74,10 @@ public class GcmIntentService extends IntentService {
     // This is just one simple example of what you might choose to do with
     // a GCM message.
     private void sendNotification(String msg) {
+    	SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
+		SharedPreferences.Editor editor = settings.edit();	
+    	editor.putBoolean("request", true);
+    	editor.commit();
     	Date now = new Date();
     	long uniqueId = now.getTime();//use date to generate an unique id to differentiate the notifications.
     	
