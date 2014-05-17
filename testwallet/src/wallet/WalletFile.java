@@ -45,6 +45,7 @@ public class WalletFile {
 		String aeskey = (String) jsonObject.get("aes_key");
 		String mpubkey = (String) jsonObject.get("master_public_key");
 		String chaincode = (String) jsonObject.get("chain_code");
+		String gcm = (String) jsonObject.get("GCM");
 		long numkeys = (Long) jsonObject.get("keys_n");
 		JSONArray msg = (JSONArray) jsonObject.get("keys");
 		Iterator<JSONObject> iterator = msg.iterator();
@@ -57,6 +58,7 @@ public class WalletFile {
 		newobj.put("aes_key", aeskey);
 		newobj.put("master_public_key", mpubkey);
 		newobj.put("chain_code", chaincode);
+		newobj.put("GCM", gcm);
 		newobj.put("testnet", testnet);
 		newobj.put("keys_n", numkeys);
 		newobj.put("keys", jsonlist);
@@ -94,7 +96,8 @@ public class WalletFile {
 		String aeskey = (String) jsonObject.get("aes_key");
 		String mpubkey = (String) jsonObject.get("master_public_key");
 		String chaincode = (String) jsonObject.get("chain_code");
-		Boolean testnet = (Boolean) jsonObject.get("testnet");
+		String gcm = (String) jsonObject.get("GCM");
+		Boolean testnet = (Boolean) jsonObject.get("testnet"); 
 		long numkeys = (Long) jsonObject.get("keys_n");
 		JSONArray msg = (JSONArray) jsonObject.get("keys");
 		Iterator<JSONObject> iterator = msg.iterator();
@@ -115,6 +118,7 @@ public class WalletFile {
 		newobj.put("aes_key", aeskey);
 		newobj.put("master_public_key", mpubkey);
 		newobj.put("chain_code", chaincode);
+		newobj.put("GCM", gcm);
 		newobj.put("testnet", testnet);
 		newobj.put("keys_n", numkeys);
 		newobj.put("keys", jsonlist);
@@ -135,7 +139,7 @@ public class WalletFile {
 			}
 	}
 	
-	/**This method is used during pairing. It saves the data from the Autheticator to file*/
+	/**This method is used during pairing. It saves the data from the Authenticator to file*/
 	void writePairingData(String mpubkey, String chaincode, String key, String GCM){
 		JSONArray jsonlist = new JSONArray();
 		Map obj=new LinkedHashMap();
@@ -326,7 +330,7 @@ public class WalletFile {
 		return testnet;
 	}
 	
-	public String getGCMRegID(){
+	public byte[] getGCMRegID(){
 		JSONParser parser = new JSONParser();
 		Object obj = null;
 		try {
@@ -336,7 +340,7 @@ public class WalletFile {
 		}
 		JSONObject jsonObject = (JSONObject) obj;
 		String GCM = (String) jsonObject.get("GCM");
-		return GCM;
+		return GCM.getBytes();
 	}
 	
 }

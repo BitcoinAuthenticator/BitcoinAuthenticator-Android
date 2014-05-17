@@ -139,14 +139,17 @@ public class Main {
 				  break;
 			//testgcm
 			  case 7:
-				  System.out.print("Android Device Registration ID: ");
+				  WalletFile file4 = new WalletFile();
+				  byte[] ID = file4.getGCMRegID();
+				 // System.out.print("Android Device Registration ID: ");
 				  //"APA91bEwbGCjr1T-bNkiB1tdERfzOGChTHnjFHA9JizMJNs7D6dinCHUv86MWUOW-IchY3o7nVZwM2s3VCpDmYyWvlVAQ1lo1jnmnbP550uczJSPrYGmBxwlFvfa1poWIxReiIS5Nsm-fPAv2iiaKgT5eacr470RBJE3sxYkFtSi1svVfiJTGig"
-				  String regID = in.nextLine();
+				  //String regID = in.nextLine();
 				  GCMSender sender = new GCMSender();
 				  Dispacher disp = new Dispacher();
 				  Device d = new Device(PairingProtocol.chaincode,
 						  PairingProtocol.mPubKey,
-						  regID.getBytes(),
+						  ID,
+						  //regID.getBytes(),
 						  "-1".getBytes(),
 						  PairingProtocol.sharedsecret);
 				  

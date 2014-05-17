@@ -103,7 +103,8 @@ public class Wallet_list extends Activity {
         		try {
         			req = new JSONObject (extra.getString("pairingReq"));
         			hasPendingReq = true;
-        			new ConnectToWallets().execute("");
+        			new getIPtask().execute("");	
+        			System.out.println("#1");
         		} catch (JSONException e) {
         			e.printStackTrace();
         		}
@@ -463,6 +464,7 @@ public class Wallet_list extends Activity {
     	TxData tx;
         @Override
         protected Connection doInBackground(String... message) {
+        	System.out.println("#3");
         	//Load AES Key from file
         	byte [] key = null;
     		String FILENAME = "AESKey1";
@@ -496,6 +498,7 @@ public class Wallet_list extends Activity {
     		{
     			//TODO - add multiple wallet handling
     			try {
+    				System.out.println("#4");
     				JSONObject reqPayload = new JSONObject(req.getString("ReqPayload"));
     				IPAddress =  reqPayload.getString("ExternalIP");
     				LocalIP = reqPayload.getString("LocalIP");
@@ -510,7 +513,6 @@ public class Wallet_list extends Activity {
     				e.printStackTrace();
     			}
     		}
- 
         	//Decide which IP to use for the connection
         	String IP = null;
         	if (IPAddress.equals(PublicIP)){IP = LocalIP;}
@@ -519,6 +521,7 @@ public class Wallet_list extends Activity {
         	//Otherwise we will create a new connection.
         	if (PairingProtocol.conn==null){
         		try {
+        			System.out.println("#5");
 					conn = new Connection(IP);
 				} catch (IOException e) {
 					runOnUiThread(new Runnable() {
@@ -539,6 +542,7 @@ public class Wallet_list extends Activity {
 			try {
 				tx = msg.receiveTX(sharedsecret);
 			} catch (Exception e) {e.printStackTrace();}
+			System.out.println("#6");
         	
 			return null;
         }
@@ -567,6 +571,7 @@ public class Wallet_list extends Activity {
     public class getIPtask extends AsyncTask<String,String,String> {
         @Override
         protected String doInBackground(String... message) {
+        	System.out.println("#2");
         	String ip = Utils.getPublicIP();
             return ip;
         }

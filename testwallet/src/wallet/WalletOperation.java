@@ -141,32 +141,19 @@ public class WalletOperation {
 		
 		// Init dispacher
 		byte[] cipherKeyBytes;
-		Dispacher disp;
-		if (PairingProtocol.out == null){
-			DataOutputStream out = new DataOutputStream(OpenPort.socket.getOutputStream());
-			DataInputStream in = new DataInputStream(OpenPort.socket.getInputStream());
-			disp = new Dispacher(out,in);
+		Dispacher disp = new Dispacher();
+		
 			/*out.writeInt(cipherBytes.length);
 			out.write(cipherBytes);
 			System.out.println("Sent transaction");
 			int keysize = in.readInt();
 		    cipherKeyBytes = new byte[keysize];
 		    in.read(cipherKeyBytes);*/
-		}
-		else {
-			disp = new Dispacher(PairingProtocol.out,PairingProtocol.in);
-			/*PairingProtocol.out.writeInt(cipherBytes.length);
-			PairingProtocol.out.write(cipherBytes);
-			System.out.println("Sent transaction");
-			int keysize = PairingProtocol.in.readInt();
-		    cipherKeyBytes = new byte[keysize];
-		    PairingProtocol.in.read(cipherKeyBytes);*/
-		}
 		
 		//Send the encrypted payload over to the Authenticator and wait for the response.
 		//disp.write(cipherBytes.length, cipherBytes);
 		ArrayList<String> keyandchain = file.getPubAndChain();
-		byte[] gcmID = file.getGCMRegID().getBytes();
+		byte[] gcmID = file.getGCMRegID();
 		Device d = new Device(keyandchain.get(1).getBytes(),
 				keyandchain.get(0).getBytes(),
 				gcmID,

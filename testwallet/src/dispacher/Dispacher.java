@@ -58,13 +58,13 @@ public class Dispacher {
 					inStream = new DataInputStream(socket.getInputStream());
 					outStream = new DataOutputStream(socket.getOutputStream());
 					
-					//write(payload.length,payload);
+					write(payload.length,payload);
 					
 					// dispose
-					outStream.close();
-					inStream.close();
-					plugnplay.removeMapping();
-					ss.close();
+					//outStream.close();
+					//inStream.close();
+					//plugnplay.removeMapping();
+					//ss.close();
 					
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
@@ -77,7 +77,7 @@ public class Dispacher {
 		}
 	}
 	
-	private void write(int length,byte[] payload) throws IOException  
+	private void write(int length, byte[] payload) throws IOException  
 	{
 		outStream.writeInt(length);
 		outStream.write(payload);
