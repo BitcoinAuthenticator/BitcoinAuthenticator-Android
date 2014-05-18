@@ -5,18 +5,23 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.nio.ByteBuffer;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONValue;
 
 import com.google.bitcoin.core.ECKey;
 import com.google.bitcoin.core.NetworkParameters;
@@ -129,7 +134,7 @@ public class Wallet_list extends Activity {
     public void onCreateContextMenu(ContextMenu menu, View v,ContextMenuInfo menuInfo) {
 	super.onCreateContextMenu(menu, v, menuInfo);
 		menu.setHeaderTitle("Select Action");
-		menu.add(0, v.getId(), 0, "Re-pair with wallet");
+		menu.add(0, v.getId(), 0, "Re-pair");
 		menu.add(0, v.getId(), 0, "Rename");
 		menu.add(0, v.getId(), 0, "Delete");
 	}
@@ -140,7 +145,7 @@ public class Wallet_list extends Activity {
     	AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
         final int index = info.position;
         //Re-pairs with the wallet
-       	if(item.getTitle()=="Re-pair with wallet"){
+       	if(item.getTitle()=="Re-pair"){
        		Object o = lv1.getItemAtPosition(index);
 			WalletItem Data = (WalletItem) o;
 			Re_pair_wallet.walletNum = Data.getWalletNum();
@@ -320,20 +325,16 @@ public class Wallet_list extends Activity {
 						//Close the dialog box first since the signature operations will create a little lag
 						//and we can do them in the background.
 						dialog.cancel();
-						//Prep the byte array we will fill with the signatures.
-						ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-						byte[] tempArr = ByteBuffer.allocate(4).putInt(tx.numInputs).array();
-						byte[] numSigs = Arrays.copyOfRange(tempArr, 2, 4);
-						try {
-							outputStream.write(numSigs);
-						} catch (IOException e1) {
-							e1.printStackTrace();
-						}
+						//Prep the JSON object we will fill with the signatures.
+						Map obj=new LinkedHashMap();
+						obj.put("version", 1);
+						obj.put("sig_n", tx.numInputs);
+						JSONArray siglist = new JSONArray();
 						//Loop creating a signature for each input
 						for (int j=0; j<tx.numInputs; j++){
 							//Derive the private key needed to sign the transaction
 							ArrayList<Integer> index = tx.getIndexes();
-							ArrayList<byte[]> walpubkeys = tx.getPublicKeys();
+							ArrayList<String> walpubkeys = tx.getPublicKeys();
 							HDKeyDerivation HDKey = null;
 							DeterministicKey masterKey = HDKey.createMasterPrivateKey(authseed);
 							DeterministicKey walletMasterKey = HDKey.deriveChildKey(masterKey,1);
@@ -341,49 +342,41 @@ public class Wallet_list extends Activity {
 							byte[] privKey = childKey.getPrivKeyBytes();
 							byte[] pubKey = childKey.getPubKey();
 							ECKey authenticatorKey = new ECKey(privKey, pubKey);
-							ECKey walletPubKey = new ECKey(null, walpubkeys.get(j)); 							
+							ECKey walletPubKey = new ECKey(null, Utils.hexStringToByteArray(walpubkeys.get(j))); 							
 							List<ECKey> keys = ImmutableList.of(authenticatorKey, walletPubKey);
 							//Create the multisig script we will be using for signing. 
 							Script scriptpubkey = ScriptBuilder.createMultiSigOutputScript(2,keys);
 							//Create the signature.
 							TransactionSignature sig2 = unsignedTx.calculateSignature(j, authenticatorKey, scriptpubkey, Transaction.SigHash.ALL, false);
 							byte[] signature = sig2.encodeToBitcoin();
-							byte[] tempArr2 = ByteBuffer.allocate(4).putInt(signature.length).array();
-							byte[] sigLen = Arrays.copyOfRange(tempArr2, 3, 4);
-							try {
-								outputStream.write(sigLen);
-								outputStream.write(signature);
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
+							JSONObject sigobj = new JSONObject();
+							try {sigobj.put("signature", Utils.bytesToHex(signature));} 
+							catch (JSONException e) {e.printStackTrace();}
+							//Add key object to array
+							siglist.add(sigobj);
 						}
-						byte[] sigArray = outputStream.toByteArray();
+						obj.put("siglist", siglist);
+						StringWriter jsonOut = new StringWriter();
+						try {JSONValue.writeJSONString(obj, jsonOut);} 
+						catch (IOException e1) {e1.printStackTrace();}
+						String jsonText = jsonOut.toString();
+						System.out.println(jsonText);
+						byte[] jsonBytes = jsonText.getBytes();
 						//Select which connection to use
 						Message msg = null;
 			        	if (PairingProtocol.conn==null){
-			        		try {
-								msg = new Message(conn);
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
+			        		try {msg = new Message(conn);} 
+			        		catch (IOException e) {e.printStackTrace();}
 			        	}
 			        	else {
-			        		try {
-								msg = new Message(PairingProtocol.conn);
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
+			        		try {msg = new Message(PairingProtocol.conn);} 
+			        		catch (IOException e) {e.printStackTrace();}
 			        	}
 			        	//Send the signature
-							try {
-								msg.sendSig(sigArray, sharedsecret);
-							} catch (InvalidKeyException e) {
-								e.printStackTrace();
-							} catch (NoSuchAlgorithmException e) {
-								e.printStackTrace();
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
+						try {msg.sendSig(jsonBytes, sharedsecret);} 
+						catch (InvalidKeyException e) {e.printStackTrace();} 
+						catch (NoSuchAlgorithmException e) {e.printStackTrace();} 
+						catch (IOException e) {e.printStackTrace();							}
 						//Reload the ConnectionToWallets task to set up to receive another transaction.
 						new ConnectToWallets().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 					}

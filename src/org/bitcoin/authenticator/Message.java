@@ -44,19 +44,16 @@ public class Message {
 	  	Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
 	    cipher.init(Cipher.DECRYPT_MODE, sharedsecret);
 	    //Split the payload into it's parts.
-	    String message = Utils.bytesToHex(cipher.doFinal(cipherBytes));
-	    String payload = message.substring(0,message.length()-64);
-	    TxData data = new TxData(payload);
-	    String HMAC = message.substring(message.length()-64,message.length());
-	    System.out.println("#2");
+	    String payload = Utils.bytesToHex(cipher.doFinal(cipherBytes));
+		byte[] testpayload = Utils.hexStringToByteArray(payload.substring(0,payload.length()-64));
+		byte[] hash = Utils.hexStringToByteArray(payload.substring(payload.length()-64,payload.length()));
+	    TxData data = new TxData(testpayload);
 	    //Verify the HMAC
 	    Mac mac = Mac.getInstance("HmacSHA256");
 		mac.init(sharedsecret);
-	    byte[] testmsg = Utils.hexStringToByteArray(payload);
-	    byte[] hash = Utils.hexStringToByteArray(HMAC);
-		byte[] macbytes = mac.doFinal(testmsg);
+		byte[] macbytes = mac.doFinal(testpayload);
 		if (Arrays.equals(macbytes, hash)){
-			//Return the payload as a string
+			//Return the payload
 			return data;
 		}
 		else {
@@ -81,29 +78,18 @@ public class Message {
 		byte payload[] = outputStream.toByteArray();
   		//Encrypt the payload
   	    Cipher cipher = null;
-			try {
-				cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-			} catch (NoSuchAlgorithmException e) {
-				e.printStackTrace();
-			} catch (NoSuchPaddingException e) {
-				e.printStackTrace();
-			}
-          try {
-				cipher.init(Cipher.ENCRYPT_MODE, sharedsecret);
-			} catch (InvalidKeyException e) {
-				e.printStackTrace();
-			}
-          byte[] cipherBytes = null;
-			try {
-				cipherBytes = cipher.doFinal(payload);
-			} catch (IllegalBlockSizeException e) {
-				e.printStackTrace();
-			} catch (BadPaddingException e) {
-				e.printStackTrace();
-			}
-			//Send the payload over to the wallet
-	  		out.writeInt(cipherBytes.length);
-			out.write(cipherBytes);
+		try {cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");} 
+		catch (NoSuchAlgorithmException e) {e.printStackTrace();} 
+		catch (NoSuchPaddingException e) {e.printStackTrace();}
+        try {cipher.init(Cipher.ENCRYPT_MODE, sharedsecret);} 
+        catch (InvalidKeyException e) {e.printStackTrace();}
+        byte[] cipherBytes = null;
+		try {cipherBytes = cipher.doFinal(payload);} 
+		catch (IllegalBlockSizeException e) {e.printStackTrace();} 
+		catch (BadPaddingException e) {e.printStackTrace();}
+		//Send the payload over to the wallet
+	  	out.writeInt(cipherBytes.length);
+		out.write(cipherBytes);
     }
 	
 }

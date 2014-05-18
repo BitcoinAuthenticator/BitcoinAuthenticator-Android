@@ -3,12 +3,16 @@ package org.bitcoin.authenticator;
 
 
 import java.io.*;
+import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.security.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import javax.crypto.*;
 
 import org.bitcoin.authenticator.GcmUtil.GcmUtilGlobal;
+import org.json.simple.JSONValue;
 
 import android.util.Log;
 
@@ -24,6 +28,7 @@ public class PairingProtocol {
     static DataOutputStream out;
     static DataInputStream in;
     public static Connection conn;
+    static Socket socket;
     
     /**	Constructor creates a new connection object to connect to the wallet. */
     public PairingProtocol(String IP) throws IOException {
@@ -47,66 +52,51 @@ public class PairingProtocol {
     	byte[] mpubkey = childkey.getPubKey(); // 32 bytes
     	byte[] pairID = ByteBuffer.allocate(4).putInt(pairingID).array(); // 4bytes
     	byte[] regID = GcmUtilGlobal.gcmRegistrationToken.getBytes();
-
-    	Log.v("ASDF","chaincode length byte[] - " + chaincode.length);
-    	Log.v("ASDF","mpubkey length byte[] - " + mpubkey.length);
-    	Log.v("ASDF","regID length byte[] - " + regID.length);
-
-   		ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
-   		outputStream.write(mpubkey);
-    	outputStream.write(chaincode);
-    	outputStream.write(pairID);
-    	outputStream.write(regID);
-    	byte[] keychaincode = outputStream.toByteArray();
+    	//Format data into a JSON object
+    	Map obj=new LinkedHashMap();
+    	obj.put("version", 1);
+		obj.put("mpubkey", Utils.bytesToHex(mpubkey));
+		obj.put("chaincode", Utils.bytesToHex(chaincode));
+		obj.put("pairID", Utils.bytesToHex(pairID));
+		obj.put("gcmID", new String (regID));
+		StringWriter jsonOut = new StringWriter();
+		try {JSONValue.writeJSONString(obj, jsonOut);} 
+		catch (IOException e1) {e1.printStackTrace();}
+		String jsonText = jsonOut.toString();
+		byte[] jsonBytes = jsonText.getBytes();
     	//Calculate the HMAC
     	Mac mac = Mac.getInstance("HmacSHA256");
     	mac.init(AESKey);
-    	byte[] macbytes = mac.doFinal(keychaincode);
-    	//Concatenate with the Key and Chaincode
+    	byte[] macbytes = mac.doFinal(jsonBytes);
+    	//Concatenate with the JSON object
+    	ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
+    	outputStream.write(jsonBytes);
     	outputStream.write(macbytes);
-    	//TODO - format message in a json or protopub
     	/**
-    	 * 			---33B-- + ---32B--- + --4B----- + -------->4kb----- + --32B--
-    	 * PAYLOAD = mpubkey + chaincode + pairingID + GCMRegistrationID + macbytes
-    	 * 			|___________________________________________________|    |
-    	 * 				           HmacSHA256 -------------------------------
+    	 * 			---------JSON object encoded as byte array------- + --32B--
+    	 * PAYLOAD = mpubkey, chaincode, pairingID, GCMRegistrationID + macbytes
+    	 * 			|________________________________________________|    |
+    	 * 				                HmacSHA256 ------------------------
     	 */
     	byte payload[] = outputStream.toByteArray();
     	Log.v("ASDF","payload length byte[] - " + payload.length);
     	//Encrypt the payload
     	Cipher cipher = null;
-    		try {
-    			cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-    		} catch (NoSuchAlgorithmException e) {
-    			e.printStackTrace();
-    		} catch (NoSuchPaddingException e) {
-    			e.printStackTrace();
-    		}
-    	    try {
-    	    	cipher.init(Cipher.ENCRYPT_MODE, AESKey);
-    		} catch (InvalidKeyException e) {
-    			e.printStackTrace();
-    		}
-    	    byte[] cipherBytes = null;
-    		try {
-    			cipherBytes = cipher.doFinal(payload);
-    		} catch (IllegalBlockSizeException e) {
-    			e.printStackTrace();
-    		} catch (BadPaddingException e) {
-    			e.printStackTrace();
-    		}
-    		//Send the payload over to the wallet
-    	    try {
-    			out.writeInt(cipherBytes.length);
-    		} catch (IOException e) {
-    			e.printStackTrace();
-    		}
-    	  	try {
-    			out.write(cipherBytes);
-    		} catch (IOException e) {
-    			e.printStackTrace();
-    		}
-    	  	conn.close();
+    	try {cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");} 
+    	catch (NoSuchAlgorithmException e) {e.printStackTrace();} 
+    	catch (NoSuchPaddingException e) {e.printStackTrace();}
+    	try {cipher.init(Cipher.ENCRYPT_MODE, AESKey);} 
+    	catch (InvalidKeyException e) {e.printStackTrace();}
+    	byte[] cipherBytes = null;
+    	try {cipherBytes = cipher.doFinal(payload);} 
+    	catch (IllegalBlockSizeException e) {e.printStackTrace();} 
+    	catch (BadPaddingException e) {e.printStackTrace();}
+    	//Send the payload over to the wallet
+    	try {out.writeInt(cipherBytes.length);} 
+    	catch (IOException e) {e.printStackTrace();}
+    	try {out.write(cipherBytes);} 
+    	catch (IOException e) {e.printStackTrace();}
+    	conn.close();
 	  }
 	  
 }

@@ -1,38 +1,51 @@
 package org.bitcoin.authenticator;
 
 import java.util.ArrayList;
+import java.util.Iterator;
+
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 
 /**Class creates an object that contains all the transaction data sent over from the wallet*/
 public class TxData {
 	
-	String version;
+	int version;
 	int numInputs;
 	ArrayList<Integer> ChildKeyIndex;
-	ArrayList<byte[]> PublicKeys;
+	ArrayList<String> PublicKeys;
 	byte[] tx;
 	
 	/**Constructor takes in the message payload as a string and parses it into its relevant parts*/
-	public TxData(String payload){
-		System.out.println("#1");
+	public TxData(byte[] payload) throws ParseException{
 		ChildKeyIndex = new ArrayList<Integer>();
-		PublicKeys = new ArrayList<byte[]>();
-		version = payload.substring(0, 2);
-		System.out.println(version);
-		numInputs = Integer.parseInt(payload.substring(2,6),16);
-		System.out.println(numInputs);
-		int pos = 6;
-		for (int i=0; i<numInputs; i++){
-			ChildKeyIndex.add(Integer.parseInt(payload.substring(pos, pos+8),16));
-			System.out.println(ChildKeyIndex.get(i));
-			PublicKeys.add(Utils.hexStringToByteArray(payload.substring(pos+8, pos + 74)));
-			System.out.println(Utils.bytesToHex(PublicKeys.get(i)));
-			pos = pos + 74;
+		PublicKeys = new ArrayList<String>();
+		String strJson = new String(payload);
+		JSONParser parser=new JSONParser();	  
+		Object obj = parser.parse(strJson);
+		JSONObject jsonObject = (JSONObject) obj;
+		version = ((Long) jsonObject.get("version")).intValue();
+		numInputs = ((Long) jsonObject.get("in_n")).intValue();
+		tx = Utils.hexStringToByteArray((String) jsonObject.get("tx"));
+		JSONArray msg = (JSONArray) jsonObject.get("keylist");
+		Iterator<JSONObject> iterator = msg.iterator();
+		JSONArray jsonlist = new JSONArray();
+		while (iterator.hasNext()) {
+			jsonlist.add(iterator.next());
 		}
-		tx = Utils.hexStringToByteArray(payload.substring(((numInputs*74)+6),payload.length()));
+		JSONObject jsonObj = (JSONObject) obj;
+		for(int i=0; i<jsonlist.size(); i++){
+			jsonObj = (JSONObject) jsonlist.get(i);
+			int index = ((Long) jsonObj.get("index")).intValue();
+			ChildKeyIndex.add(index);
+			String pubkey = (String) jsonObj.get("pubkey");
+			PublicKeys.add(pubkey);
+		}
 	}
 	
 	/**Returns the version as a string*/
-	public String getVersion(){
+	public int getVersion(){
 		return version;
 	}
 	
@@ -47,7 +60,7 @@ public class TxData {
 	}
 	
 	/**Returns and array of public keys from the wallet*/
-	public  ArrayList<byte[]> getPublicKeys(){
+	public  ArrayList<String> getPublicKeys(){
 		return PublicKeys;
 	}
 	

@@ -91,6 +91,7 @@ public class Re_pair_wallet extends Activity{
 			}
 			else if (resultCode == RESULT_CANCELED) {
 				QRInput = "Scan canceled.";
+				startActivity(new Intent(Re_pair_wallet.this, Wallet_list.class));
 			}
 	}
 	

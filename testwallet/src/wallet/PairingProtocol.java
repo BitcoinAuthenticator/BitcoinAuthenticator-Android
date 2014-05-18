@@ -10,6 +10,7 @@ import javax.crypto.*;
 
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
+import org.json.simple.parser.JSONParser;
 
 /**
  * This is the wallet side of the Pairing Protocol. It uses UpNp to map a port on the router if there is one,
@@ -18,11 +19,6 @@ import org.json.simple.JSONValue;
 public class PairingProtocol {
 	public static DataInputStream in;
 	public static DataOutputStream out;
-	public static byte[] chaincode;
-	public static byte[] mPubKey;
-	public static byte[] gcmRegId;
-	public static byte[] pairingID;
-	public static SecretKey sharedsecret;
 	
   public static void run (String args) throws Exception {
 
@@ -42,7 +38,7 @@ public class PairingProtocol {
       kgen.init(256);
 
       // Generate the secret key specs.
-      sharedsecret = kgen.generateKey();
+      SecretKey sharedsecret = kgen.generateKey();
       byte[] raw = sharedsecret.getEncoded();
       String key = bytesToHex(raw);
 	  
@@ -54,7 +50,7 @@ public class PairingProtocol {
 	  QR.CloseWindow();
 	  System.out.println("Connected to Alice");
     
-	  // Receive Master Public Key and Chaincode
+	  // Receive the payload
 	  in = new DataInputStream(socket.getInputStream());
 	  out = new DataOutputStream(socket.getOutputStream());
 	  int keysize = in.readInt();
@@ -71,27 +67,32 @@ public class PairingProtocol {
 	  mac.init(sharedsecret);
 	  byte[] macbytes = mac.doFinal(testpayload);
 	  if (Arrays.equals(macbytes, hash)){
-		  mPubKey = hexStringToByteArray(payload.substring(0,66));
-		  chaincode = hexStringToByteArray(payload.substring(66,130));
-		  pairingID = hexStringToByteArray(payload.substring(130,138));
-		  gcmRegId = hexStringToByteArray(payload.substring(138,payload.length()-64));
-		  System.out.println("Received Master Public Key: " + bytesToHex(mPubKey) + "\n" +
-				  			 "chaincode: " +  bytesToHex(chaincode) + "\n" +
-				  			 "gcmRegId: " +  new String(gcmRegId) + "\n" + 
-				  			 "pairing ID: " + new String(pairingID));
+		  //Parse the received json object
+		  String strJson = new String(testpayload);
+		  JSONParser parser=new JSONParser();
+		  Object obj = parser.parse(strJson);
+		  JSONObject jsonObject = (JSONObject) obj;
+		  String mPubKey = (String) jsonObject.get("mpubkey");
+		  String ChainCode = (String) jsonObject.get("chaincode");
+		  String PairID = (String) jsonObject.get("pairID");
+		  String GCM = (String) jsonObject.get("gcmID");
+		  System.out.println("Received Master Public Key: " + mPubKey + "\n" +
+				  			 "chaincode: " +  ChainCode + "\n" +
+				  			 "gcmRegId: " +  GCM + "\n" + 
+				  			 "pairing ID: " + PairID);
 		  //Save mPubKey and the Chaincode to file
 		  WalletFile file = new WalletFile();
-		  file.writePairingData(bytesToHex(mPubKey), bytesToHex(chaincode), key, new String(gcmRegId));
+		  file.writePairingData(mPubKey, ChainCode, key, GCM);
 	  }
 	  else {
 		  System.out.println("Message authentication code is invalid");
 	  }
 	  
-	  //dispose
-	  //in.close();
-	  //out.close();
-	  //plugnplay.removeMapping();
-	  //ss.close();
+	  //Dispose
+	  in.close();
+	  out.close();
+	  plugnplay.removeMapping();
+	  ss.close();
 	  // Return to main
 	  Main.inputCommand();
 

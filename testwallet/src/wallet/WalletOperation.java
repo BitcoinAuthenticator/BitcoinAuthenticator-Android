@@ -8,6 +8,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -20,7 +21,10 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Formatter;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
@@ -33,6 +37,8 @@ import javax.crypto.spec.SecretKeySpec;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.simple.JSONValue;
+import org.json.simple.parser.JSONParser;
 import org.spongycastle.util.encoders.Hex;
 
 import com.google.bitcoin.core.Address;
@@ -81,77 +87,45 @@ public class WalletOperation {
 	
 	/**
 	 * Sends a transaction message over to the Authenticator.
-	 * The message form is as follows:
-	 * 1 Byte -- Version (01 is the only version right now)
-	 * 2 Byes -- Number of inputs
-	 * <---For Each Input --->
-	 * 4 Bytes -- Child key index
-	 * 33 Bytes -- Public key the wallet used to create the P2SH address
+	 * The payload is a json object which contains:
+	 * Version (01 is the only version right now)
+	 * Number of inputs
+	 * <---JSON Array For Each Input --->
+	 * Child key index
+	 * Public key the wallet used to create the P2SH address
 	 * <---End For Each --->
-	 * ? Bytes -- Raw unsigned transaction
-	 * 32 Bytes -- HMAC-SHA256 of the above
+	 * Raw unsigned transaction
+	 * The JSON object is encoded to a byte array and concatenated with the HMAC-SHA256 of the above
 	 * */
 	void sendTX() throws Exception {
-		//Create the payload
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
-		byte[] version = hexStringToByteArray("01");
-		outputStream.write(version);
-		byte[] tempArr = ByteBuffer.allocate(4).putInt(numInputs).array();
-		byte[] numIns = Arrays.copyOfRange(tempArr, 2, 4);
-		outputStream.write(numIns);
-		for (int a=0; a<numInputs; a++){
-			byte[] index = ByteBuffer.allocate(4).putInt(childkeyindex.get(a)).array();
-			outputStream.write(index);
-			byte[] pubkey = publickeys.get(a);
-			outputStream.write(pubkey);
-		}
-		byte[] transaction = hexStringToByteArray(unsignedTx);
-		outputStream.write(transaction);
-		byte payload[] = outputStream.toByteArray( );
+		
+		//Format payload into a JSON object
+		byte[] jsonBytes = WalletFile.formatMessage(numInputs, publickeys, childkeyindex, unsignedTx);
 		//Calculate the HMAC and concatenate it to the payload
 		WalletFile file = new WalletFile();
 		Mac mac = Mac.getInstance("HmacSHA256");
 		SecretKey secretkey = new SecretKeySpec(hexStringToByteArray(file.getAESKey()), "AES");
 		mac.init(secretkey);
-		byte[] macbytes = mac.doFinal(payload);
+		byte[] macbytes = mac.doFinal(jsonBytes);
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
+		outputStream.write(jsonBytes);
 		outputStream.write(macbytes);
-		payload = outputStream.toByteArray( );
+		byte payload[] = outputStream.toByteArray( );
 		//Encrypt the payload
 		Cipher cipher = null;
-		try {
-			cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		} catch (NoSuchPaddingException e) {
-			e.printStackTrace();
-		}
-      try {
-			cipher.init(Cipher.ENCRYPT_MODE, secretkey);
-		} catch (InvalidKeyException e) {
-			e.printStackTrace();
-		}
-      byte[] cipherBytes = null;
-		try {
-			cipherBytes = cipher.doFinal(payload);
-		} catch (IllegalBlockSizeException e) {
-			e.printStackTrace();
-		} catch (BadPaddingException e) {
-			e.printStackTrace();
-		}
+		try {cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");} 
+		catch (NoSuchAlgorithmException e) {e.printStackTrace();} 
+		catch (NoSuchPaddingException e) {e.printStackTrace();}
+		try {cipher.init(Cipher.ENCRYPT_MODE, secretkey);} 
+		catch (InvalidKeyException e) {e.printStackTrace();}
+		byte[] cipherBytes = null;
+		try {cipherBytes = cipher.doFinal(payload);} 
+		catch (IllegalBlockSizeException e) {e.printStackTrace();} 
+		catch (BadPaddingException e) {e.printStackTrace();}
 		
-		// Init dispacher
+		// Init dispatcher and send the transaction
 		byte[] cipherKeyBytes;
 		Dispacher disp = new Dispacher();
-		
-			/*out.writeInt(cipherBytes.length);
-			out.write(cipherBytes);
-			System.out.println("Sent transaction");
-			int keysize = in.readInt();
-		    cipherKeyBytes = new byte[keysize];
-		    in.read(cipherKeyBytes);*/
-		
-		//Send the encrypted payload over to the Authenticator and wait for the response.
-		//disp.write(cipherBytes.length, cipherBytes);
 		ArrayList<String> keyandchain = file.getPubAndChain();
 		byte[] gcmID = file.getGCMRegID();
 		Device d = new Device(keyandchain.get(1).getBytes(),
@@ -185,17 +159,9 @@ public class WalletOperation {
 		byte[] key = hexStringToByteArray(keyandchain.get(0));
 		byte[] chain = hexStringToByteArray(keyandchain.get(1));
 		List<TransactionInput> inputs = spendtx.getInputs();
-		//Break apart the signature array sent over from the authenticator
-		String sigstr = bytesToHex(testsig);
+		//Parse the JSON signature object
 		ArrayList<byte[]> AuthSigs =  new ArrayList<byte[]>();
-		int pos = 4;
-		for (int b=0; b<numInputs; b++){
-			String strlen = sigstr.substring(pos, pos+2);
-			int intlen = Integer.parseInt(strlen, 16)*2;
-			pos = pos + 2;
-			AuthSigs.add(hexStringToByteArray(sigstr.substring(pos, pos+intlen)));
-			pos = pos + intlen;
-		}
+		AuthSigs = WalletFile.deserializeMessage(testsig);
 		//Loop to create a signature for each input
 		for (int z=0; z<numInputs; z++){
 			HDKeyDerivation HDKey = null;
