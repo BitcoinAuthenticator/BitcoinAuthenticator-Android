@@ -152,21 +152,12 @@ public class Pair_wallet extends Activity {
 	    String FILENAME = "AESKey" + num;
 	    byte[] keyBytes = Utils.hexStringToByteArray(AESKey);
 	    FileOutputStream outputStream = null;
-		try {
-			outputStream = openFileOutput(FILENAME, Context.MODE_PRIVATE);
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
-		}
-		try {
-			outputStream.write(keyBytes);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		try {
-			outputStream.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		} 
+		try {outputStream = openFileOutput(FILENAME, Context.MODE_PRIVATE);} 
+		catch (FileNotFoundException e1) {e1.printStackTrace();}
+		try {outputStream.write(keyBytes);} 
+		catch (IOException e) {e.printStackTrace();}
+		try {outputStream.close();} 
+		catch (IOException e) {e.printStackTrace();} 
 		
 	}
 
@@ -249,45 +240,28 @@ public class Pair_wallet extends Activity {
     		if (size != 0)
     		{
     			FileInputStream inputStream = null;
-    			try {
-    				inputStream = openFileInput(FILENAME);
-    			} catch (FileNotFoundException e1) {
-    				e1.printStackTrace();
-    			}
+    			try {inputStream = openFileInput(FILENAME);} 
+    			catch (FileNotFoundException e1) {e1.printStackTrace();}
     			seed = new byte[size];
-    			try {
-    				inputStream.read(seed, 0, size);
-    			} catch (IOException e) {
-    				e.printStackTrace();
-    			}
-    			try {
-    				inputStream.close();
-    			} catch (IOException e) {
-    				e.printStackTrace();
-    			}
+    			try {inputStream.read(seed, 0, size);} 
+    			catch (IOException e) {e.printStackTrace();}
+    			try {inputStream.close();} 
+    			catch (IOException e) {e.printStackTrace();}
     		}
-        	
         	PairingProtocol pair2wallet = null;
-            if (IPAddress.equals(PublicIP)){try {
-				pair2wallet = new PairingProtocol(LocalIP);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}}
-            else {try {
-				pair2wallet = new PairingProtocol(IPAddress);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}}
+            if (IPAddress.equals(PublicIP)){
+            	try {pair2wallet = new PairingProtocol(LocalIP);} 
+            	catch (IOException e) {e.printStackTrace();}
+            }
+            else {
+            	try {pair2wallet = new PairingProtocol(IPAddress);}
+            	catch (IOException e) {e.printStackTrace();}
+            }
             SecretKey secretkey = new SecretKeySpec(Utils.hexStringToByteArray(AESKey), "AES");
-			try {
-				pair2wallet.run(seed, secretkey, num);
-			} catch (InvalidKeyException e) {
-				e.printStackTrace();
-			} catch (NoSuchAlgorithmException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			try {pair2wallet.run(seed, secretkey, num);} 
+			catch (InvalidKeyException e) {e.printStackTrace();} 
+			catch (NoSuchAlgorithmException e) {e.printStackTrace();} 
+			catch (IOException e) {e.printStackTrace();}
             return null;
         }
         @Override

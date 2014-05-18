@@ -77,6 +77,10 @@
             android:label="@string/app_name" > 
         </activity>
         <activity
+            android:name="Re_pair_wallet"
+            android:label="@string/app_name" > 
+        </activity>
+        <activity
 			android:name="com.google.zxing.client.android.CaptureActivity"
 			android:configChanges="orientation|keyboardHidden"
 			android:screenOrientation="landscape"

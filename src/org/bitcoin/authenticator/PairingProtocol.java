@@ -30,7 +30,6 @@ public class PairingProtocol {
     	conn = new Connection(IP);
     	out = conn.getOutputStream();
     	in = conn.getInputStream();
-    	System.out.println("#3c");
     }
     
     /**	
@@ -40,7 +39,6 @@ public class PairingProtocol {
      */
     public void run(byte[] seed, SecretKey AESKey, int pairingID) throws IOException, NoSuchAlgorithmException, InvalidKeyException  {
     	//Derive the key and chaincode from the seed.
-    	System.out.println("#5");
     	int num = 1;
     	HDKeyDerivation HDKey = null;
     	DeterministicKey masterkey = HDKey.createMasterPrivateKey(seed);

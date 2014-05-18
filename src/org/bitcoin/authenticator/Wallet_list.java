@@ -86,7 +86,7 @@ public class Wallet_list extends Activity {
         SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
         hasPendingReq = settings.getBoolean("request", false);
         //Start the AsyncTask which waits for new transactions
-		new getIPtask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+		new getIP().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 	
 	/**Creates the listview component and defines behavior to a long press on a list item.*/
@@ -139,7 +139,13 @@ public class Wallet_list extends Activity {
 	public boolean onContextItemSelected(MenuItem item) {
     	AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
         final int index = info.position;
-       	if(item.getTitle()=="Re-pair with wallet"){}//menu actions go here. Should use switch.
+        //Re-pairs with the wallet
+       	if(item.getTitle()=="Re-pair with wallet"){
+       		Object o = lv1.getItemAtPosition(index);
+			WalletItem Data = (WalletItem) o;
+			Re_pair_wallet.walletNum = Data.getWalletNum();
+			startActivity (new Intent(Wallet_list.this, Re_pair_wallet.class));
+       	}
        	//Displays a dialog allowing the user to rename the wallet in the listview
     	else if(item.getTitle()=="Rename"){
     		AlertDialog.Builder alert = new AlertDialog.Builder(this);
@@ -662,7 +668,7 @@ public class Wallet_list extends Activity {
      * Class to get the public IP of the device so the Authenticator can decide if the device is on
      * the same WiFi network. 
      */
-    public class getIPtask extends AsyncTask<String,String,String> {
+    public class getIP extends AsyncTask<String,String,String> {
         @Override
         protected String doInBackground(String... message) {
         	String ip = Utils.getPublicIP();
