@@ -29,6 +29,14 @@ public class Connection {
 		return SOCKET;
 	}
 	
+	/** Closes the connection */
+	public void close() throws IOException{
+		SOCKET.close();
+		IN.close();
+		OUT.close();
+	}
+	
+	
 	/**	Returns the DataInputStream object for the open connection*/
 	public DataInputStream getInputStream() throws IOException {
 		return IN;

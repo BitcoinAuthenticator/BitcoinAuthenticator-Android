@@ -64,14 +64,12 @@ The test wallet included in this repo (also using Maven) has a few more dependen
 4. Right click on the BitcoinAuthenticator project:
 
  ```
-Package Explorer -> Properties -> Android -> under Library -> Add      google_play_services_froyo 
+Package Explorer -> Properties -> Android -> under Library -> Add google_play_services_froyo 
 ```
 
 5. Rick click on the BitcoinAuthenticator project:
 	
- ```Package Explorer -> Properties -> Java Build Path -> Order and Export -> check Android Private Libraries and move it (by clicking up) to the top of the list
-```
-
+ ```Package Explorer -> Properties -> Java Build Path -> Order and Export -> check Android Private Libraries and move it (by clicking up) to the top of the list```
 
 ## TODO
 

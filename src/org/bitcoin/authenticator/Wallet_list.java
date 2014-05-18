@@ -39,7 +39,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.text.Editable;
 import android.text.Html;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -69,7 +68,7 @@ public class Wallet_list extends Activity {
 	public static String LocalIP;
 	public static String IPAddress;
 	Connection conn = null;
-	
+	ListView lv1;
 	public static JSONObject req;
 	public static Boolean hasPendingReq;
  
@@ -87,13 +86,13 @@ public class Wallet_list extends Activity {
         SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
         hasPendingReq = settings.getBoolean("request", false);
         //Start the AsyncTask which waits for new transactions
-		new getIPtask().execute("");
+		new getIPtask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 	
 	/**Creates the listview component and defines behavior to a long press on a list item.*/
 	void setListView(){
         ArrayList walletList = getListData();
-        final ListView lv1 = (ListView) findViewById(R.id.custom_list);
+        lv1 = (ListView) findViewById(R.id.custom_list);
         lv1.setLongClickable(true);
         lv1.setAdapter(new CustomListAdapter(this, walletList));
         registerForContextMenu(lv1);
@@ -141,6 +140,7 @@ public class Wallet_list extends Activity {
     	AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
         final int index = info.position;
        	if(item.getTitle()=="Re-pair with wallet"){}//menu actions go here. Should use switch.
+       	//Displays a dialog allowing the user to rename the wallet in the listview
     	else if(item.getTitle()=="Rename"){
     		AlertDialog.Builder alert = new AlertDialog.Builder(this);
     		alert.setTitle("Rename");
@@ -151,7 +151,9 @@ public class Wallet_list extends Activity {
     		alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
     		public void onClick(DialogInterface dialog, int whichButton) {
     			String value = input.getText().toString();
-    			String wdata = "WalletData" + (index+1);
+    			Object o = lv1.getItemAtPosition(index);
+    			WalletItem Data = (WalletItem) o;
+    			String wdata = "WalletData" + Data.getWalletNum();
     			SharedPreferences data = getSharedPreferences(wdata, 0);
     			SharedPreferences.Editor editor = data.edit();	
     			editor.putString("ID", value);
@@ -166,7 +168,36 @@ public class Wallet_list extends Activity {
     		});
     		alert.show();
     	}
-    	else if(item.getTitle()=="Delete"){}
+       	//Displays a dialog prompting the user to confirm they want to delete a wallet from the listview
+    	else if(item.getTitle()=="Delete"){
+    		AlertDialog.Builder alert = new AlertDialog.Builder(this);
+    	    alert.setTitle("Delete");
+    	    alert.setMessage(Html.fromHtml("Are you sure you want to delete this wallet?<br><br> Do not continue if this wallet has a positive balance as you will not be able to sign any more transactions."));
+    	    alert.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+    	        public void onClick(DialogInterface dialog, int which) { 
+    	        	Object o = lv1.getItemAtPosition(index);
+        			WalletItem Data = (WalletItem) o;
+        			String wdata = "WalletData" + Data.getWalletNum();
+        			SharedPreferences data = getSharedPreferences(wdata, 0);
+        			SharedPreferences.Editor editor = data.edit();	
+        			editor.putBoolean("Deleted", true);
+        			editor.putString("ID", "");
+        			editor.putString("Fingerprint", "");
+        			editor.putString("Type", "");
+        			editor.putString("ExternalIP", "");
+        			editor.putString("LocalIP", "");
+        			editor.commit();
+        			setListView();
+    	        }
+    	     })
+    	    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+    	        public void onClick(DialogInterface dialog, int which) { 
+    	            // do nothing
+    	        }
+    	     })
+    	    .setIcon(android.R.drawable.ic_dialog_alert)
+    	     .show();
+    	}
     	else {return false;}
 	return true;
 	}
@@ -348,7 +379,7 @@ public class Wallet_list extends Activity {
 								e.printStackTrace();
 							}
 						//Reload the ConnectionToWallets task to set up to receive another transaction.
-						new ConnectToWallets().execute("");
+						new ConnectToWallets().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 					}
 				  })
 				.setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
@@ -370,25 +401,27 @@ public class Wallet_list extends Activity {
     	ArrayList results = new ArrayList();
     	//Load the data for each wallet and add it to a WalletItem object
     	for (int i=1; i<num+1; i+=1){
-    	String wdata = "WalletData" + i;
-    	SharedPreferences data = getSharedPreferences(wdata, 0);	
-        WalletItem walletData = new WalletItem();
-        String wID = ("ID");
-        String wFP = ("Fingerprint");
-        String wTP = ("Type");
-        walletData.setWalletLabel(data.getString(wID, "null"));
-        walletData.setFingerprint(data.getString(wFP, "null"));
-        //Decide which icon to display
-        if (data.getString(wTP, "null").equals("blockchain")){walletData.setIcon(R.drawable.blockchain_info_logo);}
-        else if (data.getString(wTP, "null").equals("electrum")){walletData.setIcon(R.drawable.electrum_logo);}
-        else if (data.getString(wTP, "null").equals("hive")){walletData.setIcon(R.drawable.hive_logo);}
-        else if (data.getString(wTP, "null").equals("multibit")){walletData.setIcon(R.drawable.multibit_logo);}
-        else if (data.getString(wTP, "null").equals("bitcoincore")){walletData.setIcon(R.drawable.bitcoin_core_logo);}
-        else if (data.getString(wTP, "null").equals("armory")){walletData.setIcon(R.drawable.armory_logo);}
-        else if (data.getString(wTP, "null").equals("darkwallet")){walletData.setIcon(R.drawable.darkwallet_logo);}
-        else {walletData.setIcon(R.drawable.authenticator_logo);}
-        results.add(walletData);}
- 
+    		String wdata = "WalletData" + i;
+    		SharedPreferences data = getSharedPreferences(wdata, 0);	
+    		WalletItem walletData = new WalletItem();
+    		Boolean deleted = data.getBoolean("Deleted", false);
+    		String wID = ("ID");
+    		String wFP = ("Fingerprint");
+    		String wTP = ("Type");
+    		walletData.setWalletNum(i);
+    		walletData.setWalletLabel(data.getString(wID, "null"));
+    		walletData.setFingerprint(data.getString(wFP, "null"));
+    		//Decide which icon to display
+    		if (data.getString(wTP, "null").equals("blockchain")){walletData.setIcon(R.drawable.blockchain_info_logo);}
+    		else if (data.getString(wTP, "null").equals("electrum")){walletData.setIcon(R.drawable.electrum_logo);}
+    		else if (data.getString(wTP, "null").equals("hive")){walletData.setIcon(R.drawable.hive_logo);}
+    		else if (data.getString(wTP, "null").equals("multibit")){walletData.setIcon(R.drawable.multibit_logo);}
+    		else if (data.getString(wTP, "null").equals("bitcoincore")){walletData.setIcon(R.drawable.bitcoin_core_logo);}
+    		else if (data.getString(wTP, "null").equals("armory")){walletData.setIcon(R.drawable.armory_logo);}
+        	else if (data.getString(wTP, "null").equals("darkwallet")){walletData.setIcon(R.drawable.darkwallet_logo);}
+        	else {walletData.setIcon(R.drawable.authenticator_logo);}
+    		if (!deleted){results.add(walletData);}
+    	}
         return results;
     }
     
@@ -398,6 +431,15 @@ public class Wallet_list extends Activity {
         private String walletLabel;
         private String fingerprint;
         private int icon;
+        private int WalletNum;
+        
+        public int getWalletNum() {
+        	return WalletNum;
+        }
+        
+        public void setWalletNum(int num) {
+        	this.WalletNum = num;
+        }
      
         public String getWalletLabel() {
             return walletLabel;
@@ -490,7 +532,6 @@ public class Wallet_list extends Activity {
     	TxData tx;
         @Override
         protected Connection doInBackground(String... message) {
-        	System.out.println("#3");
         	//Load AES Key from file
         	byte [] key = null;
     		String FILENAME = "AESKey1";
@@ -536,7 +577,6 @@ public class Wallet_list extends Activity {
             		try {
             			req = new JSONObject (extra.getString("pairingReq"));
             			hasPendingReq = true;	
-            			System.out.println("#1");
             		} catch (JSONException e) {
             			e.printStackTrace();
             		}
@@ -550,7 +590,6 @@ public class Wallet_list extends Activity {
     		{
     			//TODO - add multiple wallet handling
     			try {
-    				System.out.println("#4");
     				JSONObject reqPayload = new JSONObject(req.getString("ReqPayload"));
     				IPAddress =  reqPayload.getString("ExternalIP");
     				LocalIP = reqPayload.getString("LocalIP");
@@ -578,7 +617,6 @@ public class Wallet_list extends Activity {
         	//Otherwise we will create a new connection.
         	if (PairingProtocol.conn==null){
         		try {
-        			System.out.println("#5");
 					conn = new Connection(IP);
 				} catch (IOException e) {
 					runOnUiThread(new Runnable() {
@@ -599,7 +637,6 @@ public class Wallet_list extends Activity {
 			try {
 				tx = msg.receiveTX(sharedsecret);
 			} catch (Exception e) {e.printStackTrace();}
-			System.out.println("#6");
         	
 			return null;
         }
@@ -628,7 +665,6 @@ public class Wallet_list extends Activity {
     public class getIPtask extends AsyncTask<String,String,String> {
         @Override
         protected String doInBackground(String... message) {
-        	System.out.println("#2");
         	String ip = Utils.getPublicIP();
             return ip;
         }
@@ -642,7 +678,7 @@ public class Wallet_list extends Activity {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
             PublicIP = result;
-            new ConnectToWallets().execute("");
+            new ConnectToWallets().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }    
     }
 

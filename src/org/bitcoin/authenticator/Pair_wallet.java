@@ -127,10 +127,8 @@ public class Pair_wallet extends Activity {
 		//Calculate the fingerprint of the AES key to serve as the wallet identifier.
 		MessageDigest md = MessageDigest.getInstance("SHA-1");
 	    fingerprint=Utils.bytesToHex(md.digest(Utils.hexStringToByteArray(AESKey)));
-	    //Increment the counter for the number of paired wallet in shared preferences
-		SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
-		SharedPreferences.Editor settingseditor = settings.edit();	
-	    num = (settings.getInt("numwallets", 0))+1;
+	  	SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
+	  	SharedPreferences.Editor settingseditor = settings.edit();	
 	    String walletData = "WalletData" + num;
 	    SharedPreferences data = getSharedPreferences(walletData, 0);
 	    SharedPreferences.Editor editor = data.edit();	
@@ -193,15 +191,20 @@ public class Pair_wallet extends Activity {
 		            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 		            mProgressDialog.show();
 				try {
+					//Increment the counter for the number of paired wallet in shared preferences
+					SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
+					SharedPreferences.Editor settingseditor = settings.edit();	
+				    num = (settings.getInt("numwallets", 0))+1;
 					completePairing();
 				} catch (NoSuchAlgorithmException e) {
 					e.printStackTrace();
 				}
 				//Start the pairing protocol by first getting the device IP address.
-				new getIPtask().execute("");
+				getIPtask ip = new getIPtask();
+				ip.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 			} 
 			else if (resultCode == RESULT_CANCELED) {
-				QRInput = "Scan cancelled.";
+				QRInput = "Scan canceled.";
 			}
 		//}
 	}
@@ -225,7 +228,8 @@ public class Pair_wallet extends Activity {
         protected void onPostExecute(String result) {
             super.onPostExecute(result);
             PublicIP = result;
-            new connectTask().execute("");
+            connectTask conx = new connectTask();
+            conx.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         }    
     }
 	
@@ -276,7 +280,7 @@ public class Pair_wallet extends Activity {
 			}}
             SecretKey secretkey = new SecretKeySpec(Utils.hexStringToByteArray(AESKey), "AES");
 			try {
-				pair2wallet.run(seed, secretkey,num);
+				pair2wallet.run(seed, secretkey, num);
 			} catch (InvalidKeyException e) {
 				e.printStackTrace();
 			} catch (NoSuchAlgorithmException e) {
