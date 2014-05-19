@@ -18,6 +18,7 @@ import java.util.Map;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.bitcoin.authenticator.GcmUtil.GcmIntentService;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.simple.JSONArray;
@@ -40,6 +41,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -87,6 +89,7 @@ public class Wallet_list extends Activity {
         SharedPreferences prefs = getSharedPreferences("WalletData1", 0);	
         IPAddress = prefs.getString("ExternalIP", "null");
         LocalIP = prefs.getString("LocalIP","null");
+        System.out.println(IPAddress + " " + LocalIP);
         //Load pending request Boolean
         SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
         hasPendingReq = settings.getBoolean("request", false);
@@ -227,6 +230,9 @@ public class Wallet_list extends Activity {
 	 * Asks user for authorization. If yes, it signs the transaction and sends it back to the wallet.
 	 */
 	public void showDialogBox(final TxData tx) throws InterruptedException{
+		//Close the notification if it is still open
+		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		mNotificationManager.cancel((int)GcmIntentService.uniqueId);
 		if (tx.equals("error")){
 			Toast.makeText(getApplicationContext(), "Unable to connect to wallet", Toast.LENGTH_LONG).show();
 		}
@@ -234,7 +240,7 @@ public class Wallet_list extends Activity {
 			//Load walletID from Shared Preferences
 			SharedPreferences data = getSharedPreferences("WalletData1", 0);
 			String name = data.getString("ID", "null");
-			//Load AES Key from file
+			//Load AES Key from internal storage
         	byte [] key = null;
     		String FILENAME = "AESKey1";
     		File file = new File(getFilesDir(), FILENAME);
@@ -354,12 +360,18 @@ public class Wallet_list extends Activity {
 						catch (NoSuchAlgorithmException e) {e.printStackTrace();} 
 						catch (IOException e) {e.printStackTrace();							}
 						//Reload the ConnectionToWallets task to set up to receive another transaction.
+						try {conn.close();} 
+						catch (IOException e) {e.printStackTrace();}
 						new ConnectToWallets().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 					}
 				  })
 				.setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog,int id) {
 						//TODO if the user doesn't approve the transaction, send a message decline message back to the wallet.
+						//Reload the ConnectionToWallets task to set up to receive another transaction.
+						try {conn.close();} 
+						catch (IOException e) {e.printStackTrace();}
+						new ConnectToWallets().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 						dialog.cancel();
 					}
 				});
@@ -526,70 +538,78 @@ public class Wallet_list extends Activity {
     		final byte[] AESKey = key;
     		SecretKey sharedsecret = new SecretKeySpec(AESKey, "AES");
     		Log.v("ASDF", "hasPendingReq " + hasPendingReq.toString());
-    		//Check pending requests via GCM
-    		System.out.println("#1");
-    		while (hasPendingReq==false){
-    			SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
-    	        hasPendingReq = settings.getBoolean("request", false);
-    		}
-    		System.out.println("#2a");
     		//Load the GCM settings from shared preferences
             SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
             Boolean GCM = settings.getBoolean("GCM", true);
-    		
-    		//Handle pending requests from GCM
             if(GCM){
+            	//Wait for pending requests via GCM
+            	while (!hasPendingReq){
+            		SharedPreferences settings2 = getSharedPreferences("ConfigFile", 0);
+            		hasPendingReq = settings2.getBoolean("request", false);
+            	}
+            	//Handle pending requests from GCM
             	Bundle extra = getIntent().getExtras();
             	if(extra != null && extra.containsKey("pairingReq")){ // TODO - currently works for only one request
-            		System.out.println("#2b");
             		try {
             			req = new JSONObject (extra.getString("pairingReq"));
             			hasPendingReq = true;	
             		} catch (JSONException e) {e.printStackTrace();}
             	}
-            	else {
-            		System.out.println("#2c");
-            		hasPendingReq = false;
+            	else {hasPendingReq = false;}
+            	if(hasPendingReq){
+            		//TODO - add multiple wallet handling
+            		try {
+            			JSONObject reqPayload = new JSONObject(req.getString("ReqPayload"));
+            			IPAddress =  reqPayload.getString("ExternalIP");
+            			LocalIP = reqPayload.getString("LocalIP");
+            			SharedPreferences prefs = getSharedPreferences("WalletData1", 0);
+            			SharedPreferences.Editor editor = prefs.edit();
+            			editor.putString("ExternalIP", IPAddress);
+            			editor.putString("LocalIP", LocalIP);
+            			editor.commit();
+            			Log.v("ASDF", "Changed wallet ip address from GCM to: " + IPAddress + "\n" +
+            					"Changed wallet local ip address from GCM to: " + LocalIP);
+            		} catch (JSONException e) {e.printStackTrace();}
+            	}
+            	hasPendingReq=false;
+            	SharedPreferences.Editor editor = settings.edit();	
+            	editor.putBoolean("request", false);
+            	editor.commit();
+            	//Open a new connection
+            	try {conn = new Connection(IPAddress);} 
+            	catch (IOException e1) {
+            		try {conn = new Connection(LocalIP);} 
+            		catch (IOException e2) {
+            			runOnUiThread(new Runnable() {
+            				public void run() {
+            					Toast.makeText(getApplicationContext(), "Unable to connect to wallet", Toast.LENGTH_LONG).show();
+            				}
+            			});
+            		}
             	}
             }
-    		
-    		if(hasPendingReq)
-    		{
-    			System.out.println("#2d");
-    			//TODO - add multiple wallet handling
-    			try {
-    				JSONObject reqPayload = new JSONObject(req.getString("ReqPayload"));
-    				IPAddress =  reqPayload.getString("ExternalIP");
-    				LocalIP = reqPayload.getString("LocalIP");
-    				SharedPreferences prefs = getSharedPreferences("WalletData1", 0);
-    				SharedPreferences.Editor editor = prefs.edit();
-    				editor.putString("ExternalIP", IPAddress);
-    				editor.putString("LocalIP", LocalIP);
-    				editor.commit();
-    				Log.v("ASDF", "Changed wallet ip address from GCM to: " + IPAddress + "\n" +
-    						"Changed wallet local ip address from GCM to: " + LocalIP);
-    			} catch (JSONException e) {e.printStackTrace();}
-    		}
-    		hasPendingReq=false;
-    		SharedPreferences.Editor editor = settings.edit();	
-        	editor.putBoolean("request", false);
-        	editor.commit();
-        	//Open a new connection
-        	System.out.println("#3a");
-        	try {conn = new Connection(IPAddress);} 
-        	catch (IOException e1) {
-        		System.out.println("#3b");
-        		try {conn = new Connection(LocalIP);} 
-        		catch (IOException e2) {
-        			System.out.println("#3c");
-        			runOnUiThread(new Runnable() {
-        				public void run() {
-        					Toast.makeText(getApplicationContext(), "Unable to connect to wallet", Toast.LENGTH_LONG).show();
-        				}
-        			});
-        		}
-			}
-        	System.out.println("#4");
+            else {
+            	Boolean connected = false;
+            	while(!connected){
+                	System.out.println("#1");
+            		connected = true;
+            		try {conn = new Connection(IPAddress);} 
+                	catch (IOException e1) {
+                		System.out.println("#2");
+                		try {conn = new Connection(LocalIP);}
+                		catch (IOException e2) {
+                			connected = false;
+                        	System.out.println("#3");
+                			runOnUiThread(new Runnable() {
+                				public void run() {
+                					Toast.makeText(getApplicationContext(), "Unable to connect to wallet", Toast.LENGTH_LONG).show();
+                				}
+                			});
+                		}
+                	}	
+            	}
+            	System.out.println("#4");
+            }
         	//Create a new message object for receiving the transaction.
         	Message msg = null;
 			try {msg = new Message(conn);} 

@@ -8,9 +8,9 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 import org.json.JSONException;
+import org.xml.sax.SAXException;
 
 import GCM.GCMSender;
-
 import wallet.UpNp;
 
 
@@ -19,6 +19,8 @@ import wallet.UpNp;
 public class Dispacher {
 	DataOutputStream outStream;
 	DataInputStream inStream;
+	UpNp plugnplay;
+	ServerSocket ss;
 	
 	public Dispacher(){}
 	public Dispacher(DataOutputStream out,DataInputStream in)
@@ -35,13 +37,13 @@ public class Dispacher {
 			{
 				final int port = 1234;
 				
-				UpNp plugnplay = new UpNp();
+				plugnplay = new UpNp();
 				
 				try {
 					if (!plugnplay.isPortMapped(port)) // TODO - move port to singelton
 						plugnplay.run(null);
 					//assert(plugnplay.isPortMapped(port));
-					ServerSocket ss = new ServerSocket (port);
+					ss = new ServerSocket (port);
 					MessageBuilder msgGCM = new MessageBuilder(MessageType.signTx,
 							new String[]{new String(device.pairingID),plugnplay.getExternalIP(),
 							   plugnplay.getLocalIP().substring(1)});
@@ -60,14 +62,7 @@ public class Dispacher {
 					
 					write(payload.length,payload);
 					
-					// dispose
-					//outStream.close();
-					//inStream.close();
-					//plugnplay.removeMapping();
-					//ss.close();
-					
 				} catch (Exception e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
@@ -75,6 +70,14 @@ public class Dispacher {
 				;//TODO
 			break;
 		}
+	}
+	
+	public void dispose() throws IOException, SAXException{
+		// dispose
+		outStream.close();
+		inStream.close();
+		plugnplay.removeMapping();
+		ss.close();
 	}
 	
 	private void write(int length, byte[] payload) throws IOException  

@@ -138,6 +138,7 @@ public class WalletOperation {
 		int keysize = disp.readInt();
 		cipherKeyBytes = new byte[keysize];
 		disp.read(cipherKeyBytes);
+		disp.dispose();
 		
 		//Decrypt the response
 	    cipher.init(Cipher.DECRYPT_MODE, secretkey);

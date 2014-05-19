@@ -26,6 +26,7 @@ public class GcmIntentService extends IntentService {
     public static final int NOTIFICATION_ID = 1;
     private NotificationManager mNotificationManager;
     NotificationCompat.Builder builder;
+    public static long uniqueId;
 
     public GcmIntentService() {
         super("GcmIntentService");
@@ -79,7 +80,7 @@ public class GcmIntentService extends IntentService {
     	editor.putBoolean("request", true);
     	editor.commit();
     	Date now = new Date();
-    	long uniqueId = now.getTime();//use date to generate an unique id to differentiate the notifications.
+    	uniqueId = now.getTime();//use date to generate an unique id to differentiate the notifications.
     	
     	mNotificationManager = (NotificationManager)
                 this.getSystemService(Context.NOTIFICATION_SERVICE);

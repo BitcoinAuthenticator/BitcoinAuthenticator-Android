@@ -21,10 +21,10 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.widget.Toast;
 
 public class Re_pair_wallet extends Activity{
 	static int walletNum;
-	String PublicIP;
 	String AESKey;
 	String IPAddress;
 	String LocalIP;
@@ -49,7 +49,6 @@ public class Re_pair_wallet extends Activity{
 	
 	public void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		String QRInput;
-		//TODO
 		//if (requestCode == ZXING_QR_SCANNER_REQUEST) {
 			if (resultCode == RESULT_OK) {
 				QRInput = intent.getStringExtra("SCAN_RESULT");
@@ -81,9 +80,9 @@ public class Re_pair_wallet extends Activity{
 				catch (IOException e) {e.printStackTrace();}
 				try {outputStream.close();} 
 				catch (IOException e) {e.printStackTrace();} 
-				//Start the pairing protocol by first getting the device IP address.
-				getIPtask ip = new getIPtask();
-				ip.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+				//Start the pairing protocol
+				connectTask conx = new connectTask();
+				conx.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 				startActivity(new Intent(Re_pair_wallet.this, Wallet_list.class));
 			}
 			else if (resultCode == RESULT_CANCELED) {
@@ -93,38 +92,13 @@ public class Re_pair_wallet extends Activity{
 	}
 	
 	/**
-	 * This class runs in the background and gets the device's IP address so that we can determine 
-	 * if the device is on the same WiFi network as the wallet. If it is, we will need to connect to
-	 * the wallet using the local IP address rather than the external IP address. 
-	 */
-	public class getIPtask extends AsyncTask<String,String,String> {
-        @Override
-        protected String doInBackground(String... message) {
-        	String ip = Utils.getPublicIP();
-            return ip;
-        }
-        @Override
-        protected void onProgressUpdate(String... values) {
-            super.onProgressUpdate(values);
-        }
-        /**After the task is finished we will launch the AsyncTask which connects to the wallet*/
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            PublicIP = result;
-            connectTask conx = new connectTask();
-            conx.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        }    
-    }
-	
-	/**
-	 * Another class which runs in the background. This one creates a connection object which connects
+	 * This class runs in the background. It creates a connection object which connects
 	 * to the wallet and executes the core of the pairing protocol.
 	 */
 	public class connectTask extends AsyncTask<String,String,PairingProtocol> {
         @Override
         protected PairingProtocol doInBackground(String... message) {
-            //Figure out if the mobile device is connected to the same network as the wallet and pass the
-        	//appropriate IP address to the connection class. 
+            //Load the seed from file
         	byte [] seed = null;
     		String FILENAME = "seed";
     		File file = new File(getFilesDir(), FILENAME);
@@ -140,15 +114,19 @@ public class Re_pair_wallet extends Activity{
     			try {inputStream.close();} 
     			catch (IOException e) {e.printStackTrace();}
     		}
-        	PairingProtocol pair2wallet = null;
-            if (IPAddress.equals(PublicIP)){
-            	try {pair2wallet = new PairingProtocol(LocalIP);} 
-            	catch (IOException e) {e.printStackTrace();}
-            }
-            else {
-            	try {pair2wallet = new PairingProtocol(IPAddress);}
-            	catch (IOException e) {e.printStackTrace();}
-            }
+    		//Try to connect to wallet using either IP
+    		PairingProtocol pair2wallet = null;
+    		try {pair2wallet = new PairingProtocol(IPAddress);}
+        	catch (IOException e1) {
+        		try {pair2wallet = new PairingProtocol(LocalIP);} 
+            	catch (IOException e2) {
+            		runOnUiThread(new Runnable() {
+            			public void run() {
+    						  Toast.makeText(getApplicationContext(), "Unable to connect to wallet", Toast.LENGTH_LONG).show();
+    					}
+    				});
+            	}
+        	}
             SecretKey secretkey = new SecretKeySpec(Utils.hexStringToByteArray(AESKey), "AES");
 			try {pair2wallet.run(seed, secretkey, walletNum);} 
 			catch (InvalidKeyException e) {e.printStackTrace();} 
