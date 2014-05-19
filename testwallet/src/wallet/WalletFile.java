@@ -352,7 +352,7 @@ public class WalletFile {
 	public static byte[] formatMessage(int numInputs, ArrayList<byte[]> publickeys, ArrayList<Integer> childkeyindex, String transaction){
 		Map obj=new LinkedHashMap();
 		obj.put("version", 1);
-		obj.put("in_n", numInputs);
+		obj.put("ins_n", numInputs);
 		obj.put("tx", transaction);
 		JSONArray keylist = new JSONArray();
 		for (int a=0; a<numInputs; a++){
@@ -379,7 +379,7 @@ public class WalletFile {
 		Object obj = parser.parse(strJson);
 		JSONObject jsonObject = (JSONObject) obj;
 		int version = ((Long) jsonObject.get("version")).intValue();
-		int numSigs = ((Long) jsonObject.get("sig_n")).intValue();
+		int numSigs = ((Long) jsonObject.get("sigs_n")).intValue();
 		JSONArray msg = (JSONArray) jsonObject.get("siglist");
 		Iterator<JSONObject> iterator = msg.iterator();
 		JSONArray jsonlist = new JSONArray();

@@ -72,10 +72,10 @@ public class Wallet_list extends Activity {
 	public static String PublicIP;
 	public static String LocalIP;
 	public static String IPAddress;
-	Connection conn = null;
 	ListView lv1;
 	public static JSONObject req;
 	public static Boolean hasPendingReq;
+	public static Connection conn;
  
 	
 	public void onCreate(Bundle savedInstanceState) {
@@ -91,7 +91,7 @@ public class Wallet_list extends Activity {
         SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
         hasPendingReq = settings.getBoolean("request", false);
         //Start the AsyncTask which waits for new transactions
-		new getIP().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+		new ConnectToWallets().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 	
 	/**Creates the listview component and defines behavior to a long press on a list item.*/
@@ -242,22 +242,13 @@ public class Wallet_list extends Activity {
     		if (size != 0)
     		{
     			FileInputStream inputStream = null;
-    			try {
-    				inputStream = openFileInput(FILENAME);
-    			} catch (FileNotFoundException e1) {
-    				e1.printStackTrace();
-    			}
+    			try {inputStream = openFileInput(FILENAME);} 
+    			catch (FileNotFoundException e1) {e1.printStackTrace();}
     			key = new byte[size];
-    			try {
-    				inputStream.read(key, 0, size);
-    			} catch (IOException e) {
-    				e.printStackTrace();
-    			}
-    			try {
-    				inputStream.close();
-    			} catch (IOException e) {
-    				e.printStackTrace();
-    			}
+    			try {inputStream.read(key, 0, size);} 
+    			catch (IOException e) {e.printStackTrace();}
+    			try {inputStream.close();} 
+    			catch (IOException e) {e.printStackTrace();}
     		}
     		final byte[] AESKey = key;
     		final SecretKey sharedsecret = new SecretKeySpec(AESKey, "AES");
@@ -269,22 +260,13 @@ public class Wallet_list extends Activity {
     		if (size2 != 0)
     		{
     			FileInputStream inputStream = null;
-    			try {
-    				inputStream = openFileInput(FILENAME2);
-    			} catch (FileNotFoundException e1) {
-    				e1.printStackTrace();
-    			}
+    			try {inputStream = openFileInput(FILENAME2);} 
+    			catch (FileNotFoundException e1) {e1.printStackTrace();}
     			seed = new byte[size2];
-    			try {
-    				inputStream.read(seed, 0, size2);
-    			} catch (IOException e) {
-    				e.printStackTrace();
-    			}
-    			try {
-    				inputStream.close();
-    			} catch (IOException e) {
-    				e.printStackTrace();
-    			}
+    			try {inputStream.read(seed, 0, size2);} 
+    			catch (IOException e) {e.printStackTrace();}
+    			try {inputStream.close();} 
+    			catch (IOException e) {e.printStackTrace();}
     		}
     		final byte[] authseed = seed;
     		//Load network parameters from shared preferences
@@ -328,7 +310,7 @@ public class Wallet_list extends Activity {
 						//Prep the JSON object we will fill with the signatures.
 						Map obj=new LinkedHashMap();
 						obj.put("version", 1);
-						obj.put("sig_n", tx.numInputs);
+						obj.put("sigs_n", tx.numInputs);
 						JSONArray siglist = new JSONArray();
 						//Loop creating a signature for each input
 						for (int j=0; j<tx.numInputs; j++){
@@ -362,16 +344,10 @@ public class Wallet_list extends Activity {
 						String jsonText = jsonOut.toString();
 						System.out.println(jsonText);
 						byte[] jsonBytes = jsonText.getBytes();
-						//Select which connection to use
+						//Create a new message object
 						Message msg = null;
-			        	if (PairingProtocol.conn==null){
-			        		try {msg = new Message(conn);} 
-			        		catch (IOException e) {e.printStackTrace();}
-			        	}
-			        	else {
-			        		try {msg = new Message(PairingProtocol.conn);} 
-			        		catch (IOException e) {e.printStackTrace();}
-			        	}
+			        	try {msg = new Message(conn);} 
+			        	catch (IOException e) {e.printStackTrace();}
 			        	//Send the signature
 						try {msg.sendSig(jsonBytes, sharedsecret);} 
 						catch (InvalidKeyException e) {e.printStackTrace();} 
@@ -539,32 +515,24 @@ public class Wallet_list extends Activity {
     		if (size != 0)
     		{
     			FileInputStream inputStream = null;
-    			try {
-    				inputStream = openFileInput(FILENAME);
-    			} catch (FileNotFoundException e1) {
-    				e1.printStackTrace();
-    			}
+    			try {inputStream = openFileInput(FILENAME);} 
+    			catch (FileNotFoundException e1) {e1.printStackTrace();}
     			key = new byte[size];
-    			try {
-    				inputStream.read(key, 0, size);
-    			} catch (IOException e) {
-    				e.printStackTrace();
-    			}
-    			try {
-    				inputStream.close();
-    			} catch (IOException e) {
-    				e.printStackTrace();
-    			}
+    			try {inputStream.read(key, 0, size);} 
+    			catch (IOException e) {e.printStackTrace();}
+    			try {inputStream.close();} 
+    			catch (IOException e) {e.printStackTrace();}
     		}
     		final byte[] AESKey = key;
     		SecretKey sharedsecret = new SecretKeySpec(AESKey, "AES");
     		Log.v("ASDF", "hasPendingReq " + hasPendingReq.toString());
     		//Check pending requests via GCM
+    		System.out.println("#1");
     		while (hasPendingReq==false){
     			SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
     	        hasPendingReq = settings.getBoolean("request", false);
     		}
-    		
+    		System.out.println("#2a");
     		//Load the GCM settings from shared preferences
             SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
             Boolean GCM = settings.getBoolean("GCM", true);
@@ -573,20 +541,21 @@ public class Wallet_list extends Activity {
             if(GCM){
             	Bundle extra = getIntent().getExtras();
             	if(extra != null && extra.containsKey("pairingReq")){ // TODO - currently works for only one request
+            		System.out.println("#2b");
             		try {
             			req = new JSONObject (extra.getString("pairingReq"));
             			hasPendingReq = true;	
-            		} catch (JSONException e) {
-            			e.printStackTrace();
-            		}
+            		} catch (JSONException e) {e.printStackTrace();}
             	}
             	else {
+            		System.out.println("#2c");
             		hasPendingReq = false;
             	}
             }
     		
     		if(hasPendingReq)
     		{
+    			System.out.println("#2d");
     			//TODO - add multiple wallet handling
     			try {
     				JSONObject reqPayload = new JSONObject(req.getString("ReqPayload"));
@@ -599,43 +568,34 @@ public class Wallet_list extends Activity {
     				editor.commit();
     				Log.v("ASDF", "Changed wallet ip address from GCM to: " + IPAddress + "\n" +
     						"Changed wallet local ip address from GCM to: " + LocalIP);
-    			} catch (JSONException e) {
-    				e.printStackTrace();
-    			}
+    			} catch (JSONException e) {e.printStackTrace();}
     		}
     		hasPendingReq=false;
     		SharedPreferences.Editor editor = settings.edit();	
         	editor.putBoolean("request", false);
         	editor.commit();
-
-        	//Decide which IP to use for the connection
-        	String IP = null;
-        	if (IPAddress.equals(PublicIP)){IP = LocalIP;}
-        	else {IP = IPAddress;}
-        	//If wallet was recently paired we can use the connection from PairingProtocol.
-        	//Otherwise we will create a new connection.
-        	if (PairingProtocol.conn==null){
-        		try {
-					conn = new Connection(IP);
-				} catch (IOException e) {
-					runOnUiThread(new Runnable() {
-						  public void run() {
-							  Toast.makeText(getApplicationContext(), "Unable to connect to wallet", Toast.LENGTH_LONG).show();
-						  }
-						});
-				}catch (Exception e) {e.printStackTrace();}
-        	}
-        	else {
-        		conn = PairingProtocol.conn;
-        	}
+        	//Open a new connection
+        	System.out.println("#3a");
+        	try {conn = new Connection(IPAddress);} 
+        	catch (IOException e1) {
+        		System.out.println("#3b");
+        		try {conn = new Connection(LocalIP);} 
+        		catch (IOException e2) {
+        			System.out.println("#3c");
+        			runOnUiThread(new Runnable() {
+        				public void run() {
+        					Toast.makeText(getApplicationContext(), "Unable to connect to wallet", Toast.LENGTH_LONG).show();
+        				}
+        			});
+        		}
+			}
+        	System.out.println("#4");
         	//Create a new message object for receiving the transaction.
         	Message msg = null;
-			try {
-				msg = new Message(conn);
-			} catch (IOException e) {e.printStackTrace();}
-			try {
-				tx = msg.receiveTX(sharedsecret);
-			} catch (Exception e) {e.printStackTrace();}
+			try {msg = new Message(conn);} 
+			catch (IOException e) {e.printStackTrace();}
+			try {tx = msg.receiveTX(sharedsecret);} 
+			catch (Exception e) {e.printStackTrace();}
         	
 			return null;
         }
@@ -648,37 +608,11 @@ public class Wallet_list extends Activity {
         /**On finish show the transaction in a dialog box*/
         protected void onPostExecute(Connection result) {
            super.onPostExecute(result);
-           if (tx != null)
-			try {
-				showDialogBox(tx);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+           if (tx != null) {
+        	   try {showDialogBox(tx);} 
+        	   catch (InterruptedException e) {e.printStackTrace();}
+           }
         }
-    }
- 
-    /**
-     * Class to get the public IP of the device so the Authenticator can decide if the device is on
-     * the same WiFi network. 
-     */
-    public class getIP extends AsyncTask<String,String,String> {
-        @Override
-        protected String doInBackground(String... message) {
-        	String ip = Utils.getPublicIP();
-            return ip;
-        }
- 
-        @Override
-        protected void onProgressUpdate(String... values) {
-            super.onProgressUpdate(values);
-        }
-        
-        /**After we receive the IP connect to the wallet*/
-        protected void onPostExecute(String result) {
-            super.onPostExecute(result);
-            PublicIP = result;
-            new ConnectToWallets().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        }    
     }
 
 }

@@ -28,7 +28,6 @@ public class PairingProtocol {
     static DataOutputStream out;
     static DataInputStream in;
     public static Connection conn;
-    static Socket socket;
     
     /**	Constructor creates a new connection object to connect to the wallet. */
     public PairingProtocol(String IP) throws IOException {

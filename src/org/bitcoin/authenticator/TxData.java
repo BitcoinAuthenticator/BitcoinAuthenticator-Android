@@ -26,7 +26,7 @@ public class TxData {
 		Object obj = parser.parse(strJson);
 		JSONObject jsonObject = (JSONObject) obj;
 		version = ((Long) jsonObject.get("version")).intValue();
-		numInputs = ((Long) jsonObject.get("in_n")).intValue();
+		numInputs = ((Long) jsonObject.get("ins_n")).intValue();
 		tx = Utils.hexStringToByteArray((String) jsonObject.get("tx"));
 		JSONArray msg = (JSONArray) jsonObject.get("keylist");
 		Iterator<JSONObject> iterator = msg.iterator();

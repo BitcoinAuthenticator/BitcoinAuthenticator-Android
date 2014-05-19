@@ -12,9 +12,6 @@ import java.security.NoSuchAlgorithmException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.bitcoin.authenticator.Pair_wallet.connectTask;
-import org.bitcoin.authenticator.Pair_wallet.getIPtask;
-
 import com.google.zxing.integration.android.IntentIntegrator;
 
 import android.app.Activity;
