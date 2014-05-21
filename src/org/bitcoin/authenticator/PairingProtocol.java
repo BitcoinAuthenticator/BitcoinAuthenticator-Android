@@ -41,7 +41,7 @@ public class PairingProtocol {
      * Uses the AES key to calculate the message authentication code for the payload and concatenates 
      * it with the master public key and chaincode. The payload is encrypted and sent over to the wallet.
      */
-    public void run(byte[] seed, SecretKey AESKey, int pairingID) throws IOException, NoSuchAlgorithmException, InvalidKeyException  {
+    public void run(byte[] seed, SecretKey AESKey, String pairingID) throws IOException, NoSuchAlgorithmException, InvalidKeyException  {
     	//Derive the key and chaincode from the seed.
     	int num = 1;
     	HDKeyDerivation HDKey = null;
@@ -49,14 +49,14 @@ public class PairingProtocol {
     	DeterministicKey childkey = HDKey.deriveChildKey(masterkey,num);
     	byte[] chaincode = childkey.getChainCode(); // 32 bytes
     	byte[] mpubkey = childkey.getPubKey(); // 32 bytes
-    	byte[] pairID = ByteBuffer.allocate(4).putInt(pairingID).array(); // 4bytes
+    	byte[] pairID = pairingID.getBytes();//ByteBuffer.allocate(4).putInt(pairingID).array(); // 4bytes
     	byte[] regID = GcmUtilGlobal.gcmRegistrationToken.getBytes();
     	//Format data into a JSON object
     	Map obj=new LinkedHashMap();
     	obj.put("version", 1);
 		obj.put("mpubkey", Utils.bytesToHex(mpubkey));
 		obj.put("chaincode", Utils.bytesToHex(chaincode));
-		obj.put("pairID", Utils.bytesToHex(pairID));
+		obj.put("pairID", new String (pairID));
 		obj.put("gcmID", new String (regID));
 		StringWriter jsonOut = new StringWriter();
 		try {JSONValue.writeJSONString(obj, jsonOut);} 
@@ -71,12 +71,7 @@ public class PairingProtocol {
     	ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
     	outputStream.write(jsonBytes);
     	outputStream.write(macbytes);
-    	/**
-    	 * 			---------JSON object encoded as byte array------- + --32B--
-    	 * PAYLOAD = mpubkey, chaincode, pairingID, GCMRegistrationID + macbytes
-    	 * 			|________________________________________________|    |
-    	 * 				                HmacSHA256 ------------------------
-    	 */
+
     	byte payload[] = outputStream.toByteArray();
     	Log.v("ASDF","payload length byte[] - " + payload.length);
     	//Encrypt the payload

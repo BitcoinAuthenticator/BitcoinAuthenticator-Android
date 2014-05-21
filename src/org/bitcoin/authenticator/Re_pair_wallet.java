@@ -12,6 +12,8 @@ import java.security.NoSuchAlgorithmException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.bitcoin.authenticator.GcmUtil.GcmUtilGlobal;
+
 import com.google.zxing.integration.android.IntentIntegrator;
 
 import android.app.Activity;
@@ -128,7 +130,7 @@ public class Re_pair_wallet extends Activity{
             	}
         	}
             SecretKey secretkey = new SecretKeySpec(Utils.hexStringToByteArray(AESKey), "AES");
-			try {pair2wallet.run(seed, secretkey, walletNum);} 
+			try {pair2wallet.run(seed, secretkey, Pair_wallet.getPairingIDDigest(walletNum, GcmUtilGlobal.gcmRegistrationToken));} 
 			catch (InvalidKeyException e) {e.printStackTrace();} 
 			catch (NoSuchAlgorithmException e) {e.printStackTrace();} 
 			catch (IOException e) {e.printStackTrace();}

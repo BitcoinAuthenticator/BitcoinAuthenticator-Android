@@ -5,12 +5,15 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
+
+import org.bitcoin.authenticator.GcmUtil.GcmUtilGlobal;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 
@@ -235,7 +238,7 @@ public class Pair_wallet extends Activity {
         	}
     		//Run pairing protocol
             SecretKey secretkey = new SecretKeySpec(Utils.hexStringToByteArray(AESKey), "AES");
-			try {pair2wallet.run(seed, secretkey, num);} 
+			try {pair2wallet.run(seed, secretkey, getPairingIDDigest(num, GcmUtilGlobal.gcmRegistrationToken));} 
 			catch (InvalidKeyException e) {e.printStackTrace();} 
 			catch (NoSuchAlgorithmException e) {e.printStackTrace();} 
 			catch (IOException e) {e.printStackTrace();}
@@ -250,6 +253,34 @@ public class Pair_wallet extends Activity {
     		startActivity(new Intent(Pair_wallet.this, Wallet_list.class));
         }
     }
+	
+	public static String getPairingIDDigest(int num, String gcmRegID)
+	 {
+		 MessageDigest md = null;
+		 try {
+			 md = MessageDigest.getInstance("SHA-1");
+		 }
+	    catch(NoSuchAlgorithmException e) {
+	        e.printStackTrace();
+	    } 
+	    byte[] digest = md.digest((gcmRegID + "_" + Integer.toString(num)).getBytes());
+	    String ret = new BigInteger(1, digest).toString(16);
+	    //Make sure it is 40 chars, if less padd with 0, if more substringit
+	    if(ret.length() > 40)
+	    {
+    	ret = ret.substring(0, 39);
+	    }
+	    else if(ret.length() < 40)
+	    {
+	    	int paddingNeeded = 40 - ret.length();
+	    	String padding = "";
+	    	for(int i=0;i<paddingNeeded;i++)
+	    		padding = padding + "0";
+	    	ret = padding + ret;
+	    }
+	    //Log.v("ASDF","Reg id: " + ret);
+	    return ret;
+	}
 	
 }
 
