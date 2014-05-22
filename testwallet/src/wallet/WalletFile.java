@@ -48,6 +48,7 @@ public class WalletFile {
 		String mpubkey = (String) jsonObject.get("master_public_key");
 		String chaincode = (String) jsonObject.get("chain_code");
 		String gcm = (String) jsonObject.get("GCM");
+		String pairID = (String) jsonObject.get("pairID");
 		long numkeys = (Long) jsonObject.get("keys_n");
 		JSONArray msg = (JSONArray) jsonObject.get("keys");
 		Iterator<JSONObject> iterator = msg.iterator();
@@ -61,6 +62,7 @@ public class WalletFile {
 		newobj.put("master_public_key", mpubkey);
 		newobj.put("chain_code", chaincode);
 		newobj.put("GCM", gcm);
+		newobj.put("pairID", pairID);
 		newobj.put("testnet", testnet);
 		newobj.put("keys_n", numkeys);
 		newobj.put("keys", jsonlist);
@@ -99,6 +101,7 @@ public class WalletFile {
 		String mpubkey = (String) jsonObject.get("master_public_key");
 		String chaincode = (String) jsonObject.get("chain_code");
 		String gcm = (String) jsonObject.get("GCM");
+		String pairID = (String) jsonObject.get("pairID");
 		Boolean testnet = (Boolean) jsonObject.get("testnet"); 
 		long numkeys = (Long) jsonObject.get("keys_n");
 		JSONArray msg = (JSONArray) jsonObject.get("keys");
@@ -121,6 +124,7 @@ public class WalletFile {
 		newobj.put("master_public_key", mpubkey);
 		newobj.put("chain_code", chaincode);
 		newobj.put("GCM", gcm);
+		newobj.put("pairID", pairID);
 		newobj.put("testnet", testnet);
 		newobj.put("keys_n", numkeys);
 		newobj.put("keys", jsonlist);
@@ -142,13 +146,14 @@ public class WalletFile {
 	}
 	
 	/**This method is used during pairing. It saves the data from the Authenticator to file*/
-	void writePairingData(String mpubkey, String chaincode, String key, String GCM){
+	void writePairingData(String mpubkey, String chaincode, String key, String GCM, String pairID){
 		JSONArray jsonlist = new JSONArray();
 		Map obj=new LinkedHashMap();
 		obj.put("aes_key", key);
 		obj.put("master_public_key", mpubkey);
 		obj.put("chain_code", chaincode);
 		obj.put("GCM", GCM);
+		obj.put("pairID", pairID);
 		obj.put("testnet", false);
 		obj.put("keys_n", new Integer(0));
 		obj.put("keys", jsonlist);
@@ -343,6 +348,19 @@ public class WalletFile {
 		JSONObject jsonObject = (JSONObject) obj;
 		String GCM = (String) jsonObject.get("GCM");
 		return GCM.getBytes();
+	}
+	
+	public String getPairID(){
+		JSONParser parser = new JSONParser();
+		Object obj = null;
+		try {
+			obj = parser.parse(new FileReader(filePath));
+		} catch (IOException | ParseException e) {
+			e.printStackTrace();
+		}
+		JSONObject jsonObject = (JSONObject) obj;
+		String pairID = (String) jsonObject.get("pairID");
+		return pairID;
 	}
 	
 	/**

@@ -1,16 +1,13 @@
 package org.bitcoin.authenticator;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.nio.ByteBuffer;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,8 +75,9 @@ public class Wallet_list extends Activity {
 	public static JSONObject req;
 	public static Boolean hasPendingReq;
 	public static Connection conn;
+	public static int walletnum;
  
-	
+
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wallet_list);
@@ -96,7 +94,7 @@ public class Wallet_list extends Activity {
         //Start the AsyncTask which waits for new transactions
 		new ConnectToWallets().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
-	
+
 	/**Creates the listview component and defines behavior to a long press on a list item.*/
 	void setListView(){
         ArrayList walletList = getListData();
@@ -105,7 +103,7 @@ public class Wallet_list extends Activity {
         lv1.setAdapter(new CustomListAdapter(this, walletList));
         registerForContextMenu(lv1);
 	}
-	
+
 	/**Inflates the menu and adds it to the action bar*/
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -131,7 +129,7 @@ public class Wallet_list extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
+
 	/**Creates the context menu that pops up on a long click in the list view*/
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v,ContextMenuInfo menuInfo) {
@@ -215,7 +213,7 @@ public class Wallet_list extends Activity {
     	else {return false;}
 	return true;
 	}
-	
+
 	/**
 	 * Disable the back button because the device is now paired and any activity the user needs can be 
 	 * accessed from the menu. 
@@ -223,7 +221,7 @@ public class Wallet_list extends Activity {
 	@Override
 	public void onBackPressed() {
 	}
-	
+
 	/**
 	 * Creates a dialog box to show to the user when the Authenticator receives a transaction from the wallet.
 	 * Loads the seed from internal storage to derive the private key needed for signing.
@@ -231,8 +229,8 @@ public class Wallet_list extends Activity {
 	 */
 	public void showDialogBox(final TxData tx) throws InterruptedException{
 		//Close the notification if it is still open
-		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		mNotificationManager.cancel((int)GcmIntentService.uniqueId);
+		//NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		//mNotificationManager.cancel((int)GcmIntentService.uniqueId);
 		if (tx.equals("error")){
 			Toast.makeText(getApplicationContext(), "Unable to connect to wallet", Toast.LENGTH_LONG).show();
 		}
@@ -379,7 +377,7 @@ public class Wallet_list extends Activity {
 				AlertDialog alertDialog = alertDialogBuilder.create();
 				alertDialog.show();}
 	}
-	
+
 	/**This method loads the metadata from Shared Preferences needed to display in the listview*/
     private ArrayList getListData() {
     	//Open shared preferences and get the number of wallets
@@ -397,7 +395,7 @@ public class Wallet_list extends Activity {
     		String wTP = ("Type");
     		walletData.setWalletNum(i);
     		walletData.setWalletLabel(data.getString(wID, "null"));
-    		walletData.setFingerprint(data.getString(wFP, "null"));
+    		walletData.setFingerprint(data.getString(wFP, "null").substring(32,40).toUpperCase());
     		//Decide which icon to display
     		if (data.getString(wTP, "null").equals("blockchain")){walletData.setIcon(R.drawable.blockchain_info_logo);}
     		else if (data.getString(wTP, "null").equals("electrum")){walletData.setIcon(R.drawable.electrum_logo);}
@@ -519,28 +517,11 @@ public class Wallet_list extends Activity {
     	TxData tx;
         @Override
         protected Connection doInBackground(String... message) {
-        	//Load AES Key from file
-        	byte [] key = null;
-    		String FILENAME = "AESKey1";
-    		File file = new File(getFilesDir(), FILENAME);
-    		int size = (int)file.length();
-    		if (size != 0)
-    		{
-    			FileInputStream inputStream = null;
-    			try {inputStream = openFileInput(FILENAME);} 
-    			catch (FileNotFoundException e1) {e1.printStackTrace();}
-    			key = new byte[size];
-    			try {inputStream.read(key, 0, size);} 
-    			catch (IOException e) {e.printStackTrace();}
-    			try {inputStream.close();} 
-    			catch (IOException e) {e.printStackTrace();}
-    		}
-    		final byte[] AESKey = key;
-    		SecretKey sharedsecret = new SecretKeySpec(AESKey, "AES");
     		Log.v("ASDF", "hasPendingReq " + hasPendingReq.toString());
     		//Load the GCM settings from shared preferences
             SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
             Boolean GCM = settings.getBoolean("GCM", true);
+            int numwallets = settings.getInt("numwallets", 0);
             if(GCM){
             	//Wait for pending requests via GCM
             	while (!hasPendingReq){
@@ -562,6 +543,22 @@ public class Wallet_list extends Activity {
             			JSONObject reqPayload = new JSONObject(req.getString("ReqPayload"));
             			IPAddress =  reqPayload.getString("ExternalIP");
             			LocalIP = reqPayload.getString("LocalIP");
+            			String pairID = reqPayload.getString("PairingID");
+            		 	System.out.println(pairID);
+            			//between here
+            			for (int y=1; y<=numwallets; y++){
+            				SharedPreferences data = getSharedPreferences("WalletData" + y, 0);
+            				String fingerprint = data.getString("Fingerprint", "null");
+            				System.out.println(fingerprint);
+            				if (fingerprint.equals(pairID)){
+            					walletnum = y;
+            				}
+            				System.out.println(y);
+            			}
+            			System.out.println(walletnum);
+            			
+            			//and here
+            			
             			SharedPreferences prefs = getSharedPreferences("WalletData1", 0);
             			SharedPreferences.Editor editor = prefs.edit();
             			editor.putString("ExternalIP", IPAddress);
@@ -610,6 +607,24 @@ public class Wallet_list extends Activity {
             	}
             	System.out.println("#4");
             }
+          //Load AES Key from file
+        	byte [] key = null;
+    		String FILENAME = "AESKey1";
+    		File file = new File(getFilesDir(), FILENAME);
+    		int size = (int)file.length();
+    		if (size != 0)
+    		{
+    			FileInputStream inputStream = null;
+    			try {inputStream = openFileInput(FILENAME);} 
+    			catch (FileNotFoundException e1) {e1.printStackTrace();}
+    			key = new byte[size];
+    			try {inputStream.read(key, 0, size);} 
+    			catch (IOException e) {e.printStackTrace();}
+    			try {inputStream.close();} 
+    			catch (IOException e) {e.printStackTrace();}
+    		}
+    		final byte[] AESKey = key;
+    		SecretKey sharedsecret = new SecretKeySpec(AESKey, "AES");
         	//Create a new message object for receiving the transaction.
         	Message msg = null;
 			try {msg = new Message(conn);} 

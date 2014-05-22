@@ -63,12 +63,12 @@ public class Re_pair_wallet extends Activity{
 				MessageDigest md = null;
 				try {md = MessageDigest.getInstance("SHA-1");} 
 				catch (NoSuchAlgorithmException e) {e.printStackTrace();}
-			    String fingerprint=Utils.bytesToHex(md.digest(Utils.hexStringToByteArray(AESKey)));
+			    String fingerprint = Pair_wallet.getPairingIDDigest(walletNum, GcmUtilGlobal.gcmRegistrationToken);
 				String walletData = "WalletData" + walletNum;
 				SharedPreferences data = getSharedPreferences(walletData, 0);
 				SharedPreferences.Editor editor = data.edit();	
 				//Save the metadata for this wallet to shared preferences
-				editor.putString("Fingerprint", fingerprint.substring(32,40));
+				editor.putString("Fingerprint", fingerprint);
 				editor.putString("ExternalIP", IPAddress);
 				editor.putString("LocalIP", LocalIP);
 				editor.commit();
@@ -130,7 +130,8 @@ public class Re_pair_wallet extends Activity{
             	}
         	}
             SecretKey secretkey = new SecretKeySpec(Utils.hexStringToByteArray(AESKey), "AES");
-			try {pair2wallet.run(seed, secretkey, Pair_wallet.getPairingIDDigest(walletNum, GcmUtilGlobal.gcmRegistrationToken));} 
+            byte[] regID = (GcmUtilGlobal.gcmRegistrationToken).getBytes();
+			try {pair2wallet.run(seed, secretkey, Pair_wallet.getPairingIDDigest(walletNum, GcmUtilGlobal.gcmRegistrationToken), regID);} 
 			catch (InvalidKeyException e) {e.printStackTrace();} 
 			catch (NoSuchAlgorithmException e) {e.printStackTrace();} 
 			catch (IOException e) {e.printStackTrace();}

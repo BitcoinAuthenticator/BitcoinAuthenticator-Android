@@ -149,7 +149,7 @@ public class Pair_wallet extends Activity {
 				} catch (NoSuchAlgorithmException e) {
 					e.printStackTrace();
 				}
-				//Start the pairing protocol by first getting the device IP address.
+				//Start the pairing protocol
 				connectTask conx = new connectTask();
 	            conx.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 			} 
@@ -165,8 +165,7 @@ public class Pair_wallet extends Activity {
 	 */
 	private void completePairing() throws NoSuchAlgorithmException{
 		//Calculate the fingerprint of the AES key to serve as the wallet identifier.
-		MessageDigest md = MessageDigest.getInstance("SHA-1");
-	    fingerprint=Utils.bytesToHex(md.digest(Utils.hexStringToByteArray(AESKey)));
+	    fingerprint = getPairingIDDigest(num, GcmUtilGlobal.gcmRegistrationToken);
 	  	SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
 	  	SharedPreferences.Editor settingseditor = settings.edit();	
 	    String walletData = "WalletData" + num;
@@ -179,7 +178,7 @@ public class Pair_wallet extends Activity {
 	    String wLIP = "LocalIP";
 	    //Save the metadata for this wallet to shared preferences
 	    editor.putString(wID, walletID);
-	    editor.putString(wFP, fingerprint.substring(32,40));
+	    editor.putString(wFP, fingerprint);
 	    editor.putString(wTP, walletType);
 	    editor.putString(wEIP, IPAddress);
 	    editor.putString(wLIP, LocalIP);
@@ -238,7 +237,8 @@ public class Pair_wallet extends Activity {
         	}
     		//Run pairing protocol
             SecretKey secretkey = new SecretKeySpec(Utils.hexStringToByteArray(AESKey), "AES");
-			try {pair2wallet.run(seed, secretkey, getPairingIDDigest(num, GcmUtilGlobal.gcmRegistrationToken));} 
+            byte[] regID = (GcmUtilGlobal.gcmRegistrationToken).getBytes();
+			try {pair2wallet.run(seed, secretkey, getPairingIDDigest(num, GcmUtilGlobal.gcmRegistrationToken), regID);} 
 			catch (InvalidKeyException e) {e.printStackTrace();} 
 			catch (NoSuchAlgorithmException e) {e.printStackTrace();} 
 			catch (IOException e) {e.printStackTrace();}
@@ -256,16 +256,12 @@ public class Pair_wallet extends Activity {
 	
 	public static String getPairingIDDigest(int num, String gcmRegID)
 	 {
-		 MessageDigest md = null;
-		 try {
-			 md = MessageDigest.getInstance("SHA-1");
-		 }
-	    catch(NoSuchAlgorithmException e) {
-	        e.printStackTrace();
-	    } 
+		MessageDigest md = null;
+		try {md = MessageDigest.getInstance("SHA-1");}
+		catch(NoSuchAlgorithmException e) {e.printStackTrace();} 
 	    byte[] digest = md.digest((gcmRegID + "_" + Integer.toString(num)).getBytes());
 	    String ret = new BigInteger(1, digest).toString(16);
-	    //Make sure it is 40 chars, if less padd with 0, if more substringit
+	    //Make sure it is 40 chars, if less pad with 0, if more substringit
 	    if(ret.length() > 40)
 	    {
     	ret = ret.substring(0, 39);

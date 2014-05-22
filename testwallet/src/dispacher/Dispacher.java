@@ -45,7 +45,7 @@ public class Dispacher {
 					//assert(plugnplay.isPortMapped(port));
 					ss = new ServerSocket (port);
 					MessageBuilder msgGCM = new MessageBuilder(MessageType.signTx,
-							new String[]{new String(device.pairingID),plugnplay.getExternalIP(),
+							new String[]{device.pairingID,plugnplay.getExternalIP(),
 							   plugnplay.getLocalIP().substring(1)});
 					ArrayList<String> devicesList = new ArrayList<String>();
 					devicesList.add(new String(device.gcmRegId));

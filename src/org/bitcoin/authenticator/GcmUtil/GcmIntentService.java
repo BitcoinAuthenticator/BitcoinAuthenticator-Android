@@ -4,7 +4,6 @@ import java.util.Date;
 
 import org.bitcoin.authenticator.Main;
 import org.bitcoin.authenticator.R;
-import org.bitcoin.authenticator.Wallet_list;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -18,7 +17,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 

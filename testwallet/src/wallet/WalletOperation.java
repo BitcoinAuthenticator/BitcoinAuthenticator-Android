@@ -128,10 +128,12 @@ public class WalletOperation {
 		Dispacher disp = new Dispacher();
 		ArrayList<String> keyandchain = file.getPubAndChain();
 		byte[] gcmID = file.getGCMRegID();
+		String pairID = file.getPairID();
+		System.out.println(pairID);
 		Device d = new Device(keyandchain.get(1).getBytes(),
 				keyandchain.get(0).getBytes(),
 				gcmID,
-				hexStringToByteArray("00000001"),
+				pairID,
 				secretkey);
 		disp.dispachMessage(MessageType.signTx, cipherBytes, d);
 		System.out.println("Sent transaction");
