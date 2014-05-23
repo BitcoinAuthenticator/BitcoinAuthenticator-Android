@@ -87,12 +87,11 @@ public class Wallet_list extends Activity {
         SharedPreferences prefs = getSharedPreferences("WalletData1", 0);	
         IPAddress = prefs.getString("ExternalIP", "null");
         LocalIP = prefs.getString("LocalIP","null");
-        System.out.println(IPAddress + " " + LocalIP);
         //Load pending request Boolean
         SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
         hasPendingReq = settings.getBoolean("request", false);
         //Start the AsyncTask which waits for new transactions
-		new ConnectToWallets().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+  		new ConnectToWallets().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR); 
     }
 
 	/**Creates the listview component and defines behavior to a long press on a list item.*/
@@ -229,18 +228,18 @@ public class Wallet_list extends Activity {
 	 */
 	public void showDialogBox(final TxData tx) throws InterruptedException{
 		//Close the notification if it is still open
-		//NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		//mNotificationManager.cancel((int)GcmIntentService.uniqueId);
+		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+		mNotificationManager.cancel((int)GcmIntentService.uniqueId);
 		if (tx.equals("error")){
 			Toast.makeText(getApplicationContext(), "Unable to connect to wallet", Toast.LENGTH_LONG).show();
 		}
 		else {
 			//Load walletID from Shared Preferences
-			SharedPreferences data = getSharedPreferences("WalletData1", 0);
+			SharedPreferences data = getSharedPreferences("WalletData"+ walletnum, 0);
 			String name = data.getString("ID", "null");
 			//Load AES Key from internal storage
         	byte [] key = null;
-    		String FILENAME = "AESKey1";
+    		String FILENAME = "AESKey" + walletnum;
     		File file = new File(getFilesDir(), FILENAME);
     		int size = (int)file.length();
     		if (size != 0)
@@ -323,7 +322,7 @@ public class Wallet_list extends Activity {
 							ArrayList<String> walpubkeys = tx.getPublicKeys();
 							HDKeyDerivation HDKey = null;
 							DeterministicKey masterKey = HDKey.createMasterPrivateKey(authseed);
-							DeterministicKey walletMasterKey = HDKey.deriveChildKey(masterKey,1);
+							DeterministicKey walletMasterKey = HDKey.deriveChildKey(masterKey, walletnum);
 							DeterministicKey childKey = HDKey.deriveChildKey(walletMasterKey,index.get(j));
 							byte[] privKey = childKey.getPrivKeyBytes();
 							byte[] pubKey = childKey.getPubKey();
@@ -523,51 +522,36 @@ public class Wallet_list extends Activity {
             Boolean GCM = settings.getBoolean("GCM", true);
             int numwallets = settings.getInt("numwallets", 0);
             if(GCM){
-            	//Wait for pending requests via GCM
+            	//Wait for pending requests via GCM\
             	while (!hasPendingReq){
             		SharedPreferences settings2 = getSharedPreferences("ConfigFile", 0);
             		hasPendingReq = settings2.getBoolean("request", false);
             	}
             	//Handle pending requests from GCM
-            	Bundle extra = getIntent().getExtras();
-            	if(extra != null && extra.containsKey("pairingReq")){ // TODO - currently works for only one request
-            		try {
-            			req = new JSONObject (extra.getString("pairingReq"));
-            			hasPendingReq = true;	
-            		} catch (JSONException e) {e.printStackTrace();}
-            	}
-            	else {hasPendingReq = false;}
-            	if(hasPendingReq){
-            		//TODO - add multiple wallet handling
-            		try {
-            			JSONObject reqPayload = new JSONObject(req.getString("ReqPayload"));
-            			IPAddress =  reqPayload.getString("ExternalIP");
-            			LocalIP = reqPayload.getString("LocalIP");
-            			String pairID = reqPayload.getString("PairingID");
-            		 	System.out.println(pairID);
-            			//between here
-            			for (int y=1; y<=numwallets; y++){
-            				SharedPreferences data = getSharedPreferences("WalletData" + y, 0);
-            				String fingerprint = data.getString("Fingerprint", "null");
-            				System.out.println(fingerprint);
-            				if (fingerprint.equals(pairID)){
-            					walletnum = y;
-            				}
-            				System.out.println(y);
+            	req = GcmIntentService.getMessage();
+            	try {
+            		JSONObject reqPayload = new JSONObject();
+            		reqPayload = req.getJSONObject("ReqPayload");
+            		IPAddress =  reqPayload.getString("ExternalIP");
+            		LocalIP = reqPayload.getString("LocalIP");
+            		String pairID = req.getString("PairingID");
+            		System.out.println(pairID);
+            		for (int y=1; y<=numwallets; y++){
+            			SharedPreferences data = getSharedPreferences("WalletData" + y, 0);
+            			String fingerprint = data.getString("Fingerprint", "null");
+            			System.out.println(fingerprint);
+            			if (fingerprint.equals(pairID)){
+            				walletnum = y;
             			}
-            			System.out.println(walletnum);
-            			
-            			//and here
-            			
-            			SharedPreferences prefs = getSharedPreferences("WalletData1", 0);
-            			SharedPreferences.Editor editor = prefs.edit();
-            			editor.putString("ExternalIP", IPAddress);
-            			editor.putString("LocalIP", LocalIP);
-            			editor.commit();
-            			Log.v("ASDF", "Changed wallet ip address from GCM to: " + IPAddress + "\n" +
-            					"Changed wallet local ip address from GCM to: " + LocalIP);
-            		} catch (JSONException e) {e.printStackTrace();}
-            	}
+            		}
+            		SharedPreferences prefs = getSharedPreferences("WalletData" + walletnum, 0);
+            		SharedPreferences.Editor editor = prefs.edit();
+            		editor.putString("ExternalIP", IPAddress);
+            		editor.putString("LocalIP", LocalIP);
+            		editor.commit();
+            		Log.v("ASDF", "Changed wallet ip address from GCM to: " + IPAddress + "\n" +
+            				"Changed wallet local ip address from GCM to: " + LocalIP);
+            	} catch (JSONException e) {e.printStackTrace();} 
             	hasPendingReq=false;
             	SharedPreferences.Editor editor = settings.edit();	
             	editor.putBoolean("request", false);
@@ -609,7 +593,7 @@ public class Wallet_list extends Activity {
             }
           //Load AES Key from file
         	byte [] key = null;
-    		String FILENAME = "AESKey1";
+    		String FILENAME = "AESKey" + walletnum;
     		File file = new File(getFilesDir(), FILENAME);
     		int size = (int)file.length();
     		if (size != 0)
@@ -634,7 +618,7 @@ public class Wallet_list extends Activity {
         	
 			return null;
         }
- 	
+
         @Override
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);

@@ -25,6 +25,7 @@ public class GcmIntentService extends IntentService {
     private NotificationManager mNotificationManager;
     NotificationCompat.Builder builder;
     public static long uniqueId;
+    public static JSONObject obj;
 
     public GcmIntentService() {
         super("GcmIntentService");
@@ -73,10 +74,6 @@ public class GcmIntentService extends IntentService {
     // This is just one simple example of what you might choose to do with
     // a GCM message.
     private void sendNotification(String msg) {
-    	SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
-		SharedPreferences.Editor editor = settings.edit();	
-    	editor.putBoolean("request", true);
-    	editor.commit();
     	Date now = new Date();
     	uniqueId = now.getTime();//use date to generate an unique id to differentiate the notifications.
     	
@@ -84,17 +81,13 @@ public class GcmIntentService extends IntentService {
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
 
     	Intent intent = new Intent(this, Main.class);
-    	JSONObject obj;
     	String customMsg = "";
 		try {
 			obj = new JSONObject(msg);
 			intent.putExtra("pairingReq", msg);
 			intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 			customMsg = obj.getString("CustomMsg");
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} catch (JSONException e) {e.printStackTrace();}
   
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
                 intent, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -114,6 +107,14 @@ public class GcmIntentService extends IntentService {
         Notification notif = mBuilder.build();
         notif.flags |= Notification.FLAG_AUTO_CANCEL;
         mNotificationManager.notify((int)uniqueId, notif);
+        SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
+		SharedPreferences.Editor editor = settings.edit();	
+    	editor.putBoolean("request", true);
+    	editor.commit();
     }
    
+    public static JSONObject getMessage() {
+		return obj;
+    }
+    
 }
