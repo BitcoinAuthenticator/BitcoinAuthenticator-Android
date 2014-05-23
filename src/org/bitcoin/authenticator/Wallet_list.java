@@ -191,12 +191,8 @@ public class Wallet_list extends Activity {
         			String wdata = "WalletData" + Data.getWalletNum();
         			SharedPreferences data = getSharedPreferences(wdata, 0);
         			SharedPreferences.Editor editor = data.edit();	
+        			editor.clear();
         			editor.putBoolean("Deleted", true);
-        			editor.putString("ID", "");
-        			editor.putString("Fingerprint", "");
-        			editor.putString("Type", "");
-        			editor.putString("ExternalIP", "");
-        			editor.putString("LocalIP", "");
         			editor.commit();
         			setListView();
     	        }
@@ -394,7 +390,8 @@ public class Wallet_list extends Activity {
     		String wTP = ("Type");
     		walletData.setWalletNum(i);
     		walletData.setWalletLabel(data.getString(wID, "null"));
-    		walletData.setFingerprint(data.getString(wFP, "null").substring(32,40).toUpperCase());
+    		String fingerprint = data.getString(wFP, "null");
+    		if (!fingerprint.equals("null")) walletData.setFingerprint(fingerprint.substring(32,40).toUpperCase());
     		//Decide which icon to display
     		if (data.getString(wTP, "null").equals("blockchain")){walletData.setIcon(R.drawable.blockchain_info_logo);}
     		else if (data.getString(wTP, "null").equals("electrum")){walletData.setIcon(R.drawable.electrum_logo);}
@@ -516,18 +513,21 @@ public class Wallet_list extends Activity {
     	TxData tx;
         @Override
         protected Connection doInBackground(String... message) {
+        	System.out.println("a1");
     		Log.v("ASDF", "hasPendingReq " + hasPendingReq.toString());
     		//Load the GCM settings from shared preferences
             SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
             Boolean GCM = settings.getBoolean("GCM", true);
             int numwallets = settings.getInt("numwallets", 0);
             if(GCM){
+            	System.out.println("a2");
             	//Wait for pending requests via GCM\
             	while (!hasPendingReq){
             		SharedPreferences settings2 = getSharedPreferences("ConfigFile", 0);
             		hasPendingReq = settings2.getBoolean("request", false);
             	}
             	//Handle pending requests from GCM
+            	System.out.println("a3");
             	req = GcmIntentService.getMessage();
             	try {
             		JSONObject reqPayload = new JSONObject();
@@ -535,11 +535,9 @@ public class Wallet_list extends Activity {
             		IPAddress =  reqPayload.getString("ExternalIP");
             		LocalIP = reqPayload.getString("LocalIP");
             		String pairID = req.getString("PairingID");
-            		System.out.println(pairID);
             		for (int y=1; y<=numwallets; y++){
             			SharedPreferences data = getSharedPreferences("WalletData" + y, 0);
             			String fingerprint = data.getString("Fingerprint", "null");
-            			System.out.println(fingerprint);
             			if (fingerprint.equals(pairID)){
             				walletnum = y;
             			}
@@ -557,6 +555,7 @@ public class Wallet_list extends Activity {
             	editor.putBoolean("request", false);
             	editor.commit();
             	//Open a new connection
+            	System.out.println("a4");
             	try {conn = new Connection(IPAddress);} 
             	catch (IOException e1) {
             		try {conn = new Connection(LocalIP);} 
@@ -610,6 +609,7 @@ public class Wallet_list extends Activity {
     		final byte[] AESKey = key;
     		SecretKey sharedsecret = new SecretKeySpec(AESKey, "AES");
         	//Create a new message object for receiving the transaction.
+    		System.out.println("a5");
         	Message msg = null;
 			try {msg = new Message(conn);} 
 			catch (IOException e) {e.printStackTrace();}
@@ -628,7 +628,8 @@ public class Wallet_list extends Activity {
         protected void onPostExecute(Connection result) {
            super.onPostExecute(result);
            if (tx != null) {
-        	   try {showDialogBox(tx);} 
+        	   try {showDialogBox(tx);
+        	   System.out.println("a6");} 
         	   catch (InterruptedException e) {e.printStackTrace();}
            }
         }

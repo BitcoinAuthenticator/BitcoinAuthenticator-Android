@@ -238,7 +238,7 @@ public class Pair_wallet extends Activity {
     		//Run pairing protocol
             SecretKey secretkey = new SecretKeySpec(Utils.hexStringToByteArray(AESKey), "AES");
             byte[] regID = (GcmUtilGlobal.gcmRegistrationToken).getBytes();
-			try {pair2wallet.run(seed, secretkey, getPairingIDDigest(num, GcmUtilGlobal.gcmRegistrationToken), regID);} 
+			try {pair2wallet.run(seed, secretkey, getPairingIDDigest(num, GcmUtilGlobal.gcmRegistrationToken), regID, num);} 
 			catch (InvalidKeyException e) {e.printStackTrace();} 
 			catch (NoSuchAlgorithmException e) {e.printStackTrace();} 
 			catch (IOException e) {e.printStackTrace();}
