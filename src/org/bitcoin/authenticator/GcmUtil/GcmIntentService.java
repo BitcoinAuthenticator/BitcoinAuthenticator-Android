@@ -66,7 +66,9 @@ public class GcmIntentService extends IntentService {
 
     private void alertUserOnNotification(Bundle extras)
     {
-    	sendNotification(extras.getString("data"));
+    	SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
+    	boolean GCM = settings.getBoolean("GCM", true);
+    	if (GCM){sendNotification(extras.getString("data"));}
     	// Example - Bundle[{message=Test bulk notification, android.support.content.wakelockid=1, collapse_key=message, from=204673947609}]
     }
     

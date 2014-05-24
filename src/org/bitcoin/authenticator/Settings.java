@@ -1,6 +1,7 @@
 package org.bitcoin.authenticator;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -32,6 +33,10 @@ public class Settings extends Activity {
 		setupTestnetCheckbox();
 	}
 	
+	public void onBackPressed() {  
+	    this.startActivity(new Intent(Settings.this,Wallet_list.class));  
+	    return;  
+	}  
 	
 	private void setupGCMCheckbox(){
 		CheckBox ChkBx = ( CheckBox ) findViewById( R.id.chkGCM );

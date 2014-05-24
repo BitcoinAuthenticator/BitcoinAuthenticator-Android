@@ -8,6 +8,7 @@ import java.io.StringWriter;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -78,6 +79,9 @@ public class Wallet_list extends Activity {
 	public static Connection conn;
 	public static int walletnum;
 	public static int numpairs;
+	ArrayList<String> Eaddrs;
+	ArrayList<String> Iaddrs;
+	public static ArrayList<Integer> IndexArr;
  
 
 	public void onCreate(Bundle savedInstanceState) {
@@ -91,8 +95,16 @@ public class Wallet_list extends Activity {
         GCM = settings.getBoolean("GCM", true);
         numpairs = settings.getInt("numwallets", 0);
         //Start the AsyncTask which waits for new transactions
+        Eaddrs = new ArrayList<String>();
+        Iaddrs = new ArrayList<String>();
         if (GCM){new GCMConnect().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);}
-        else {for (int b=1; b<=numpairs; b++){new ManualConnect().execute(b);}}
+        else {
+        	for (int b=1; b<=numpairs; b++){
+        		SharedPreferences prefs = getSharedPreferences("WalletData" + b, 0);	
+        		Eaddrs.add(prefs.getString("ExternalIP", "null"));
+        		Iaddrs.add(prefs.getString("LocalIP","null"));
+        		new ManualConnect().execute(b);}
+        	}
     }
 
 	/**Creates the listview component and defines behavior to a long press on a list item.*/
@@ -352,7 +364,7 @@ public class Wallet_list extends Activity {
 						try {conn.close();} 
 						catch (IOException e) {e.printStackTrace();}
 						if (GCM){new GCMConnect().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);}
-				        else {for (int b=1; b<=numpairs; b++){new ManualConnect().execute(b);}}
+				        else {new ManualConnect().execute(walletnum);}
 					}
 				  })
 				.setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
@@ -362,7 +374,7 @@ public class Wallet_list extends Activity {
 						try {conn.close();} 
 						catch (IOException e) {e.printStackTrace();}
 						if (GCM){new GCMConnect().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);}
-				        else {for (int b=1; b<=numpairs; b++){new ManualConnect().execute(b);}}
+				        else {new ManualConnect().execute(walletnum);}
 						dialog.cancel();
 					}
 				});
@@ -504,8 +516,9 @@ public class Wallet_list extends Activity {
     }
     
     /**
-     * This is a class that runs in the background and connects to the wallet and waits to receive a transaction.
-     * When one is received, it loads the dialog box.
+     * This class runs in the background. It waits to receive a new GCM message, parses it to figure out which 
+     * wallet it came from, then opens a TCP connection to that wallet and receives the tx. Assuming it decrypts 
+     * properly, it loads the dialog box asking the user for approval. 
      */
     public class GCMConnect extends AsyncTask<String,String,Connection> {
     	TxData tx;
@@ -562,6 +575,7 @@ public class Wallet_list extends Activity {
            
           //Load AES Key from file
         	byte [] key = null;
+        	ArrayList<SecretKey> keys = new ArrayList<SecretKey>();
     		String FILENAME = "AESKey" + walletnum;
     		File file = new File(getFilesDir(), FILENAME);
     		int size = (int)file.length();
@@ -578,11 +592,12 @@ public class Wallet_list extends Activity {
     		}
     		final byte[] AESKey = key;
     		SecretKey sharedsecret = new SecretKeySpec(AESKey, "AES");
+    		keys.add(sharedsecret);
         	//Create a new message object for receiving the transaction.
         	Message msg = null;
 			try {msg = new Message(conn);} 
 			catch (IOException e) {e.printStackTrace();}
-			try {tx = msg.receiveTX(sharedsecret);} 
+			try {tx = msg.receiveTX(keys);} 
 			catch (Exception e) {e.printStackTrace();}
         	
 			return null;
@@ -603,6 +618,11 @@ public class Wallet_list extends Activity {
         }
     }
     
+    /**
+     * This class is similar to GCMConnect but it works with GCM off. It runs a loop trying to connect to the IP
+     * address of the wallet. When the wallet opens a port, it connects, receives the tx, and loads the dialog box
+     * for the user. 
+     */
     public class ManualConnect extends AsyncTask<Integer,String,Connection> {
     	TxData tx;
         protected Connection doInBackground(Integer... n) {
@@ -613,38 +633,53 @@ public class Wallet_list extends Activity {
         	Boolean connected = false;
         	while(!connected){
         		connected = true;
-        		try {conn = new Connection(LocalIP);} 
-            	catch (IOException e1) {
-            		try {conn = new Connection(IPAddress);}
-            		catch (IOException e2) {
+        		try {
+        			IndexArr = new ArrayList<Integer>();
+        			conn = new Connection(LocalIP);
+        			for (int j=0; j<Iaddrs.size(); j++){
+        				if (Iaddrs.get(j).equals(LocalIP)){IndexArr.add(j+1);}
+        			}
+        		} catch (IOException e1) {
+            		try {
+            			IndexArr = new ArrayList<Integer>();
+            			conn = new Connection(IPAddress);
+            			for (int j=0; j<Iaddrs.size(); j++){
+            				if (Iaddrs.get(j).equals(IPAddress)){IndexArr.add(j+1);}
+            			}
+            		} catch (IOException e2) {
             			connected = false;
             		}
             	}	
         	}
-        	//Load AES Key from file
-        	byte [] key = null;
-    		String FILENAME = "AESKey" + walletnum;
-    		File file = new File(getFilesDir(), FILENAME);
-    		int size = (int)file.length();
-    		if (size != 0)
-    		{
-    			FileInputStream inputStream = null;
-    			try {inputStream = openFileInput(FILENAME);} 
-    			catch (FileNotFoundException e1) {e1.printStackTrace();}
-    			key = new byte[size];
-    			try {inputStream.read(key, 0, size);} 
-    			catch (IOException e) {e.printStackTrace();}
-    			try {inputStream.close();} 
-    			catch (IOException e) {e.printStackTrace();}
-    		}
-    		final byte[] AESKey = key;
-    		SecretKey sharedsecret = new SecretKeySpec(AESKey, "AES");
+        	ArrayList<SecretKey> keys = new ArrayList<SecretKey>();
+        	for (int j=0; j<IndexArr.size(); j++){
+        		//Load AES Key from file
+        		byte [] key = null;
+        		String FILENAME = "AESKey" + IndexArr.get(j);
+        		File file = new File(getFilesDir(), FILENAME);
+        		int size = (int)file.length();
+        		if (size != 0)
+        		{
+        			FileInputStream inputStream = null;
+        			try {inputStream = openFileInput(FILENAME);} 
+        			catch (FileNotFoundException e1) {e1.printStackTrace();}
+        			key = new byte[size];
+        			try {inputStream.read(key, 0, size);} 
+        			catch (IOException e) {e.printStackTrace();}
+        			try {inputStream.close();} 
+        			catch (IOException e) {e.printStackTrace();}
+        		}
+        		final byte[] AESKey = key;
+        		SecretKey sharedsecret = new SecretKeySpec(AESKey, "AES");
+        		keys.add(sharedsecret);
+        	}
         	//Create a new message object for receiving the transaction.
         	Message msg = null;
 			try {msg = new Message(conn);} 
 			catch (IOException e) {e.printStackTrace();}
-			try {tx = msg.receiveTX(sharedsecret);} 
+			try {tx = msg.receiveTX(keys);} 
 			catch (Exception e) {e.printStackTrace();}
+      
 			return null;
         }
 
