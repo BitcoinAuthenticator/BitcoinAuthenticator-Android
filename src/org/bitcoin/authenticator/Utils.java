@@ -3,6 +3,9 @@ import java.io.*;
 import java.net.*;
 import java.util.*;   
 
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -11,6 +14,7 @@ import org.apache.http.conn.util.InetAddressUtils;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONObject;
 
+import android.content.Context;
 import android.util.Log;
 
 public class Utils {
@@ -183,4 +187,23 @@ public class Utils {
     	return sb.toString();
     }
       
+    public static SecretKey getAESSecret(Context context, int walletnum){
+    	byte [] key = null;
+		String FILENAME = "AESKey" + walletnum;
+		File file = new File(context.getFilesDir(), FILENAME);
+		int size = (int)file.length();
+		if (size != 0)
+		{
+			FileInputStream inputStream = null;
+			try {inputStream = context.openFileInput(FILENAME);} 
+			catch (FileNotFoundException e1) {e1.printStackTrace();}
+			key = new byte[size];
+			try {inputStream.read(key, 0, size);} 
+			catch (IOException e) {e.printStackTrace();}
+			try {inputStream.close();} 
+			catch (IOException e) {e.printStackTrace();}
+		}
+		final byte[] AESKey = key;
+		return new SecretKeySpec(AESKey, "AES");
+    }
 }

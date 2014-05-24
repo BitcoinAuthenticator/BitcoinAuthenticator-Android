@@ -1,9 +1,13 @@
 package org.bitcoin.authenticator.GcmUtil;
 
 import java.util.Date;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 
 import org.bitcoin.authenticator.Main;
 import org.bitcoin.authenticator.R;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -24,8 +28,9 @@ public class GcmIntentService extends IntentService {
     public static final int NOTIFICATION_ID = 1;
     private NotificationManager mNotificationManager;
     NotificationCompat.Builder builder;
-    public static long uniqueId;
-    public static JSONObject obj;
+    public long uniqueId;
+    public JSONObject obj;
+    public static BlockingQueue<String> requestQueue;
 
     public GcmIntentService() {
         super("GcmIntentService");
@@ -84,8 +89,20 @@ public class GcmIntentService extends IntentService {
     	String customMsg = "";
 		try {
 			obj = new JSONObject(msg);
-			intent.putExtra("pairingReq", msg);
+			// Those flags would serve to create a list of pending requests
+			obj.put("seen", false);
+			/**
+			 * When a new notification enters we have 2 options:
+			 * 1) If the app is not running, put the request ID as an extra so it will pull it on launch.
+			 * 2) If app is already running we add it to a request queue so {@link org.bitcoin.authenticator.Wallet_list}<br>
+			 * 	  activity will pull it in the while loop 
+			 */
+			// 1) 
+			intent.putExtra("RequestID", obj.getString("RequestID"));
 			intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			// 2) 
+			addRequestToQueue(obj.getString("RequestID"));
+			
 			customMsg = obj.getString("CustomMsg");
 		} catch (JSONException e) {e.printStackTrace();}
   
@@ -107,14 +124,48 @@ public class GcmIntentService extends IntentService {
         Notification notif = mBuilder.build();
         notif.flags |= Notification.FLAG_AUTO_CANCEL;
         mNotificationManager.notify((int)uniqueId, notif);
-        SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
-		SharedPreferences.Editor editor = settings.edit();	
-    	editor.putBoolean("request", true);
-    	editor.commit();
-    }
-   
-    public static JSONObject getMessage() {
-		return obj;
+    	try {
+    		SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
+    		SharedPreferences.Editor editor = settings.edit();	
+        	editor.putBoolean("request", true);
+			editor.putString(obj.getString("RequestID"), obj.toString());
+			// update RequestID list
+			JSONArray o;
+			if(settings.getString("pendingList", null) !=null)
+				o = new JSONArray(settings.getString("pendingList", ""));
+			else
+				o = new JSONArray();
+			o.put(obj.getString("RequestID"));
+			editor.putString("pendingList", o.toString());
+			editor.commit();
+		} catch (JSONException e) { e.printStackTrace(); }
+    	
     }
     
+    private static BlockingQueue<String> getQueue(){
+    	if(requestQueue == null){
+    		requestQueue = new LinkedBlockingQueue<String>();
+    	}
+    	return requestQueue;
+    }
+    
+    private void addRequestToQueue(String reqID)
+    {
+    	getQueue().add(reqID);
+    }
+    
+    public static String pollRequest() throws InterruptedException{
+
+    	return getQueue().poll();
+    }
+    
+    /**
+     * block until a new gcm request is available
+     * @return - top request ID
+     * 
+     * @throws InterruptedException
+     */
+    public static String takeRequest() throws InterruptedException{
+    	return getQueue().take();
+    }
 }

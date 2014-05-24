@@ -6,7 +6,7 @@
     android:padding="5dip" >
     <!--  -->
   <ImageView
-      android:id="@+id/wallet_icon"
+      android:id="@+id/pending_icon"
       android:contentDescription="@string/app_name"
       android:layout_width="60dip"
       android:layout_height="60dip" />
@@ -16,7 +16,7 @@
 				    android:orientation="vertical">
 				    
 		    <TextView
-	        android:id="@+id/wallet_label"
+	        android:id="@+id/pending_custom_msg_label"
 	        android:layout_width="wrap_content"
 	        android:layout_height="wrap_content"
 	        android:layout_marginLeft="5dip"
@@ -27,7 +27,7 @@
 	        android:typeface="sans" />
 	
 		    <TextView
-		        android:id="@+id/wallet_fingerprint"
+		        android:id="@+id/pending_tmp"
 		        android:layout_width="wrap_content"
 		        android:layout_height="wrap_content"
 		        android:paddingTop="2dip"
@@ -36,20 +36,5 @@
 		        android:textColor="#848482"
 		        android:textSize="18dip" />
 	    
-	</LinearLayout>
-    <!--  -->
-	<LinearLayout  android:orientation="vertical"
-				    android:layout_width="wrap_content"
-				    android:layout_height="wrap_content"
-				    android:layout_marginLeft="60dp"
-				    android:layout_gravity="center">
-		    <TextView
-		        android:id="@+id/wallet_new_requests"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:text="10"
-		        android:textColor="#FFFFFF"
-		        android:textSize="23sp" />
-		    
 	</LinearLayout>
 </LinearLayout>  
