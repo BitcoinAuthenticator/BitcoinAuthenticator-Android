@@ -13,6 +13,7 @@ public class TxData {
 	
 	int version;
 	int numInputs;
+	boolean testnet;
 	ArrayList<Integer> ChildKeyIndex;
 	ArrayList<String> PublicKeys;
 	byte[] tx;
@@ -27,6 +28,7 @@ public class TxData {
 		JSONObject jsonObject = (JSONObject) obj;
 		version = ((Long) jsonObject.get("version")).intValue();
 		numInputs = ((Long) jsonObject.get("ins_n")).intValue();
+		testnet = (Boolean) jsonObject.get("testnet");
 		tx = Utils.hexStringToByteArray((String) jsonObject.get("tx"));
 		JSONArray msg = (JSONArray) jsonObject.get("keylist");
 		Iterator<JSONObject> iterator = msg.iterator();
@@ -68,4 +70,10 @@ public class TxData {
 	public byte[] getTransaction(){
 		return tx;
 	}
+	
+	/**Returns the network params*/
+	public boolean getParams() {
+		return testnet;
+	}
+	
 }

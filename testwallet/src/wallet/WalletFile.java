@@ -22,7 +22,7 @@ import com.google.bitcoin.core.Utils;
  */
 public class WalletFile {
 	
-	String filePath = null;
+	static String filePath = null;
 
 	/**Contructor defines the loclation of the .json file*/
 	public WalletFile(){
@@ -324,7 +324,7 @@ public class WalletFile {
 		return null;
 	}
 	
-	public Boolean getTestnet(){
+	public static Boolean getTestnet(){
 		JSONParser parser = new JSONParser();
 		Object obj = null;
 		try {
@@ -381,6 +381,7 @@ public class WalletFile {
 			keylist.add(keyobj);
 		}
 		obj.put("keylist", keylist);
+		obj.put("testnet", getTestnet());
 		StringWriter jsonOut = new StringWriter();
 		try {JSONValue.writeJSONString(obj, jsonOut);} 
 		catch (IOException e1) {e1.printStackTrace();}
