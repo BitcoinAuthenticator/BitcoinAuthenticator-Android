@@ -39,30 +39,46 @@ public class Message {
 	 */
 	public TxData receiveTX(ArrayList<SecretKey> sharedsecret) throws Exception {
 		//Receive the encrypted payload
+		System.out.println("x3");
 	  	byte[] cipherBytes;
 	  	int size = in.readInt();
 		cipherBytes = new byte[size];
 		in.read(cipherBytes);
 		TxData data = null;
+		//Multiple wallets may use the same IP address. If GCM is off we need to attempt to decrypt the payload
+		//with each AES key paired to that IP address.
 		for (int a=0; a<sharedsecret.size(); a++){
+			System.out.println("x4");
 			//Decrypt the payload
-			Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
-			cipher.init(Cipher.DECRYPT_MODE, sharedsecret.get(a));
-			//Split the payload into it's parts.
-			String payload = Utils.bytesToHex(cipher.doFinal(cipherBytes));
-			byte[] testpayload = Utils.hexStringToByteArray(payload.substring(0,payload.length()-64));
-			byte[] hash = Utils.hexStringToByteArray(payload.substring(payload.length()-64,payload.length()));
-			//Verify the HMAC
-			Mac mac = Mac.getInstance("HmacSHA256");
-			mac.init(sharedsecret.get(a));
-			byte[] macbytes = mac.doFinal(testpayload);
-			if (Arrays.equals(macbytes, hash)){
-				//Return the payload
-				data = new TxData(testpayload);
-				if (!Wallet_list.GCM) {Wallet_list.walletnum = Wallet_list.IndexArr.get(a);}
-			}
-			else {
-				System.out.println("Message authentication code is invalid");
+			String payload = null;
+			boolean decrypted = true;
+			try {
+				Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
+				cipher.init(Cipher.DECRYPT_MODE, sharedsecret.get(a));
+				//Split the payload into it's parts.
+				payload = Utils.bytesToHex(cipher.doFinal(cipherBytes));
+			} catch (BadPaddingException e) {
+				System.out.println("x4.5");
+				decrypted = false;
+				}
+			byte[] testpayload = null;
+			byte[] hash = null;
+			if (decrypted){
+				testpayload = Utils.hexStringToByteArray(payload.substring(0,payload.length()-64));
+				hash = Utils.hexStringToByteArray(payload.substring(payload.length()-64,payload.length()));
+				//Verify the HMAC
+				Mac mac = Mac.getInstance("HmacSHA256");
+				mac.init(sharedsecret.get(a));
+				byte[] macbytes = mac.doFinal(testpayload);
+				if (Arrays.equals(macbytes, hash)){
+					//Return the payload
+					data = new TxData(testpayload);
+					System.out.println("x5");
+					if (!Wallet_list.GCM) {Wallet_list.walletnum = Wallet_list.IndexArr.get(a);}
+				}
+				else {
+					System.out.println("Message authentication code is invalid");
+				}
 			}
 		}
 		return data;

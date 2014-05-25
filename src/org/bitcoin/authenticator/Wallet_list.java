@@ -79,9 +79,10 @@ public class Wallet_list extends Activity {
 	public static Connection conn;
 	public static int walletnum;
 	public static int numpairs;
-	ArrayList<String> Eaddrs;
-	ArrayList<String> Iaddrs;
-	public static ArrayList<Integer> IndexArr;
+	ArrayList<String> InternalAddrs;
+	ArrayList<String> ExternalAddrs;
+	public static ArrayList<Integer> IndexArr = new ArrayList<Integer>();
+	public static String address;
  
 
 	public void onCreate(Bundle savedInstanceState) {
@@ -94,17 +95,23 @@ public class Wallet_list extends Activity {
         hasPendingReq = settings.getBoolean("request", false);
         GCM = settings.getBoolean("GCM", true);
         numpairs = settings.getInt("numwallets", 0);
-        //Start the AsyncTask which waits for new transactions
-        Eaddrs = new ArrayList<String>();
-        Iaddrs = new ArrayList<String>();
+        //If GCM is turned on start the AsyncTask which waits for a new GCM message
         if (GCM){new GCMConnect().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);}
+        //If GCM is off load the data needed to connect to the wallets and start the Manual Connect AsyncTask
         else {
+        	InternalAddrs = new ArrayList<String>();
+        	ExternalAddrs = new ArrayList<String>();
+        	//Attempt to connect to each IP address (both internal and external) only once
         	for (int b=1; b<=numpairs; b++){
         		SharedPreferences prefs = getSharedPreferences("WalletData" + b, 0);	
-        		Eaddrs.add(prefs.getString("ExternalIP", "null"));
-        		Iaddrs.add(prefs.getString("LocalIP","null"));
-        		new ManualConnect().execute(b);}
+        		String Internal = prefs.getString("LocalIP", "null");
+        		String External = prefs.getString("ExternalIP", "null");
+        		if (!ExternalAddrs.contains(Internal)) {new ManualConnect().execute(Internal);}
+        		if (!ExternalAddrs.contains(External)) {new ManualConnect().execute(External);}
+        		ExternalAddrs.add(Internal);
+        		InternalAddrs.add(External);
         	}
+        }
     }
 
 	/**Creates the listview component and defines behavior to a long press on a list item.*/
@@ -236,6 +243,7 @@ public class Wallet_list extends Activity {
 	 * Asks user for authorization. If yes, it signs the transaction and sends it back to the wallet.
 	 */
 	public void showDialogBox(final TxData tx) throws InterruptedException{
+		IndexArr = new ArrayList<Integer>();
 		//Close the notification if it is still open
 		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		mNotificationManager.cancel((int)GcmIntentService.uniqueId);
@@ -364,7 +372,7 @@ public class Wallet_list extends Activity {
 						try {conn.close();} 
 						catch (IOException e) {e.printStackTrace();}
 						if (GCM){new GCMConnect().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);}
-				        else {new ManualConnect().execute(walletnum);}
+				        else {new ManualConnect().execute(address);}
 					}
 				  })
 				.setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
@@ -374,7 +382,7 @@ public class Wallet_list extends Activity {
 						try {conn.close();} 
 						catch (IOException e) {e.printStackTrace();}
 						if (GCM){new GCMConnect().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);}
-				        else {new ManualConnect().execute(walletnum);}
+				        else {new ManualConnect().execute(address);}
 						dialog.cancel();
 					}
 				});
@@ -623,35 +631,31 @@ public class Wallet_list extends Activity {
      * address of the wallet. When the wallet opens a port, it connects, receives the tx, and loads the dialog box
      * for the user. 
      */
-    public class ManualConnect extends AsyncTask<Integer,String,Connection> {
+    public class ManualConnect extends AsyncTask<String,String,Connection> {
     	TxData tx;
-        protected Connection doInBackground(Integer... n) {
-        	walletnum = n[0];
-        	SharedPreferences prefs = getSharedPreferences("WalletData" + walletnum, 0);	
-            IPAddress = prefs.getString("ExternalIP", "null");
-            LocalIP = prefs.getString("LocalIP","null");
+        protected Connection doInBackground(String... IP) {
         	Boolean connected = false;
+        	ArrayList<Integer> arr = null;
+        	String ip = IP[0];
+        	//Attempt to connect to the wallet
         	while(!connected){
         		connected = true;
         		try {
-        			IndexArr = new ArrayList<Integer>();
-        			conn = new Connection(LocalIP);
-        			for (int j=0; j<Iaddrs.size(); j++){
-        				if (Iaddrs.get(j).equals(LocalIP)){IndexArr.add(j+1);}
+        			arr = new ArrayList<Integer>();
+        			conn = new Connection(ip);
+        			//If we connect, add the index of each instance of the IP address in the address array to an index array
+        			//We will need these indices for loading the AES keys
+        			for (int j=0; j<InternalAddrs.size(); j++){
+        				if (InternalAddrs.get(j).equals(ip)){arr.add(j+1);}
+        				if (ExternalAddrs.get(j).equals(ip)){arr.add(j+1);}
         			}
-        		} catch (IOException e1) {
-            		try {
-            			IndexArr = new ArrayList<Integer>();
-            			conn = new Connection(IPAddress);
-            			for (int j=0; j<Iaddrs.size(); j++){
-            				if (Iaddrs.get(j).equals(IPAddress)){IndexArr.add(j+1);}
-            			}
-            		} catch (IOException e2) {
-            			connected = false;
-            		}
-            	}	
+        		} catch (IOException e1) {connected = false;}
         	}
+        	address = ip;
+        	for (int z=0; z<arr.size(); z++){IndexArr.add(arr.get(z));}
+        	System.out.println("x1");
         	ArrayList<SecretKey> keys = new ArrayList<SecretKey>();
+        	//Load AES key for each index in the index array
         	for (int j=0; j<IndexArr.size(); j++){
         		//Load AES Key from file
         		byte [] key = null;
@@ -674,6 +678,7 @@ public class Wallet_list extends Activity {
         		keys.add(sharedsecret);
         	}
         	//Create a new message object for receiving the transaction.
+        	System.out.println("x2");
         	Message msg = null;
 			try {msg = new Message(conn);} 
 			catch (IOException e) {e.printStackTrace();}
@@ -692,7 +697,8 @@ public class Wallet_list extends Activity {
         protected void onPostExecute(Connection result) {
         	super.onPostExecute(result);
             if (tx != null) {
-         	   try {showDialogBox(tx);} 
+         	   try {showDialogBox(tx);
+         	  System.out.println("x6");} 
          	   catch (InterruptedException e) {e.printStackTrace();}
             }
         }
