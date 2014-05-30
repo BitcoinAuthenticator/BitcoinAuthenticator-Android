@@ -15,6 +15,8 @@ import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
+import org.json.simple.JSONObject;
+
 /**
  * This class handles the communication messages sent between the Authenticator and the wallet.
  */
@@ -27,6 +29,15 @@ public class Message {
 	public Message(Connection conn) throws IOException{
 		in = conn.getInputStream();
 		out = conn.getOutputStream();
+	}
+	
+	@SuppressWarnings("unchecked")
+	public void sentRequestID(String requestID) throws IOException{
+		JSONObject jo = new JSONObject();
+		jo.put("requestID", requestID);
+		byte[] payload = jo.toString().getBytes();
+		out.writeInt(payload.length);
+		out.write(payload);
 	}
 	
 	/**

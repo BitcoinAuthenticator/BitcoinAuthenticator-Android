@@ -193,11 +193,16 @@ public class ActivityPendingRequests extends Activity {
             		}
             	}
             	
+            	
             	//Receive Tx
             	SecretKey sharedsecret = Utils.getAESSecret(getApplicationContext(), ret.walletnum); 
             	//Create a new message object for receiving the transaction.
             	Message msg = null;
-    			try {msg = new Message(conn);} 
+    			try {
+    				msg = new Message(conn);
+    				//send request id
+    				msg.sentRequestID(data.reqID);
+    			} 
     			catch (IOException e) {e.printStackTrace();}
     			try {tx = msg.receiveTX(sharedsecret);} 
     			catch (Exception e) {e.printStackTrace();}

@@ -454,7 +454,11 @@ public class Wallet_list extends Activity {
                 	//Create a new message object for receiving the transaction.
             		System.out.println("a5");
                 	Message msg = null;
-        			try {msg = new Message(conn);} 
+        			try {
+        				msg = new Message(conn);
+        				//send request id
+        				msg.sentRequestID(getIntent().getStringExtra("RequestID"));
+        			} 
         			catch (IOException e) {e.printStackTrace();}
         			try {tx = msg.receiveTX(sharedsecret);} 
         			catch (Exception e) {e.printStackTrace();}
