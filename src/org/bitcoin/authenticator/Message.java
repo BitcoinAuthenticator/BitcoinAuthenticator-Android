@@ -77,7 +77,7 @@ public class Message {
 	 * Method to send the transaction signature back to the wallet.
 	 * It calculates the HMAC of the signature, concatentates it, and encypts it with AES.
 	 */
-	public void sendSig (byte[] sig, SecretKey sharedsecret) throws IOException, InvalidKeyException, NoSuchAlgorithmException{
+	public void sendEncrypted (byte[] sig, SecretKey sharedsecret) throws IOException, InvalidKeyException, NoSuchAlgorithmException{
 		//Calculate the HMAC
     	Mac mac = Mac.getInstance("HmacSHA256");
 		mac.init(sharedsecret);

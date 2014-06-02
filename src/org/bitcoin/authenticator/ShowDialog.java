@@ -132,6 +132,7 @@ public class ShowDialog {
 			.setMessage(Html.fromHtml("Bitcoin Authenticator has received a transaction<br><br>From: <br>" + name + "<br><br>To:<br>" + display))
 			.setCancelable(false)
 			.setPositiveButton("Authorize",new DialogInterface.OnClickListener() {
+				@SuppressWarnings("unchecked")
 				public void onClick(DialogInterface dialog,int id) {
 					//Close the dialog box first since the signature operations will create a little lag
 					//and we can do them in the background.
@@ -178,7 +179,7 @@ public class ShowDialog {
 		        	try {msg = new Message(conn);} 
 		        	catch (IOException e) {e.printStackTrace();}
 		        	//Send the signature
-					try {msg.sendSig(jsonBytes, sharedsecret);} 
+					try {msg.sendEncrypted(jsonBytes, sharedsecret);} 
 					catch (InvalidKeyException e) {e.printStackTrace();} 
 					catch (NoSuchAlgorithmException e) {e.printStackTrace();} 
 					catch (IOException e) {e.printStackTrace();							}
@@ -191,11 +192,21 @@ public class ShowDialog {
 			.setNegativeButton("Cancel",new DialogInterface.OnClickListener() 
 			{
 				public void onClick(DialogInterface dialog,int id) {
-					//TODO if the user doesn't approve the transaction, send a message decline message back to the wallet.
-					//Reload the ConnectionToWallets task to set up to receive another transaction.
-					//try {conn.close();} 
-					//catch (IOException e) {e.printStackTrace();}
-					//new ConnectToWallets().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+					JSONObject obj = new JSONObject();
+					try {
+						obj.put("result", "0");
+						obj.put("reason", "Authenticator refused to autherize the transaction");
+						//
+						Message msg = new Message(conn);
+						msg.sendEncrypted(obj.toString().getBytes(), sharedsecret);
+					} 
+					catch (JSONException e) { e.printStackTrace(); } 
+					catch (IOException e) { e.printStackTrace(); } 
+					catch (InvalidKeyException e) { e.printStackTrace(); } 
+					catch (NoSuchAlgorithmException e) { e.printStackTrace(); }
+					finally{
+						try { conn.close(); } catch (IOException e) { e.printStackTrace(); }
+					}
 					dialog.cancel();
 				}
 			});
