@@ -24,7 +24,7 @@ public class Main extends Activity {
 	    Boolean pendingReq = false;
 	    
 		{
-			if(intent.getStringExtra("pairingReq") != null){ // TODO - currently works for only one request
+			if(intent.getStringExtra("RequestID") != null){
 				pendingReq = true;
 			}
 		}
@@ -33,7 +33,7 @@ public class Main extends Activity {
 	    	Intent in = new Intent(Main.this, Wallet_list.class);
 	    	if(pendingReq)
 	    	{
-	    		in.putExtra("pairingReq", intent.getStringExtra("pairingReq"));
+	    		in.putExtra("RequestID", intent.getStringExtra("RequestID"));
 	    	}
 	    	startActivity (in);
 	    }

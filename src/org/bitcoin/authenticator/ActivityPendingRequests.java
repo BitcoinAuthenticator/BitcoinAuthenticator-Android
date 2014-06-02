@@ -1,0 +1,317 @@
+package org.bitcoin.authenticator;
+
+import java.io.IOException;
+import java.util.ArrayList;
+
+import javax.crypto.SecretKey;
+
+import org.bitcoin.authenticator.Wallet_list.ConnectToWallets;
+import org.bitcoin.authenticator.Wallet_list.WalletItem;
+import org.bitcoin.authenticator.Wallet_list.CustomListAdapter.ViewHolder;
+import org.bitcoin.authenticator.Events.GlobalEvents;
+import org.bitcoin.authenticator.GcmUtil.ProcessGCMRequest;
+import org.bitcoin.authenticator.GcmUtil.RequestType;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.app.Activity;
+import android.app.ActionBar;
+import android.app.Fragment;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.view.ContextMenu;
+import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.ListView;
+import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.os.Build;
+
+public class ActivityPendingRequests extends Activity {
+
+	ListView lv1;
+	public Adapter adapter;
+	public GlobalEvents singletonEvents;
+	
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_pending_requests);			
+		
+		try {
+			String fingerprint = getIntent().getStringExtra("fingerprint");
+			ArrayList<JSONObject> pendingReq = getGCMPendingRequests(fingerprint);
+			ArrayList<dataClass> data;
+			lv1 = (ListView) findViewById(R.id.lstPendingReq);
+			data = getData(pendingReq);
+			adapter = new Adapter(getApplicationContext(),data);
+			lv1.setAdapter(adapter);
+			registerForContextMenu(lv1);
+		} catch (JSONException e) { e.printStackTrace(); } catch (InterruptedException e) { e.printStackTrace(); }
+		
+		/**
+		 * Events
+		 */
+		this.singletonEvents = GlobalEvents.SharedGlobal();
+	}
+
+	private ArrayList<dataClass> getData(ArrayList<JSONObject> jsonobj) throws JSONException{
+		ArrayList<dataClass> ret = new ArrayList<dataClass>();
+		for(JSONObject o:jsonobj){
+			dataClass n = new dataClass(o);
+			ret.add(n);
+		}
+		return ret;
+	}
+	
+	private ArrayList<JSONObject> getGCMPendingRequests(String fingerprint) throws InterruptedException, JSONException{
+		// poll pending requests
+		ArrayList<JSONObject> pending = new ArrayList<JSONObject>();
+		ArrayList<String> allPending = new ArrayList<String>();
+    	//load from preference
+		SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
+		JSONArray arr;
+		if(settings.getString("pendingList", null) != null){
+			arr = new JSONArray(settings.getString("pendingList", null));
+			for (int i = 0; i < arr.length(); i++)
+				allPending.add(arr.getString(i));
+		}
+		
+		// Load pending request
+		for(String req:allPending){
+			JSONObject o = new JSONObject(settings.getString(req, null));
+			String fingerPrintFromPairingID = o.getString("PairingID").substring(32,40).toUpperCase();
+			if(fingerPrintFromPairingID.equals(fingerprint))
+			if(o.getBoolean("seen") == false)
+				pending.add(o);
+		}
+		
+		return pending;
+	}
+	
+	private void markPendingRequestAsSeen(String reqID) throws JSONException{
+	   SharedPreferences settings2 = getSharedPreferences("ConfigFile", 0);
+	   String req = settings2.getString(reqID, null);
+	   SharedPreferences.Editor editor = settings2.edit();
+	   JSONObject jo = new JSONObject(req);
+	   jo.put("seen", true);
+	   editor.putString(jo.getString("RequestID"), jo.toString());
+	   editor.commit();
+	   
+	   //
+	   this.singletonEvents.onSetPendingGCMRequestToSeen.Raise(this, null);
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.activity_pending_requests, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// Handle action bar item clicks here. The action bar will
+		// automatically handle clicks on the Home/Up button, so long
+		// as you specify a parent activity in AndroidManifest.xml.
+		int id = item.getItemId();
+		if (id == R.id.action_settings) {
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+	
+	/**Creates the context menu that pops up on a long click in the list view*/
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v,ContextMenuInfo menuInfo) {
+	super.onCreateContextMenu(menu, v, menuInfo);
+		menu.setHeaderTitle("Select Action");
+		menu.add(0, v.getId(), 0, "Open");
+		menu.add(0, v.getId(), 0, "Delete");
+	}
+    
+    /**Handles the clicks in the context menu*/
+    @Override
+	public boolean onContextItemSelected(MenuItem item) {
+    	AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+        final int index = info.position;
+        //Re-pairs with the wallet
+        if(item.getTitle() == "Open"){
+        	new ConnectToWallet(index).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR); 
+        }
+        else if(item.getTitle() == "Delete"){
+        	dataClass data = (dataClass)lv1.getItemAtPosition(index);
+        	try {
+				markPendingRequestAsSeen(data.getReqID());
+				adapter.removePendigRequestAt(index);
+			} catch (JSONException e) { e.printStackTrace(); }
+        	
+        }
+        return true;
+    }
+    
+    public class ConnectToWallet extends AsyncTask<String,String,Connection> {
+    	public ConnectToWallet(int index){
+    		this.index = index;
+    	}
+    	int index;
+    	TxData tx;
+    	ProcessGCMRequest.ProcessReturnObject ret;
+    	Connection conn = null;
+    	dataClass data;
+		@Override
+		protected Connection doInBackground(String... params) {
+			SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
+            Boolean GCM = settings.getBoolean("GCM", true);
+            data = (dataClass)lv1.getItemAtPosition(index);
+            if(GCM){
+            	SharedPreferences settings2 = getSharedPreferences("ConfigFile", 0);
+        		String reqString = settings2.getString(data.getReqID(), null);
+        		ProcessGCMRequest processor = new ProcessGCMRequest(getApplicationContext());
+        		ret = processor.ProcessRequest(reqString);
+        		//Open a new connection
+            	try {conn = new Connection(ret.IPAddress);} 
+            	catch (IOException e1) {
+            		try {conn = new Connection(ret.LocalIP);} 
+            		catch (IOException e2) {
+            			runOnUiThread(new Runnable() {
+            				public void run() {
+            					Toast.makeText(getApplicationContext(), "Unable to connect to wallet", Toast.LENGTH_LONG).show();
+            				}
+            			});
+            		}
+            	}
+            	
+            	
+            	//Receive Tx
+            	SecretKey sharedsecret = Utils.getAESSecret(getApplicationContext(), ret.walletnum); 
+            	//Create a new message object for receiving the transaction.
+            	Message msg = null;
+    			try {
+    				msg = new Message(conn);
+    				//send request id
+    				msg.sentRequestID(data.reqID);
+    			} 
+    			catch (IOException e) {e.printStackTrace();}
+    			try {tx = msg.receiveTX(sharedsecret);} 
+    			catch (Exception e) {e.printStackTrace();}
+            }
+			return null;
+		}
+    	
+		/**On finish show the transaction in a dialog box*/
+        protected void onPostExecute(Connection result) {
+        	// Show Tx dialog
+			try {
+				new ShowDialog(conn, tx, ActivityPendingRequests.this, ret.walletnum);
+			} catch (InterruptedException e) { e.printStackTrace(); }
+ 		   // Update pending tx    			
+		   try {
+			   markPendingRequestAsSeen(data.getReqID());
+			   adapter.removePendigRequestAt(index);
+		   	} catch (JSONException e) { e.printStackTrace(); }
+		}
+    }
+	
+	public class dataClass
+	{
+		public String tmp;
+		public String pairingID;
+		public String reqID;
+		public RequestType ReqType;
+		public String customMsg;
+		public int icon;
+		
+		public dataClass(JSONObject jObj) throws JSONException{
+			this.tmp = jObj.getString("tmp");
+			this.pairingID = jObj.getString("PairingID");
+			this.reqID = jObj.getString("RequestID");
+			// type
+			if(Integer.parseInt( jObj.getString("RequestType") ) == RequestType.test.getValue()){
+				
+			}
+			else if(Integer.parseInt( jObj.getString("RequestType") ) == RequestType.signTx.getValue()){
+				this.ReqType = RequestType.signTx;
+				this.icon = R.drawable.ic_spend_request;
+			}
+			//
+			this.customMsg =  jObj.getString("CustomMsg");
+		}
+		
+		public String getTmp(){ return this.tmp; }
+		public String getPairingID(){ return this.pairingID; }
+		public String getReqID(){ return this.reqID; }
+		public RequestType getRequestType(){ return this.ReqType; }
+		public String getCustomMsg(){ return this.customMsg; }
+		public int getIcon(){ return this.icon; }
+	}
+	
+	public class Adapter extends BaseAdapter {
+		private ArrayList<dataClass> listData;
+    	private LayoutInflater layoutInflater;
+		
+    	public Adapter(Context context, ArrayList<dataClass> listData) {
+    		this.listData = listData;
+    		layoutInflater = LayoutInflater.from(context);
+    	}
+    	
+    	public void removePendigRequestAt(int index)
+    	{
+    		this.listData.remove(index);
+    		this.notifyDataSetChanged();
+    	}
+    	
+		@Override
+		public int getCount() {
+			return this.listData.size();
+		}
+
+		@Override
+		public Object getItem(int position) {
+			return this.listData.get(position);
+		}
+
+		@Override
+		public long getItemId(int position) {
+			return 0;
+		}
+
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent) {
+			ViewHolder holder;
+    		if (convertView == null) {
+    			convertView = layoutInflater.inflate(R.layout.pending_list_item, null);
+    			holder = new ViewHolder();
+    			holder.customMsg = (TextView) convertView.findViewById(R.id.pending_custom_msg_label);
+    			holder.tmp = (TextView) convertView.findViewById(R.id.pending_tmp);
+    			holder.actionIcon = (ImageView) convertView.findViewById(R.id.pending_icon);
+    			convertView.setTag(holder);
+    		} else {
+    			holder = (ViewHolder) convertView.getTag();
+    		}
+    		
+    		holder.customMsg.setText(((dataClass) listData.get(position)).getCustomMsg());
+    		holder.tmp.setText(((dataClass) listData.get(position)).getTmp());
+    		holder.actionIcon.setImageResource(((dataClass) listData.get(position)).getIcon());
+ 
+    		return convertView;
+		}
+		class ViewHolder {
+			TextView customMsg;
+			TextView tmp;
+			ImageView actionIcon;
+    	}
+		
+	}
+}

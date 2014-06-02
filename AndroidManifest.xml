@@ -3,14 +3,16 @@
     package="org.bitcoin.authenticator"
     android:versionCode="1"
     android:versionName="1.0" >
-    
+
     <uses-permission android:name="android.permission.CAMERA" />
-	<uses-permission android:name="android.permission.FLASHLIGHT"/>
-	<uses-permission android:name="android.permission.INTERNET"/>
-	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-	<permission
+    <uses-permission android:name="android.permission.FLASHLIGHT" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <permission
         android:name="org.bitcoin.authenticator.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
+
     <uses-permission android:name="org.bitcoin.authenticator.permission.C2D_MESSAGE" />
     <uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
     <uses-permission android:name="android.permission.VIBRATE" />
@@ -25,79 +27,85 @@
         android:icon="@drawable/authenticator"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
-        
+
         <!-- GCM -->
         <receiver
             android:name="org.bitcoin.authenticator.GcmUtil.GcmBroadcastReceiver"
             android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
+
                 <category android:name="org.bitcoin.authenticator" />
             </intent-filter>
         </receiver>
+
         <service android:name="org.bitcoin.authenticator.GcmUtil.GcmIntentService" />
-        
+
         <activity
             android:name="org.bitcoin.authenticator.Main"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name="How_it_works"
-            android:label="@string/app_name" >
-        </activity>
-         <activity
-            android:name="Show_seed"
+            android:name="org.bitcoin.authenticator.How_it_works"
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name="Pair_wallet"
+            android:name="org.bitcoin.authenticator.Show_seed"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
+            android:name="org.bitcoin.authenticator.Pair_wallet"
             android:label="@string/app_name"
             android:theme="@style/default_activity_theme" >
         </activity>
         <activity
-            android:name="Settings"
+            android:name="org.bitcoin.authenticator.Settings"
             android:label="@string/app_name"
             android:theme="@style/default_activity_theme" >
         </activity>
         <activity
-            android:name="Wallet_list"
-            android:label="@string/app_name" 
-            android:theme="@style/default_activity_theme">
+            android:name="org.bitcoin.authenticator.Wallet_list"
+            android:label="@string/app_name"
+            android:theme="@style/default_activity_theme" >
         </activity>
         <activity
-            android:name="TCPClient"
+            android:name="org.bitcoin.authenticator.TCPClient"
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name="Welcome"
-            android:label="@string/app_name" > 
+            android:name="org.bitcoin.authenticator.Welcome"
+            android:label="@string/app_name" >
         </activity>
         <activity
-            android:name="Re_pair_wallet"
-            android:label="@string/app_name" > 
+            android:name="org.bitcoin.authenticator.Re_pair_wallet"
+            android:label="@string/app_name" >
         </activity>
         <activity
-			android:name="com.google.zxing.client.android.CaptureActivity"
-			android:configChanges="orientation|keyboardHidden"
-			android:screenOrientation="landscape"
-			android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
-			android:windowSoftInputMode="stateAlwaysHidden" >
-		<intent-filter>
-		<action android:name="android.intent.action.MAIN" />
+            android:name="com.google.zxing.client.android.CaptureActivity"
+            android:configChanges="orientation|keyboardHidden"
+            android:screenOrientation="landscape"
+            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
+            android:windowSoftInputMode="stateAlwaysHidden" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
 
-		<category android:name="android.intent.category.DEFAULT" />
-		</intent-filter>
-		<intent-filter>
-		<action android:name="com.google.zxing.client.android.SCAN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.google.zxing.client.android.SCAN" />
 
-		<category android:name="android.intent.category.DEFAULT" />
-		</intent-filter>
-		</activity>
-           
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="org.bitcoin.authenticator.ActivityPendingRequests"
+            android:label="@string/title_activity_activity_pending_requests" >
+        </activity>
     </application>
 
 </manifest>

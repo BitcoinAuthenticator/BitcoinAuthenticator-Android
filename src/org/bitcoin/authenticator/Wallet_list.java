@@ -1,51 +1,33 @@
 package org.bitcoin.authenticator;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.StringWriter;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+<<<<<<< HEAD
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+=======
+>>>>>>> multi_gcm
 
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 
+import org.bitcoin.authenticator.Events.GlobalEvents;
 import org.bitcoin.authenticator.GcmUtil.GcmIntentService;
+import org.bitcoin.authenticator.GcmUtil.ProcessGCMRequest;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONValue;
-
-import com.google.bitcoin.core.ECKey;
-import com.google.bitcoin.core.NetworkParameters;
-import com.google.bitcoin.core.Transaction;
-import com.google.bitcoin.core.TransactionOutput;
-import com.google.bitcoin.crypto.DeterministicKey;
-import com.google.bitcoin.crypto.HDKeyDerivation;
-import com.google.bitcoin.crypto.TransactionSignature;
-import com.google.bitcoin.params.MainNetParams;
-import com.google.bitcoin.params.TestNet3Params;
-import com.google.bitcoin.script.Script;
-import com.google.bitcoin.script.ScriptBuilder;
-import com.google.common.collect.ImmutableList;
+import org.json.JSONArray;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.text.Html;
-import android.util.Log;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
@@ -69,11 +51,9 @@ import android.widget.Toast;
  * and sends it back to the wallet.
  */
 public class Wallet_list extends Activity {
-	public static String PublicIP;
-	public static String LocalIP;
-	public static String IPAddress;
 	ListView lv1;
 	public static JSONObject req;
+<<<<<<< HEAD
 	public static Boolean hasPendingReq;
 	public static Boolean GCM;
 	public static Connection conn;
@@ -84,11 +64,17 @@ public class Wallet_list extends Activity {
 	public static ArrayList<Integer> IndexArr = new ArrayList<Integer>();
 	public static String address;
  
+=======
+	public static Connection conn; 
+	private CustomListAdapter listAdapter;
+	public GlobalEvents singletonEvents;
+>>>>>>> multi_gcm
 
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wallet_list);
         //Create the list view
+<<<<<<< HEAD
         setListView();
         //Load pending request Boolean and GCM boolean
         SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
@@ -112,15 +98,36 @@ public class Wallet_list extends Activity {
         		InternalAddrs.add(External);
         	}
         }
+=======
+        try { setListView(); } catch (InterruptedException e) { e.printStackTrace(); } catch (JSONException e) { e.printStackTrace(); }
+        //Start the AsyncTask which waits for new transactions
+  		new ConnectToWallets().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR); 
+  		
+  		/**
+  		 * Events
+  		 */
+  		this.singletonEvents = GlobalEvents.SharedGlobal();
+  		singletonEvents.onSetPendingGCMRequestToSeen.AddListener(this, "onSetPendingGCMRequestToSeen");
+>>>>>>> multi_gcm
     }
 
-	/**Creates the listview component and defines behavior to a long press on a list item.*/
-	void setListView(){
+	/**Creates the listview component and defines behavior to a long press on a list item.
+	 * @throws JSONException 
+	 * @throws InterruptedException */
+	void setListView() throws InterruptedException, JSONException{
         ArrayList walletList = getListData();
         lv1 = (ListView) findViewById(R.id.custom_list);
         lv1.setLongClickable(true);
-        lv1.setAdapter(new CustomListAdapter(this, walletList));
+        listAdapter = new CustomListAdapter(this, walletList);
+        lv1.setAdapter(listAdapter);
         registerForContextMenu(lv1);
+        new ProcessGCMInBackground().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+	}
+	
+	public void updatePendingGCMRequest(){
+		try {
+			listAdapter.updateData(getGCMPendingRequests(listAdapter.listData));
+		} catch (InterruptedException e) { e.printStackTrace(); } catch (JSONException e) { e.printStackTrace(); }
 	}
 
 	/**Inflates the menu and adds it to the action bar*/
@@ -154,6 +161,7 @@ public class Wallet_list extends Activity {
     public void onCreateContextMenu(ContextMenu menu, View v,ContextMenuInfo menuInfo) {
 	super.onCreateContextMenu(menu, v, menuInfo);
 		menu.setHeaderTitle("Select Action");
+		menu.add(0, v.getId(), 0, "Show Pending Requests");
 		menu.add(0, v.getId(), 0, "Re-pair");
 		menu.add(0, v.getId(), 0, "Rename");
 		menu.add(0, v.getId(), 0, "Delete");
@@ -165,7 +173,13 @@ public class Wallet_list extends Activity {
     	AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
         final int index = info.position;
         //Re-pairs with the wallet
-       	if(item.getTitle()=="Re-pair"){
+        if(item.getTitle() == "Show Pending Requests"){
+        	Intent i = new Intent(Wallet_list.this, ActivityPendingRequests.class);
+        	WalletItem wi = (WalletItem)lv1.getItemAtPosition(index);
+        	i.putExtra("fingerprint", wi.getFingerprint());
+        	startActivity (i);
+        }
+        else if(item.getTitle()=="Re-pair"){
        		Object o = lv1.getItemAtPosition(index);
 			WalletItem Data = (WalletItem) o;
 			Re_pair_wallet.walletNum = Data.getWalletNum();
@@ -189,7 +203,7 @@ public class Wallet_list extends Activity {
     			SharedPreferences.Editor editor = data.edit();	
     			editor.putString("ID", value);
     			editor.commit();
-    			setListView();
+    	        try { setListView(); } catch (InterruptedException e) { e.printStackTrace(); } catch (JSONException e) { e.printStackTrace(); }
     			}
     		});
     		alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -214,7 +228,7 @@ public class Wallet_list extends Activity {
         			editor.clear();
         			editor.putBoolean("Deleted", true);
         			editor.commit();
-        			setListView();
+        	        try { setListView(); } catch (InterruptedException e) { e.printStackTrace(); } catch (JSONException e) { e.printStackTrace(); }
     	        }
     	     })
     	    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -237,6 +251,7 @@ public class Wallet_list extends Activity {
 	public void onBackPressed() {
 	}
 
+<<<<<<< HEAD
 	/**
 	 * Creates a dialog box to show to the user when the Authenticator receives a transaction from the wallet.
 	 * Loads the seed from internal storage to derive the private key needed for signing.
@@ -389,14 +404,66 @@ public class Wallet_list extends Activity {
 				// create and show the alert dialog
 				AlertDialog alertDialog = alertDialogBuilder.create();
 				alertDialog.show();}
+=======
+	@SuppressWarnings("unchecked")
+	public void removePendingRequestFromListAndThenUpdate(String requestID) throws JSONException{
+	   SharedPreferences settings2 = getSharedPreferences("ConfigFile", 0);
+	   SharedPreferences.Editor editor = settings2.edit();
+	   JSONArray pja;
+	   JSONArray newPja = new JSONArray();
+	   if(settings2.getString("pendingList", null) != null){
+		   pja = new JSONArray(settings2.getString("pendingList", null));
+		   for(int i=0;i<pja.length();i++){
+			   if(!getIntent().getStringExtra("RequestID").equals(pja.get(i)))
+				   newPja.put(pja.get(i));
+		   }
+		}
+		editor.putString("pendingList", newPja.toString());
+		editor.commit();
+	
+		// update adapter
+		try {
+			listAdapter.updateData(getGCMPendingRequests(listAdapter.listData));
+		} catch (InterruptedException e) { e.printStackTrace(); } catch (JSONException e) { e.printStackTrace(); }
+	}
+	
+	@SuppressWarnings("unchecked")
+	private ArrayList getGCMPendingRequests(ArrayList wallets) throws InterruptedException, JSONException{
+		// poll pending requests
+    	ArrayList<String> pending = new ArrayList<String>();
+    	//load from preference
+		SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
+		JSONArray arr;
+		if(settings.getString("pendingList", null) != null){
+			arr = new JSONArray(settings.getString("pendingList", null));
+			for (int i = 0; i < arr.length(); i++)
+				pending.add(arr.getString(i));
+		}
+		
+		for(WalletItem walletData:(ArrayList<WalletItem>)wallets){
+			walletData.pendingGCMRequests = new ArrayList<JSONObject>();
+			// Load pending request
+			for(String req:pending){
+				JSONObject o = new JSONObject(settings.getString(req, null));
+				String fingerPrintFromPairingID = o.getString("PairingID").substring(32,40).toUpperCase();
+				if(fingerPrintFromPairingID.equals(walletData.getFingerprint()))
+				if(o.getBoolean("seen") == false)
+					walletData.addPendingGCMRequest(o);
+			}
+		}
+		return wallets;
+>>>>>>> multi_gcm
 	}
 
-	/**This method loads the metadata from Shared Preferences needed to display in the listview*/
-    private ArrayList getListData() {
+	/**This method loads the metadata from Shared Preferences needed to display in the listview
+	 * @throws InterruptedException 
+	 * @throws JSONException */
+    private ArrayList getListData() throws InterruptedException, JSONException {
     	//Open shared preferences and get the number of wallets
     	SharedPreferences settings = getSharedPreferences("ConfigFile", 0);	
 	    int num = settings.getInt("numwallets", 0);
     	ArrayList results = new ArrayList();
+    	
     	//Load the data for each wallet and add it to a WalletItem object
     	for (int i=1; i<num+1; i+=1){
     		String wdata = "WalletData" + i;
@@ -421,7 +488,7 @@ public class Wallet_list extends Activity {
         	else {walletData.setIcon(R.drawable.authenticator_logo);}
     		if (!deleted){results.add(walletData);}
     	}
-        return results;
+        return getGCMPendingRequests(results);
     }
     
     /**Creates an object that holds the metadata for each wallet to include in the listview*/
@@ -429,6 +496,7 @@ public class Wallet_list extends Activity {
     	 
         private String walletLabel;
         private String fingerprint;
+        private ArrayList<JSONObject> pendingGCMRequests;
         private int icon;
         private int WalletNum;
         
@@ -446,6 +514,17 @@ public class Wallet_list extends Activity {
      
         public void setWalletLabel(String label) {
             this.walletLabel = label;
+        }
+        
+        // pending gcm requests
+        public ArrayList<JSONObject> getPendingGCMRequests() {
+        	if(this.pendingGCMRequests == null)
+        		this.pendingGCMRequests = new ArrayList<JSONObject>();
+            return this.pendingGCMRequests;
+        }
+     
+        public void addPendingGCMRequest(JSONObject req) {
+        	getPendingGCMRequests().add(req);
         }
      
         public String getFingerprint() {
@@ -481,6 +560,11 @@ public class Wallet_list extends Activity {
     		this.listData = listData;
     		layoutInflater = LayoutInflater.from(context);
     	}
+    	
+    	public void updateData(ArrayList data){
+    		this.listData = data;
+    		this.notifyDataSetChanged();
+    	}
  
     	@Override
     	public int getCount() {
@@ -504,6 +588,7 @@ public class Wallet_list extends Activity {
     			holder = new ViewHolder();
     			holder.walletLabelView = (TextView) convertView.findViewById(R.id.wallet_label);
     			holder.walletFingerprintView = (TextView) convertView.findViewById(R.id.wallet_fingerprint);
+    			holder.walletPendingRequestCntView = (TextView) convertView.findViewById(R.id.wallet_new_requests);
     			holder.walletIcon = (ImageView) convertView.findViewById(R.id.wallet_icon);
     			convertView.setTag(holder);
     		} else {
@@ -511,6 +596,7 @@ public class Wallet_list extends Activity {
     		}
     		holder.walletLabelView.setText(((WalletItem) listData.get(position)).getWalletLabel());
     		holder.walletFingerprintView.setText(((WalletItem) listData.get(position)).getFingerprint());
+    		holder.walletPendingRequestCntView.setText(Integer.toString(((WalletItem) listData.get(position)).getPendingGCMRequests().size()));
     		holder.walletIcon.setImageResource(((WalletItem) listData.get(position)).getIcon());
  
     		return convertView;
@@ -519,6 +605,7 @@ public class Wallet_list extends Activity {
     	class ViewHolder {
     		TextView walletLabelView;
     		TextView walletFingerprintView;
+    		TextView walletPendingRequestCntView;
     		ImageView walletIcon;
     	}
     }
@@ -530,12 +617,19 @@ public class Wallet_list extends Activity {
      */
     public class GCMConnect extends AsyncTask<String,String,Connection> {
     	TxData tx;
+    	ProcessGCMRequest.ProcessReturnObject ret;
         @Override
         protected Connection doInBackground(String... message) {
+<<<<<<< HEAD
     		Log.v("ASDF", "hasPendingReq " + hasPendingReq.toString());
     		//Load the settings from shared preferences
+=======
+        	System.out.println("a1");
+    		//Load the GCM settings from shared preferences
+>>>>>>> multi_gcm
             SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
             int numwallets = settings.getInt("numwallets", 0);
+<<<<<<< HEAD
             //Wait for pending requests via GCM\
             while (!hasPendingReq){
            		SharedPreferences settings2 = getSharedPreferences("ConfigFile", 0);
@@ -578,8 +672,76 @@ public class Wallet_list extends Activity {
             				Toast.makeText(getApplicationContext(), "Unable to connect to wallet", Toast.LENGTH_LONG).show();
             			}
             		});
+=======
+            if(GCM){
+            	System.out.println("a2");
+            	// Handle a request that was pressed by the user
+            	String reqString = null;
+            	if(getIntent().getStringExtra("RequestID") != null){
+            		SharedPreferences settings2 = getSharedPreferences("ConfigFile", 0);
+            		reqString = settings2.getString(getIntent().getStringExtra("RequestID"), null);
+            		ProcessGCMRequest processor = new ProcessGCMRequest(getApplicationContext());
+            		ret = processor.ProcessRequest(reqString);
+            		// Connect
+                	SharedPreferences.Editor editor = settings.edit();	
+                	editor.putBoolean("request", false);
+                	editor.commit();
+                	//Open a new connection
+                	System.out.println("a4");
+                	try {conn = new Connection(ret.IPAddress);} 
+                	catch (IOException e1) {
+                		try {conn = new Connection(ret.LocalIP);} 
+                		catch (IOException e2) {
+                			runOnUiThread(new Runnable() {
+                				public void run() {
+                					Toast.makeText(getApplicationContext(), "Unable to connect to wallet", Toast.LENGTH_LONG).show();
+                				}
+                			});
+                		}
+                	}
+                	
+                	SecretKey sharedsecret = Utils.getAESSecret(getApplicationContext(), ret.walletnum); 
+                	//Create a new message object for receiving the transaction.
+            		System.out.println("a5");
+                	Message msg = null;
+        			try {
+        				msg = new Message(conn);
+        				//send request id
+        				msg.sentRequestID(getIntent().getStringExtra("RequestID"));
+        			} 
+        			catch (IOException e) {e.printStackTrace();}
+        			try {tx = msg.receiveTX(sharedsecret);} 
+        			catch (Exception e) {e.printStackTrace();}
+            	}            		
+            }
+            else { // TODO !
+            	//Load the IPs for each wallet from shared preferences.
+                SharedPreferences prefs = getSharedPreferences("WalletData1", 0);	
+                String IPAddress = prefs.getString("ExternalIP", "null");
+                String LocalIP = prefs.getString("LocalIP","null");
+                
+            	Boolean connected = false;
+            	while(!connected){
+                	System.out.println("#1");
+            		connected = true;
+            		try {conn = new Connection(IPAddress);} 
+                	catch (IOException e1) {
+                		System.out.println("#2");
+                		try {conn = new Connection(LocalIP);}
+                		catch (IOException e2) {
+                			connected = false;
+                        	System.out.println("#3");
+                			runOnUiThread(new Runnable() {
+                				public void run() {
+                					Toast.makeText(getApplicationContext(), "Unable to connect to wallet", Toast.LENGTH_LONG).show();
+                				}
+                			});
+                		}
+                	}	
+>>>>>>> multi_gcm
             	}
             }
+<<<<<<< HEAD
            
           //Load AES Key from file
         	byte [] key = null;
@@ -607,6 +769,8 @@ public class Wallet_list extends Activity {
 			catch (IOException e) {e.printStackTrace();}
 			try {tx = msg.receiveTX(keys);} 
 			catch (Exception e) {e.printStackTrace();}
+=======
+>>>>>>> multi_gcm
         	
 			return null;
         }
@@ -620,13 +784,33 @@ public class Wallet_list extends Activity {
         protected void onPostExecute(Connection result) {
            super.onPostExecute(result);
            if (tx != null) {
+<<<<<<< HEAD
         	   try {showDialogBox(tx);} 
         	   catch (InterruptedException e) {e.printStackTrace();}
+=======
+        	   try 
+        	   {
+        		   new ShowDialog(conn, tx, Wallet_list.this, ret.walletnum);
+        		   System.out.println("a6");
+        		   SharedPreferences settings2 = getSharedPreferences("ConfigFile", 0);
+        		   // set request as seen
+           		   String req = settings2.getString(getIntent().getStringExtra("RequestID"), null);
+           		   SharedPreferences.Editor editor = settings2.edit();
+           		   JSONObject jo = new JSONObject(req);
+           		   jo.put("seen", true);
+	           	   editor.putString(jo.getString("RequestID"), jo.toString());
+	    		   editor.commit();
+	    		   // remove from pending requests
+	    		   removePendingRequestFromListAndThenUpdate(getIntent().getStringExtra("RequestID"));
+        	   } 
+        	   catch (InterruptedException e) {e.printStackTrace();} catch (JSONException e) { e.printStackTrace(); }
+>>>>>>> multi_gcm
            }
         }
     }
     
     /**
+<<<<<<< HEAD
      * This class is similar to GCMConnect but it works with GCM off. It runs a loop trying to connect to the IP
      * address of the wallet. When the wallet opens a port, it connects, receives the tx, and loads the dialog box
      * for the user. 
@@ -703,5 +887,38 @@ public class Wallet_list extends Activity {
             }
         }
     }
+=======
+     * This is a class that runs in the background and connects to the wallet and waits to receive a transaction.
+     * When one is received, it loads the dialog box.
+     */
+    public class ProcessGCMInBackground extends AsyncTask<String,String,Connection> {
+>>>>>>> multi_gcm
 
+		@Override
+		protected Connection doInBackground(String... params) {
+			while(true)
+			{
+				// blocking
+				try {
+					String reqID = GcmIntentService.takeRequest();
+					if(reqID != null)
+						runOnUiThread(new Runnable() {
+	        				public void run() {
+	        					updatePendingGCMRequest();
+	        				}
+						});
+						
+				} catch (InterruptedException e) { e.printStackTrace(); }
+			}
+		}
+    	
+    }
+    
+    /**
+     * Events
+     */
+    public void onSetPendingGCMRequestToSeen(Object Sender, Object Arguments)
+	{
+    	updatePendingGCMRequest();
+	}
 }

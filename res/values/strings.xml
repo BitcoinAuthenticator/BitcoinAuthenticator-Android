@@ -16,5 +16,6 @@
     <string name="button_begin_setup">Begin setup</string>
     <string name="title_activity_how_it_works">How it works</string>
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_activity_pending_requests">Pending Requests</string>
 
 </resources>
