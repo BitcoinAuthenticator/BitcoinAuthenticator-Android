@@ -2,13 +2,6 @@ package org.bitcoin.authenticator;
 
 import java.io.IOException;
 import java.util.ArrayList;
-<<<<<<< HEAD
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-=======
->>>>>>> multi_gcm
 
 import javax.crypto.SecretKey;
 
@@ -53,52 +46,14 @@ import android.widget.Toast;
 public class Wallet_list extends Activity {
 	ListView lv1;
 	public static JSONObject req;
-<<<<<<< HEAD
-	public static Boolean hasPendingReq;
-	public static Boolean GCM;
-	public static Connection conn;
-	public static int walletnum;
-	public static int numpairs;
-	ArrayList<String> InternalAddrs;
-	ArrayList<String> ExternalAddrs;
-	public static ArrayList<Integer> IndexArr = new ArrayList<Integer>();
-	public static String address;
- 
-=======
 	public static Connection conn; 
 	private CustomListAdapter listAdapter;
 	public GlobalEvents singletonEvents;
->>>>>>> multi_gcm
 
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wallet_list);
         //Create the list view
-<<<<<<< HEAD
-        setListView();
-        //Load pending request Boolean and GCM boolean
-        SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
-        hasPendingReq = settings.getBoolean("request", false);
-        GCM = settings.getBoolean("GCM", true);
-        numpairs = settings.getInt("numwallets", 0);
-        //If GCM is turned on start the AsyncTask which waits for a new GCM message
-        if (GCM){new GCMConnect().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);}
-        //If GCM is off load the data needed to connect to the wallets and start the Manual Connect AsyncTask
-        else {
-        	InternalAddrs = new ArrayList<String>();
-        	ExternalAddrs = new ArrayList<String>();
-        	//Attempt to connect to each IP address (both internal and external) only once
-        	for (int b=1; b<=numpairs; b++){
-        		SharedPreferences prefs = getSharedPreferences("WalletData" + b, 0);	
-        		String Internal = prefs.getString("LocalIP", "null");
-        		String External = prefs.getString("ExternalIP", "null");
-        		if (!ExternalAddrs.contains(Internal)) {new ManualConnect().execute(Internal);}
-        		if (!ExternalAddrs.contains(External)) {new ManualConnect().execute(External);}
-        		ExternalAddrs.add(Internal);
-        		InternalAddrs.add(External);
-        	}
-        }
-=======
         try { setListView(); } catch (InterruptedException e) { e.printStackTrace(); } catch (JSONException e) { e.printStackTrace(); }
         //Start the AsyncTask which waits for new transactions
   		new ConnectToWallets().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR); 
@@ -108,7 +63,6 @@ public class Wallet_list extends Activity {
   		 */
   		this.singletonEvents = GlobalEvents.SharedGlobal();
   		singletonEvents.onSetPendingGCMRequestToSeen.AddListener(this, "onSetPendingGCMRequestToSeen");
->>>>>>> multi_gcm
     }
 
 	/**Creates the listview component and defines behavior to a long press on a list item.
@@ -251,160 +205,6 @@ public class Wallet_list extends Activity {
 	public void onBackPressed() {
 	}
 
-<<<<<<< HEAD
-	/**
-	 * Creates a dialog box to show to the user when the Authenticator receives a transaction from the wallet.
-	 * Loads the seed from internal storage to derive the private key needed for signing.
-	 * Asks user for authorization. If yes, it signs the transaction and sends it back to the wallet.
-	 */
-	public void showDialogBox(final TxData tx) throws InterruptedException{
-		IndexArr = new ArrayList<Integer>();
-		//Close the notification if it is still open
-		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-		mNotificationManager.cancel((int)GcmIntentService.uniqueId);
-		if (tx.equals("error")){
-			Toast.makeText(getApplicationContext(), "Unable to connect to wallet", Toast.LENGTH_LONG).show();
-		}
-		else {
-			//Load walletID from Shared Preferences
-			SharedPreferences data = getSharedPreferences("WalletData"+ walletnum, 0);
-			String name = data.getString("ID", "null");
-			//Load AES Key from internal storage
-        	byte [] key = null;
-    		String FILENAME = "AESKey" + walletnum;
-    		File file = new File(getFilesDir(), FILENAME);
-    		int size = (int)file.length();
-    		if (size != 0)
-    		{
-    			FileInputStream inputStream = null;
-    			try {inputStream = openFileInput(FILENAME);} 
-    			catch (FileNotFoundException e1) {e1.printStackTrace();}
-    			key = new byte[size];
-    			try {inputStream.read(key, 0, size);} 
-    			catch (IOException e) {e.printStackTrace();}
-    			try {inputStream.close();} 
-    			catch (IOException e) {e.printStackTrace();}
-    		}
-    		final byte[] AESKey = key;
-    		final SecretKey sharedsecret = new SecretKeySpec(AESKey, "AES");
-			//Load the seed from internal storage
-			byte [] seed = null;
-    		String FILENAME2 = "seed";
-    		File file2 = new File(getFilesDir(), FILENAME2);
-    		int size2 = (int)file2.length();
-    		if (size2 != 0)
-    		{
-    			FileInputStream inputStream = null;
-    			try {inputStream = openFileInput(FILENAME2);} 
-    			catch (FileNotFoundException e1) {e1.printStackTrace();}
-    			seed = new byte[size2];
-    			try {inputStream.read(seed, 0, size2);} 
-    			catch (IOException e) {e.printStackTrace();}
-    			try {inputStream.close();} 
-    			catch (IOException e) {e.printStackTrace();}
-    		}
-    		final byte[] authseed = seed;
-    		//Load network parameters from shared preferences
-    		Boolean testnet = tx.getParams();
-            NetworkParameters params = null;
-            if (testnet==false){params = MainNetParams.get();} 
-            else {params = TestNet3Params.get();}
-			//Parse through the transaction message and rebuild the transaction.
-			byte[] transaction = tx.getTransaction();
-			final Transaction unsignedTx = new Transaction(params, transaction);
-			//Get the output address and the amount from the transaction so we can display it to the user.
-			List<TransactionOutput> outputs = unsignedTx.getOutputs();
-			String display = "";
-			for (int i = 0; i<outputs.size(); i++){
-				TransactionOutput multisigOutput = unsignedTx.getOutput(i);
-				String strOutput = multisigOutput.toString();
-				String addr = strOutput.substring(strOutput.indexOf("to ")+3, strOutput.indexOf(" script"));
-				String amount = strOutput.substring(9, strOutput.indexOf(" to"));
-				display = display + addr + " <font color='#009933'>" + amount + " BTC</font>";
-				if (i<outputs.size()-1){display = display + "<br>";}
-			}
-		//Create the dialog box
-		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(
-				this);
-			//Set title
-			alertDialogBuilder.setTitle("Authorize Transaction");
-			//Set dialog message
-			alertDialogBuilder
-				.setMessage(Html.fromHtml("Bitcoin Authenticator has received a transaction<br><br>From: <br>" + name + "<br><br>To:<br>" + display))
-				.setCancelable(false)
-				.setPositiveButton("Authorize",new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog,int id) {
-						//Close the dialog box first since the signature operations will create a little lag
-						//and we can do them in the background.
-						dialog.cancel();
-						//Prep the JSON object we will fill with the signatures.
-						Map obj=new LinkedHashMap();
-						obj.put("version", 1);
-						obj.put("sigs_n", tx.numInputs);
-						JSONArray siglist = new JSONArray();
-						//Loop creating a signature for each input
-						for (int j=0; j<tx.numInputs; j++){
-							//Derive the private key needed to sign the transaction
-							ArrayList<Integer> index = tx.getIndexes();
-							ArrayList<String> walpubkeys = tx.getPublicKeys();
-							HDKeyDerivation HDKey = null;
-							DeterministicKey masterKey = HDKey.createMasterPrivateKey(authseed);
-							DeterministicKey walletMasterKey = HDKey.deriveChildKey(masterKey, walletnum);
-							DeterministicKey childKey = HDKey.deriveChildKey(walletMasterKey,index.get(j));
-							byte[] privKey = childKey.getPrivKeyBytes();
-							byte[] pubKey = childKey.getPubKey();
-							ECKey authenticatorKey = new ECKey(privKey, pubKey);
-							ECKey walletPubKey = new ECKey(null, Utils.hexStringToByteArray(walpubkeys.get(j))); 							
-							List<ECKey> keys = ImmutableList.of(authenticatorKey, walletPubKey);
-							//Create the multisig script we will be using for signing. 
-							Script scriptpubkey = ScriptBuilder.createMultiSigOutputScript(2,keys);
-							//Create the signature.
-							TransactionSignature sig2 = unsignedTx.calculateSignature(j, authenticatorKey, scriptpubkey, Transaction.SigHash.ALL, false);
-							byte[] signature = sig2.encodeToBitcoin();
-							JSONObject sigobj = new JSONObject();
-							try {sigobj.put("signature", Utils.bytesToHex(signature));} 
-							catch (JSONException e) {e.printStackTrace();}
-							//Add key object to array
-							siglist.add(sigobj);
-						}
-						obj.put("siglist", siglist);
-						StringWriter jsonOut = new StringWriter();
-						try {JSONValue.writeJSONString(obj, jsonOut);} 
-						catch (IOException e1) {e1.printStackTrace();}
-						String jsonText = jsonOut.toString();
-						System.out.println(jsonText);
-						byte[] jsonBytes = jsonText.getBytes();
-						//Create a new message object
-						Message msg = null;
-			        	try {msg = new Message(conn);} 
-			        	catch (IOException e) {e.printStackTrace();}
-			        	//Send the signature
-						try {msg.sendSig(jsonBytes, sharedsecret);} 
-						catch (InvalidKeyException e) {e.printStackTrace();} 
-						catch (NoSuchAlgorithmException e) {e.printStackTrace();} 
-						catch (IOException e) {e.printStackTrace();							}
-						//Reload the ConnectionToWallets task to set up to receive another transaction.
-						try {conn.close();} 
-						catch (IOException e) {e.printStackTrace();}
-						if (GCM){new GCMConnect().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);}
-				        else {new ManualConnect().execute(address);}
-					}
-				  })
-				.setNegativeButton("Cancel",new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog,int id) {
-						//TODO if the user doesn't approve the transaction, send a message decline message back to the wallet.
-						//Reload the ConnectionToWallets task to set up to receive another transaction.
-						try {conn.close();} 
-						catch (IOException e) {e.printStackTrace();}
-						if (GCM){new GCMConnect().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);}
-				        else {new ManualConnect().execute(address);}
-						dialog.cancel();
-					}
-				});
-				// create and show the alert dialog
-				AlertDialog alertDialog = alertDialogBuilder.create();
-				alertDialog.show();}
-=======
 	@SuppressWarnings("unchecked")
 	public void removePendingRequestFromListAndThenUpdate(String requestID) throws JSONException{
 	   SharedPreferences settings2 = getSharedPreferences("ConfigFile", 0);
@@ -452,7 +252,6 @@ public class Wallet_list extends Activity {
 			}
 		}
 		return wallets;
->>>>>>> multi_gcm
 	}
 
 	/**This method loads the metadata from Shared Preferences needed to display in the listview
@@ -611,68 +410,19 @@ public class Wallet_list extends Activity {
     }
     
     /**
-     * This class runs in the background. It waits to receive a new GCM message, parses it to figure out which 
-     * wallet it came from, then opens a TCP connection to that wallet and receives the tx. Assuming it decrypts 
-     * properly, it loads the dialog box asking the user for approval. 
+     * This is a class that runs in the background and connects to the wallet and waits to receive a transaction.
+     * When one is received, it loads the dialog box.
      */
-    public class GCMConnect extends AsyncTask<String,String,Connection> {
+    public class ConnectToWallets extends AsyncTask<String,String,Connection> {
     	TxData tx;
     	ProcessGCMRequest.ProcessReturnObject ret;
         @Override
         protected Connection doInBackground(String... message) {
-<<<<<<< HEAD
-    		Log.v("ASDF", "hasPendingReq " + hasPendingReq.toString());
-    		//Load the settings from shared preferences
-=======
         	System.out.println("a1");
     		//Load the GCM settings from shared preferences
->>>>>>> multi_gcm
             SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
+            Boolean GCM = settings.getBoolean("GCM", true);
             int numwallets = settings.getInt("numwallets", 0);
-<<<<<<< HEAD
-            //Wait for pending requests via GCM\
-            while (!hasPendingReq){
-           		SharedPreferences settings2 = getSharedPreferences("ConfigFile", 0);
-           		hasPendingReq = settings2.getBoolean("request", false);
-           	}
-           	//Handle pending requests from GCM
-           	req = GcmIntentService.getMessage();
-           	try {
-           		JSONObject reqPayload = new JSONObject();
-           		reqPayload = req.getJSONObject("ReqPayload");
-           		IPAddress =  reqPayload.getString("ExternalIP");
-           		LocalIP = reqPayload.getString("LocalIP");
-           		String pairID = req.getString("PairingID");
-           		for (int y=1; y<=numwallets; y++){
-            		SharedPreferences data = getSharedPreferences("WalletData" + y, 0);
-            		String fingerprint = data.getString("Fingerprint", "null");
-            		if (fingerprint.equals(pairID)){
-            			walletnum = y;
-            		}
-            	}
-            	SharedPreferences prefs = getSharedPreferences("WalletData" + walletnum, 0);
-           		SharedPreferences.Editor editor = prefs.edit();
-           		editor.putString("ExternalIP", IPAddress);
-           		editor.putString("LocalIP", LocalIP);
-           		editor.commit();
-           		Log.v("ASDF", "Changed wallet ip address from GCM to: " + IPAddress + "\n" +
-           				"Changed wallet local ip address from GCM to: " + LocalIP);
-           	} catch (JSONException e) {e.printStackTrace();} 
-           	hasPendingReq=false;
-           	SharedPreferences.Editor editor = settings.edit();	
-           	editor.putBoolean("request", false);
-           	editor.commit();
-           	//Open a new connection
-           	try {conn = new Connection(IPAddress);} 
-           	catch (IOException e1) {
-            	try {conn = new Connection(LocalIP);} 
-            	catch (IOException e2) {
-            		runOnUiThread(new Runnable() {
-            			public void run() {
-            				Toast.makeText(getApplicationContext(), "Unable to connect to wallet", Toast.LENGTH_LONG).show();
-            			}
-            		});
-=======
             if(GCM){
             	System.out.println("a2");
             	// Handle a request that was pressed by the user
@@ -738,39 +488,9 @@ public class Wallet_list extends Activity {
                 			});
                 		}
                 	}	
->>>>>>> multi_gcm
             	}
+            	System.out.println("#4");
             }
-<<<<<<< HEAD
-           
-          //Load AES Key from file
-        	byte [] key = null;
-        	ArrayList<SecretKey> keys = new ArrayList<SecretKey>();
-    		String FILENAME = "AESKey" + walletnum;
-    		File file = new File(getFilesDir(), FILENAME);
-    		int size = (int)file.length();
-    		if (size != 0)
-    		{
-    			FileInputStream inputStream = null;
-    			try {inputStream = openFileInput(FILENAME);} 
-    			catch (FileNotFoundException e1) {e1.printStackTrace();}
-    			key = new byte[size];
-    			try {inputStream.read(key, 0, size);} 
-    			catch (IOException e) {e.printStackTrace();}
-    			try {inputStream.close();} 
-    			catch (IOException e) {e.printStackTrace();}
-    		}
-    		final byte[] AESKey = key;
-    		SecretKey sharedsecret = new SecretKeySpec(AESKey, "AES");
-    		keys.add(sharedsecret);
-        	//Create a new message object for receiving the transaction.
-        	Message msg = null;
-			try {msg = new Message(conn);} 
-			catch (IOException e) {e.printStackTrace();}
-			try {tx = msg.receiveTX(keys);} 
-			catch (Exception e) {e.printStackTrace();}
-=======
->>>>>>> multi_gcm
         	
 			return null;
         }
@@ -784,10 +504,6 @@ public class Wallet_list extends Activity {
         protected void onPostExecute(Connection result) {
            super.onPostExecute(result);
            if (tx != null) {
-<<<<<<< HEAD
-        	   try {showDialogBox(tx);} 
-        	   catch (InterruptedException e) {e.printStackTrace();}
-=======
         	   try 
         	   {
         		   new ShowDialog(conn, tx, Wallet_list.this, ret.walletnum);
@@ -804,95 +520,15 @@ public class Wallet_list extends Activity {
 	    		   removePendingRequestFromListAndThenUpdate(getIntent().getStringExtra("RequestID"));
         	   } 
         	   catch (InterruptedException e) {e.printStackTrace();} catch (JSONException e) { e.printStackTrace(); }
->>>>>>> multi_gcm
            }
         }
     }
     
     /**
-<<<<<<< HEAD
-     * This class is similar to GCMConnect but it works with GCM off. It runs a loop trying to connect to the IP
-     * address of the wallet. When the wallet opens a port, it connects, receives the tx, and loads the dialog box
-     * for the user. 
-     */
-    public class ManualConnect extends AsyncTask<String,String,Connection> {
-    	TxData tx;
-        protected Connection doInBackground(String... IP) {
-        	Boolean connected = false;
-        	ArrayList<Integer> arr = null;
-        	String ip = IP[0];
-        	//Attempt to connect to the wallet
-        	while(!connected){
-        		connected = true;
-        		try {
-        			arr = new ArrayList<Integer>();
-        			conn = new Connection(ip);
-        			//If we connect, add the index of each instance of the IP address in the address array to an index array
-        			//We will need these indices for loading the AES keys
-        			for (int j=0; j<InternalAddrs.size(); j++){
-        				if (InternalAddrs.get(j).equals(ip)){arr.add(j+1);}
-        				if (ExternalAddrs.get(j).equals(ip)){arr.add(j+1);}
-        			}
-        		} catch (IOException e1) {connected = false;}
-        	}
-        	address = ip;
-        	for (int z=0; z<arr.size(); z++){IndexArr.add(arr.get(z));}
-        	System.out.println("x1");
-        	ArrayList<SecretKey> keys = new ArrayList<SecretKey>();
-        	//Load AES key for each index in the index array
-        	for (int j=0; j<IndexArr.size(); j++){
-        		//Load AES Key from file
-        		byte [] key = null;
-        		String FILENAME = "AESKey" + IndexArr.get(j);
-        		File file = new File(getFilesDir(), FILENAME);
-        		int size = (int)file.length();
-        		if (size != 0)
-        		{
-        			FileInputStream inputStream = null;
-        			try {inputStream = openFileInput(FILENAME);} 
-        			catch (FileNotFoundException e1) {e1.printStackTrace();}
-        			key = new byte[size];
-        			try {inputStream.read(key, 0, size);} 
-        			catch (IOException e) {e.printStackTrace();}
-        			try {inputStream.close();} 
-        			catch (IOException e) {e.printStackTrace();}
-        		}
-        		final byte[] AESKey = key;
-        		SecretKey sharedsecret = new SecretKeySpec(AESKey, "AES");
-        		keys.add(sharedsecret);
-        	}
-        	//Create a new message object for receiving the transaction.
-        	System.out.println("x2");
-        	Message msg = null;
-			try {msg = new Message(conn);} 
-			catch (IOException e) {e.printStackTrace();}
-			try {tx = msg.receiveTX(keys);} 
-			catch (Exception e) {e.printStackTrace();}
-      
-			return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(String... values) {
-            super.onProgressUpdate(values);
-        }
-        
-        /**On finish show the transaction in a dialog box*/
-        protected void onPostExecute(Connection result) {
-        	super.onPostExecute(result);
-            if (tx != null) {
-         	   try {showDialogBox(tx);
-         	  System.out.println("x6");} 
-         	   catch (InterruptedException e) {e.printStackTrace();}
-            }
-        }
-    }
-=======
      * This is a class that runs in the background and connects to the wallet and waits to receive a transaction.
      * When one is received, it loads the dialog box.
      */
     public class ProcessGCMInBackground extends AsyncTask<String,String,Connection> {
->>>>>>> multi_gcm
 
 		@Override
 		protected Connection doInBackground(String... params) {

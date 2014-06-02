@@ -75,14 +75,6 @@ public class GcmIntentService extends IntentService {
     	return null;
     }
 
-<<<<<<< HEAD
-    private void alertUserOnNotification(Bundle extras)
-    {
-    	SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
-    	boolean GCM = settings.getBoolean("GCM", true);
-    	if (GCM){sendNotification(extras.getString("data"));}
-    	// Example - Bundle[{message=Test bulk notification, android.support.content.wakelockid=1, collapse_key=message, from=204673947609}]
-=======
     private void processUpdateIpAddressesForPreviousMessage(String msg) throws JSONException {
     	obj = new JSONObject(msg);
     	JSONObject payload = new JSONObject(obj.getString("ReqPayload"));
@@ -136,7 +128,6 @@ public class GcmIntentService extends IntentService {
         Notification notif = mBuilder.build();
         notif.flags |= Notification.FLAG_AUTO_CANCEL;
         mNotificationManager.notify((int)uniqueId, notif);
->>>>>>> multi_gcm
     }
     
     private void processNewSigningNotification(String msg) throws JSONException {

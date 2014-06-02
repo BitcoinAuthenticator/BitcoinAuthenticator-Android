@@ -47,7 +47,6 @@ public class Pair_wallet extends Activity {
 	private EditText txtID;
 	private String IPAddress;
 	private String fingerprint;
-	private String walletID;
 	private String walletType;
 	private String LocalIP;
 	private String AESKey;
@@ -92,12 +91,7 @@ public class Pair_wallet extends Activity {
 				//If a name has been entered then open the QR code scanner.
 				else {
 					try {
-						/*Intent intent = new Intent(
-								"com.google.zxing.client.android.SCAN");
-						intent.putExtra("SCAN_MODE", "QR_CODE_MODE,PRODUCT_MODE");
-						startActivityForResult(intent, 0);*/
 						launchScanActivity();
-						walletID = txtID.getText().toString();  
 					} catch (Exception e) {
 						e.printStackTrace();
 						Toast.makeText(getApplicationContext(), "ERROR:" + e, 1).show();
@@ -177,7 +171,7 @@ public class Pair_wallet extends Activity {
 	    String wEIP = "ExternalIP";
 	    String wLIP = "LocalIP";
 	    //Save the metadata for this wallet to shared preferences
-	    editor.putString(wID, walletID);
+	    editor.putString(wID, txtID.getText().toString());
 	    editor.putString(wFP, fingerprint);
 	    editor.putString(wTP, walletType);
 	    editor.putString(wEIP, IPAddress);
