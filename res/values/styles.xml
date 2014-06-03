@@ -58,6 +58,4 @@
 	    <item name="android:topDark">@color/transparent</item>
 	</style>
 
-    <style name="default_activity_theme" parent="@android:style/Theme.Holo"/>
-
 </resources>
