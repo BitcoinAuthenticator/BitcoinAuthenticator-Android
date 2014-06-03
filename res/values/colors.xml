@@ -2,4 +2,6 @@
 <resources>  
     <color name="black">#ffffffff</color>
     <color name="transparent">#00000000</color>
+    <color name="ui_background_color">#292A2E</color>
+    <color name="ui_text_color">#BFDAEF</color>
 </resources>

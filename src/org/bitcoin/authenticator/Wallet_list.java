@@ -277,7 +277,7 @@ public class Wallet_list extends Activity {
     		String fingerprint = data.getString(wFP, "null");
     		if (!fingerprint.equals("null")) walletData.setFingerprint(fingerprint.substring(32,40).toUpperCase());
     		//Decide which icon to display
-    		if (data.getString(wTP, "null").equals("blockchain")){walletData.setIcon(R.drawable.blockchain_info_logo);}
+    		if (data.getString(wTP, "null").equals("blockchain")){walletData.setIcon(R.drawable.ic_blockchain_info_logo_gray);}
     		else if (data.getString(wTP, "null").equals("electrum")){walletData.setIcon(R.drawable.electrum_logo);}
     		else if (data.getString(wTP, "null").equals("hive")){walletData.setIcon(R.drawable.hive_logo);}
     		else if (data.getString(wTP, "null").equals("multibit")){walletData.setIcon(R.drawable.multibit_logo);}
@@ -395,7 +395,11 @@ public class Wallet_list extends Activity {
     		}
     		holder.walletLabelView.setText(((WalletItem) listData.get(position)).getWalletLabel());
     		holder.walletFingerprintView.setText(((WalletItem) listData.get(position)).getFingerprint());
-    		holder.walletPendingRequestCntView.setText(Integer.toString(((WalletItem) listData.get(position)).getPendingGCMRequests().size()));
+    		int cnt = ((WalletItem) listData.get(position)).getPendingGCMRequests().size();
+    		//if( cnt > 0)
+    			holder.walletPendingRequestCntView.setText(Integer.toString(cnt) + " Pending Requests");
+    		//else
+    		//	holder.walletPendingRequestCntView.setText("");
     		holder.walletIcon.setImageResource(((WalletItem) listData.get(position)).getIcon());
  
     		return convertView;

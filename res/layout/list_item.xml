@@ -3,53 +3,63 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="5dip" >
-    <!--  -->
-  <ImageView
-      android:id="@+id/wallet_icon"
-      android:contentDescription="@string/app_name"
-      android:layout_width="60dip"
-      android:layout_height="60dip" />
+    android:padding="5dip" >  
   <!--  -->
-	<LinearLayout android:layout_width="wrap_content"
+	<LinearLayout android:layout_width="fill_parent"
 				    android:layout_height="wrap_content"
-				    android:orientation="vertical">
+				    android:orientation="horizontal">
+			<!-- Text -->
+			<LinearLayout android:layout_width="fill_parent"
+				    android:layout_height="wrap_content"
+				    android:orientation="vertical"
+				    android:layout_weight="30">
 				    
-		    <TextView
-	        android:id="@+id/wallet_label"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:layout_marginLeft="5dip"
-	        android:text=""
-	        android:textColor="#FFFFFF"
-	        android:textSize="25dip"
-	        android:textStyle="bold"
-	        android:typeface="sans" />
-	
-		    <TextView
-		        android:id="@+id/wallet_fingerprint"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:paddingTop="2dip"
-		        android:layout_centerHorizontal="true"
-		        android:text=""
-		        android:textColor="#848482"
-		        android:textSize="18dip" />
+			    	<TextView
+				        android:id="@+id/wallet_fingerprint"
+				        android:layout_width="wrap_content"
+				        android:layout_height="wrap_content"
+				        android:paddingTop="2dip"
+				        android:layout_marginLeft="1dip"
+				        android:layout_centerHorizontal="true"
+				        android:text=""
+				        android:textColor="@color/ui_text_color"
+				        android:textSize="12dip" />
 	    
-	</LinearLayout>
-    <!--  -->
-	<LinearLayout  android:orientation="vertical"
-				    android:layout_width="wrap_content"
+			    <TextView
+			        android:id="@+id/wallet_label"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:text=""
+			        android:textColor="@color/ui_text_color"
+			        android:textSize="25dip"
+			        android:textStyle="bold"
+			        android:typeface="sans" />
+			    
+			    <TextView
+			        android:id="@+id/wallet_new_requests"
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content"
+			        android:text="10"
+			        android:layout_marginLeft="1dip"
+			        android:textColor="@color/ui_text_color"
+			        android:textSize="14sp" />	
+			    
+			</LinearLayout>
+			
+			<!-- Image -->
+			<LinearLayout android:layout_width="fill_parent"
 				    android:layout_height="wrap_content"
-				    android:layout_marginLeft="60dp"
+				    android:orientation="vertical"
+				    android:layout_weight="70"
 				    android:layout_gravity="center">
-		    <TextView
-		        android:id="@+id/wallet_new_requests"
-		        android:layout_width="wrap_content"
-		        android:layout_height="wrap_content"
-		        android:text="10"
-		        android:textColor="#FFFFFF"
-		        android:textSize="23sp" />
-		    
+			
+			    	<ImageView
+					      android:id="@+id/wallet_icon"
+					      android:contentDescription="@string/app_name"
+					      android:layout_width="60dip"
+					      android:layout_height="60dip" />
+			    
+		    </LinearLayout>
 	</LinearLayout>
+    
 </LinearLayout>  
