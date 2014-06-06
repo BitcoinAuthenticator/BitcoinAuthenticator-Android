@@ -28,11 +28,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -45,6 +48,7 @@ import android.widget.Toast;
  */
 public class Wallet_list extends Activity {
 	ListView lv1;
+	private PopupMenu popupMenu;
 	public static JSONObject req;
 	public static Connection conn; 
 	private CustomListAdapter listAdapter;
@@ -74,7 +78,30 @@ public class Wallet_list extends Activity {
         lv1.setLongClickable(true);
         listAdapter = new CustomListAdapter(this, walletList);
         lv1.setAdapter(listAdapter);
-        registerForContextMenu(lv1);
+        //registerForContextMenu(lv1);
+        lv1.setOnItemClickListener(new OnItemClickListener()
+        {
+           @Override
+           public void onItemClick(AdapterView<?> adapter, View v, int position,
+                 long arg3) 
+           {
+        	   final int index = position;
+        	   ArrayList<String> buttons = new ArrayList<String>();
+        	   buttons.add("Show Pending Requests");
+        	   buttons.add("Re-pair");
+        	   buttons.add("Rename");
+        	   buttons.add("Delete");
+        	   
+                new BAPopupMenu(getApplicationContext(),v)
+                .setButtons(buttons)
+                .setActionsListener(new BAPopupMenu.ActionsListener(){
+					@Override
+					public void pressed(MenuItem item) {
+						onPopupMenuItemSelected(item.getTitle().toString(),index);
+					}
+                }).show();
+           }
+        });
         new ProcessGCMInBackground().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 	}
 	
@@ -111,7 +138,7 @@ public class Wallet_list extends Activity {
 	}
 
 	/**Creates the context menu that pops up on a long click in the list view*/
-    @Override
+    /*@Override
     public void onCreateContextMenu(ContextMenu menu, View v,ContextMenuInfo menuInfo) {
 	super.onCreateContextMenu(menu, v, menuInfo);
 		menu.setHeaderTitle("Select Action");
@@ -119,28 +146,29 @@ public class Wallet_list extends Activity {
 		menu.add(0, v.getId(), 0, "Re-pair");
 		menu.add(0, v.getId(), 0, "Rename");
 		menu.add(0, v.getId(), 0, "Delete");
-	}
+	}*/
     
     /**Handles the clicks in the context menu*/
-    @Override
+    /*@Override
 	public boolean onContextItemSelected(MenuItem item) {
     	AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-        final int index = info.position;
+        final int index = info.position;*/
+	public void onPopupMenuItemSelected(String title, final int index){
         //Re-pairs with the wallet
-        if(item.getTitle() == "Show Pending Requests"){
+        if(title == "Show Pending Requests"){
         	Intent i = new Intent(Wallet_list.this, ActivityPendingRequests.class);
         	WalletItem wi = (WalletItem)lv1.getItemAtPosition(index);
         	i.putExtra("fingerprint", wi.getFingerprint());
         	startActivity (i);
         }
-        else if(item.getTitle()=="Re-pair"){
+        else if(title=="Re-pair"){
        		Object o = lv1.getItemAtPosition(index);
 			WalletItem Data = (WalletItem) o;
 			Re_pair_wallet.walletNum = Data.getWalletNum();
 			startActivity (new Intent(Wallet_list.this, Re_pair_wallet.class));
        	}
        	//Displays a dialog allowing the user to rename the wallet in the listview
-    	else if(item.getTitle()=="Rename"){
+    	else if(title=="Rename"){
     		AlertDialog.Builder alert = new AlertDialog.Builder(this);
     		alert.setTitle("Rename");
     		alert.setMessage("Enter a name for this wallet:");
@@ -168,7 +196,7 @@ public class Wallet_list extends Activity {
     		alert.show();
     	}
        	//Displays a dialog prompting the user to confirm they want to delete a wallet from the listview
-    	else if(item.getTitle()=="Delete"){
+    	else if(title=="Delete"){
     		AlertDialog.Builder alert = new AlertDialog.Builder(this);
     	    alert.setTitle("Delete");
     	    alert.setMessage(Html.fromHtml("Are you sure you want to delete this wallet?<br><br> Do not continue if this wallet has a positive balance as you will not be able to sign any more transactions."));
@@ -193,8 +221,7 @@ public class Wallet_list extends Activity {
     	    .setIcon(android.R.drawable.ic_dialog_alert)
     	     .show();
     	}
-    	else {return false;}
-	return true;
+    	
 	}
 
 	/**
