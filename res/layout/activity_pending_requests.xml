@@ -4,16 +4,26 @@
     android:layout_height="fill_parent"
     android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/lblPendingListHead"
-        android:layout_width="match_parent"
-        android:layout_marginTop="7dp"
-        android:layout_marginLeft="12dp"
-        android:layout_height="wrap_content"
-        android:text="You will be asked to approve transactions from these wallets. Long press for menu"
-        android:textColor="#FFFFFF"
-        android:textSize="16sp" />
- 
+    <LinearLayout android:layout_width="fill_parent"
+				    android:layout_height="wrap_content"
+				    android:orientation="horizontal"
+				    android:padding="10dp">
+			
+        	<ImageView android:layout_width="60dp"
+				    android:layout_height="60dp"
+				    android:background="@drawable/ic_spend_request"/>
+	        <TextView
+		        android:id="@+id/lblPendingListHead"
+		        android:layout_width="match_parent"
+		        android:layout_marginTop="7dp"
+		        android:layout_marginLeft="12dp"
+		        android:layout_height="wrap_content"
+		        android:text="You will be asked to approve transactions from these wallets. Long press for menu"
+		        android:textColor="@color/ui_text_color"
+		        android:textSize="18sp" />
+				        
+    </LinearLayout>
+     
     <ListView
         android:id="@+id/lstPendingReq"
         android:layout_width="fill_parent"

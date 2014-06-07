@@ -67,9 +67,11 @@ public class ActivityPendingRequests extends Activity {
 
 	private ArrayList<dataClass> getData(ArrayList<JSONObject> jsonobj) throws JSONException{
 		ArrayList<dataClass> ret = new ArrayList<dataClass>();
+		int index = 1;
 		for(JSONObject o:jsonobj){
-			dataClass n = new dataClass(o);
+			dataClass n = new dataClass(o,index);
 			ret.add(n);
+			index++;
 		}
 		return ret;
 	}
@@ -231,9 +233,9 @@ public class ActivityPendingRequests extends Activity {
 		public String reqID;
 		public RequestType ReqType;
 		public String customMsg;
-		public int icon;
+		public int index;
 		
-		public dataClass(JSONObject jObj) throws JSONException{
+		public dataClass(JSONObject jObj, int index) throws JSONException{
 			this.tmp = jObj.getString("tmp");
 			this.pairingID = jObj.getString("PairingID");
 			this.reqID = jObj.getString("RequestID");
@@ -243,10 +245,10 @@ public class ActivityPendingRequests extends Activity {
 			}
 			else if(Integer.parseInt( jObj.getString("RequestType") ) == RequestType.signTx.getValue()){
 				this.ReqType = RequestType.signTx;
-				this.icon = R.drawable.ic_spend_request;
 			}
 			//
 			this.customMsg =  jObj.getString("CustomMsg");
+			this.index = index;
 		}
 		
 		public String getTmp(){ return this.tmp; }
@@ -254,7 +256,8 @@ public class ActivityPendingRequests extends Activity {
 		public String getReqID(){ return this.reqID; }
 		public RequestType getRequestType(){ return this.ReqType; }
 		public String getCustomMsg(){ return this.customMsg; }
-		public int getIcon(){ return this.icon; }
+		public int getIndex(){ return this.index; }
+		public String getIndexString(){ return Integer.toString(getIndex()); }
 	}
 	
 	public class Adapter extends BaseAdapter {
@@ -295,7 +298,7 @@ public class ActivityPendingRequests extends Activity {
     			holder = new ViewHolder();
     			holder.customMsg = (TextView) convertView.findViewById(R.id.pending_custom_msg_label);
     			holder.tmp = (TextView) convertView.findViewById(R.id.pending_tmp);
-    			holder.actionIcon = (ImageView) convertView.findViewById(R.id.pending_icon);
+    			holder.index = (TextView) convertView.findViewById(R.id.pending_number);
     			convertView.setTag(holder);
     		} else {
     			holder = (ViewHolder) convertView.getTag();
@@ -303,14 +306,14 @@ public class ActivityPendingRequests extends Activity {
     		
     		holder.customMsg.setText(((dataClass) listData.get(position)).getCustomMsg());
     		holder.tmp.setText(((dataClass) listData.get(position)).getTmp());
-    		holder.actionIcon.setImageResource(((dataClass) listData.get(position)).getIcon());
+    		holder.index.setText(((dataClass) listData.get(position)).getIndexString() + ")");
  
     		return convertView;
 		}
 		class ViewHolder {
 			TextView customMsg;
 			TextView tmp;
-			ImageView actionIcon;
+			TextView index;
     	}
 		
 	}
