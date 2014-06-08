@@ -159,6 +159,7 @@ public class Wallet_list extends Activity {
         	Intent i = new Intent(Wallet_list.this, ActivityPendingRequests.class);
         	WalletItem wi = (WalletItem)lv1.getItemAtPosition(index);
         	i.putExtra("fingerprint", wi.getFingerprint());
+        	i.putExtra("walletName", wi.getWalletLabel());
         	startActivity (i);
         }
         else if(title=="Re-pair"){

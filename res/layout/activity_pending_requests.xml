@@ -24,12 +24,44 @@
 				        
     </LinearLayout>
      
+     <LinearLayout android:layout_width="match_parent"
+				    android:layout_height="30dp"
+				    android:orientation="horizontal"
+				    android:gravity="center">
+	        
+         <LinearLayout android:layout_width="wrap_content"
+				    android:layout_height="match_parent"
+				    android:orientation="vertical"
+				    android:gravity="center"
+				    android:paddingTop="5dp">
+				    
+             <ImageView android:layout_width="25dp"
+				    android:layout_height="25dp"
+				    android:background="@drawable/ic_wallet_white"
+				    android:layout_gravity="center"
+				    android:dither="true"/>
+				    
+          </LinearLayout>
+	        
+         <TextView
+	        android:id="@+id/lblPendingWalletName"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="xxx"
+	        android:textColor="@color/white"
+	        android:textSize="28sp" 
+	        android:paddingLeft="10dp"
+	        android:layout_gravity="center"/>
+         
+	 </LinearLayout>
+    
+    
     <ListView
         android:id="@+id/lstPendingReq"
         android:layout_width="fill_parent"
         android:layout_marginTop="7dp"
         android:layout_height="wrap_content"
-        android:divider="#C2DFFF"
+        android:divider="@color/transparent"
         android:dividerHeight="1dp" />
 
 </LinearLayout>

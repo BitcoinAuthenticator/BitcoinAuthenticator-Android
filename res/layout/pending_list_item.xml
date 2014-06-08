@@ -18,7 +18,7 @@
 		        android:layout_marginLeft="5dip"
 		        android:text=""
 		        android:textColor="@color/ui_text_color"
-		        android:textSize="32dip"
+		        android:textSize="26dip"
 		        android:textStyle="bold"
 		        android:typeface="sans" />
 	</LinearLayout>

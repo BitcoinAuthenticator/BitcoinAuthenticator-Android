@@ -29,17 +29,20 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.AdapterView.AdapterContextMenuInfo;
+import android.widget.AdapterView.OnItemClickListener;
 import android.os.Build;
 
 public class ActivityPendingRequests extends Activity {
 
 	ListView lv1;
+	TextView walletName;
 	public Adapter adapter;
 	public GlobalEvents singletonEvents;
 	
@@ -47,6 +50,9 @@ public class ActivityPendingRequests extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_pending_requests);			
+		
+		walletName = (TextView) findViewById(R.id.lblPendingWalletName);
+		walletName.setText(getIntent().getStringExtra("walletName"));
 		
 		try {
 			String fingerprint = getIntent().getStringExtra("fingerprint");
@@ -56,7 +62,28 @@ public class ActivityPendingRequests extends Activity {
 			data = getData(pendingReq);
 			adapter = new Adapter(getApplicationContext(),data);
 			lv1.setAdapter(adapter);
-			registerForContextMenu(lv1);
+			//registerForContextMenu(lv1);
+			lv1.setOnItemClickListener(new OnItemClickListener()
+	        {
+	           @Override
+	           public void onItemClick(AdapterView<?> adapter, View v, int position,
+	                 long arg3) 
+	           {
+	        	   final int index = position;
+	        	   ArrayList<String> buttons = new ArrayList<String>();
+	        	   buttons.add("Open");
+	        	   buttons.add("Delete");
+	        	   
+	                new BAPopupMenu(getApplicationContext(),v)
+	                .setButtons(buttons)
+	                .setActionsListener(new BAPopupMenu.ActionsListener(){
+						@Override
+						public void pressed(MenuItem item) {
+							onPopupMenuItemSelected(item.getTitle().toString(),index);
+						}
+	                }).show();
+	           }
+	        });
 		} catch (JSONException e) { e.printStackTrace(); } catch (InterruptedException e) { e.printStackTrace(); }
 		
 		/**
@@ -135,24 +162,25 @@ public class ActivityPendingRequests extends Activity {
 	}
 	
 	/**Creates the context menu that pops up on a long click in the list view*/
-    @Override
+    /*@Override
     public void onCreateContextMenu(ContextMenu menu, View v,ContextMenuInfo menuInfo) {
 	super.onCreateContextMenu(menu, v, menuInfo);
 		menu.setHeaderTitle("Select Action");
 		menu.add(0, v.getId(), 0, "Open");
 		menu.add(0, v.getId(), 0, "Delete");
-	}
+	}*/
     
     /**Handles the clicks in the context menu*/
-    @Override
-	public boolean onContextItemSelected(MenuItem item) {
-    	AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-        final int index = info.position;
+    //@Override
+	//public boolean onContextItemSelected(MenuItem item) {
+    //	AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
+    //    final int index = info.position;
         //Re-pairs with the wallet
-        if(item.getTitle() == "Open"){
+    public void onPopupMenuItemSelected(String title, final int index){
+        if(title == "Open"){
         	new ConnectToWallet(index).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR); 
         }
-        else if(item.getTitle() == "Delete"){
+        else if(title == "Delete"){
         	dataClass data = (dataClass)lv1.getItemAtPosition(index);
         	try {
 				markPendingRequestAsSeen(data.getReqID());
@@ -160,7 +188,6 @@ public class ActivityPendingRequests extends Activity {
 			} catch (JSONException e) { e.printStackTrace(); }
         	
         }
-        return true;
     }
     
     public class ConnectToWallet extends AsyncTask<String,String,Connection> {
