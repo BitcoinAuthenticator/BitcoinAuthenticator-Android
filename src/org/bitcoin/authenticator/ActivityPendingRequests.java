@@ -70,9 +70,9 @@ public class ActivityPendingRequests extends Activity {
 	                 long arg3) 
 	           {
 	        	   final int index = position;
-	        	   ArrayList<String> buttons = new ArrayList<String>();
-	        	   buttons.add("Open");
-	        	   buttons.add("Delete");
+	        	   ArrayList<BAPopupMenu.PopupButton> buttons = new ArrayList<BAPopupMenu.PopupButton>();
+	        	   buttons.add(new BAPopupMenu.PopupButton("Open",true));
+	        	   buttons.add(new BAPopupMenu.PopupButton("Delete",true));
 	        	   
 	                new BAPopupMenu(getApplicationContext(),v)
 	                .setButtons(buttons)

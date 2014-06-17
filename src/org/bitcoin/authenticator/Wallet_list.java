@@ -86,11 +86,11 @@ public class Wallet_list extends Activity {
                  long arg3) 
            {
         	   final int index = position;
-        	   ArrayList<String> buttons = new ArrayList<String>();
-        	   buttons.add("Show Pending Requests");
-        	   buttons.add("Re-pair");
-        	   buttons.add("Rename");
-        	   buttons.add("Delete");
+        	   ArrayList<BAPopupMenu.PopupButton> buttons = new ArrayList<BAPopupMenu.PopupButton>();
+        	   buttons.add(new BAPopupMenu.PopupButton("Show Pending Requests",false));
+        	   buttons.add(new BAPopupMenu.PopupButton("Re-pair",true));
+        	   buttons.add(new BAPopupMenu.PopupButton("Rename",true));
+        	   buttons.add(new BAPopupMenu.PopupButton("Delete",true));
         	   
                 new BAPopupMenu(getApplicationContext(),v)
                 .setButtons(buttons)
@@ -305,11 +305,11 @@ public class Wallet_list extends Activity {
     		String fingerprint = data.getString(wFP, "null");
     		if (!fingerprint.equals("null")) walletData.setFingerprint(fingerprint.substring(32,40).toUpperCase());
     		//Decide which icon to display
-    		if (data.getString(wTP, "null").equals("blockchain")){walletData.setIcon(R.drawable.ic_blockchain_info_logo_gray);}
-    		else if (data.getString(wTP, "null").equals("electrum")){walletData.setIcon(R.drawable.electrum_logo);}
+    		if (data.getString(wTP, "null").equals("blockchain")){walletData.setIcon(R.drawable.ic_bitcoin_logo);}
+    		else if (data.getString(wTP, "null").equals("electrum")){walletData.setIcon(R.drawable.ic_electrum_logo);}
     		else if (data.getString(wTP, "null").equals("hive")){walletData.setIcon(R.drawable.hive_logo);}
     		else if (data.getString(wTP, "null").equals("multibit")){walletData.setIcon(R.drawable.multibit_logo);}
-    		else if (data.getString(wTP, "null").equals("bitcoincore")){walletData.setIcon(R.drawable.bitcoin_core_logo);}
+    		else if (data.getString(wTP, "null").equals("bitcoincore")){walletData.setIcon(R.drawable.ic_bitcoin_logo);}
     		else if (data.getString(wTP, "null").equals("armory")){walletData.setIcon(R.drawable.armory_logo);}
         	else if (data.getString(wTP, "null").equals("darkwallet")){walletData.setIcon(R.drawable.darkwallet_logo);}
         	else {walletData.setIcon(R.drawable.authenticator_logo);}
@@ -424,10 +424,10 @@ public class Wallet_list extends Activity {
     		holder.walletLabelView.setText(((WalletItem) listData.get(position)).getWalletLabel());
     		holder.walletFingerprintView.setText(((WalletItem) listData.get(position)).getFingerprint());
     		int cnt = ((WalletItem) listData.get(position)).getPendingGCMRequests().size();
-    		//if( cnt > 0)
+    		if( cnt > 0)
     			holder.walletPendingRequestCntView.setText(Integer.toString(cnt) + " Pending Requests");
-    		//else
-    		//	holder.walletPendingRequestCntView.setText("");
+    		else
+    			holder.walletPendingRequestCntView.setText("");
     		holder.walletIcon.setImageResource(((WalletItem) listData.get(position)).getIcon());
  
     		return convertView;

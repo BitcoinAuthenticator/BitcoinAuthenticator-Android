@@ -11,7 +11,7 @@ import android.widget.PopupMenu.OnMenuItemClickListener;
 
 public class BAPopupMenu extends PopupMenu implements OnMenuItemClickListener{
 
-	ArrayList<String> buttons;
+	ArrayList<BAPopupMenu.PopupButton> buttons;
 	ActionsListener listener;
 	
 	public BAPopupMenu(Context context, View anchor) {
@@ -19,11 +19,12 @@ public class BAPopupMenu extends PopupMenu implements OnMenuItemClickListener{
 		this.setOnMenuItemClickListener(this);
 	}
 
-	public BAPopupMenu setButtons(ArrayList<String> buttons){
+	public BAPopupMenu setButtons(ArrayList<BAPopupMenu.PopupButton> buttons){
 		this.buttons = buttons;
 		int i = 1;
-		for (String s:buttons){
-			this.getMenu().add(Menu.NONE, i, Menu.NONE, s);
+		for (PopupButton s:buttons){
+			this.getMenu().add(Menu.NONE, i, Menu.NONE, s.name);
+			this.getMenu().getItem(i-1).setEnabled(s.active);
 			i++;
 		}
 		return this;
@@ -43,6 +44,16 @@ public class BAPopupMenu extends PopupMenu implements OnMenuItemClickListener{
 	public interface ActionsListener{
 		public void pressed(MenuItem item);
 	}
-
+	
+	static public class PopupButton{
+		
+		public PopupButton(String name, boolean active){
+			this.name = name;
+			this.active = active;
+		}
+		
+		public String name;
+		public boolean active;
+	};
 	
 }
