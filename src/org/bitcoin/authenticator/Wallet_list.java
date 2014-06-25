@@ -87,7 +87,9 @@ public class Wallet_list extends Activity {
            {
         	   final int index = position;
         	   ArrayList<BAPopupMenu.PopupButton> buttons = new ArrayList<BAPopupMenu.PopupButton>();
-        	   buttons.add(new BAPopupMenu.PopupButton("Show Pending Requests",false));
+        	   int cnt = ((WalletItem)listAdapter.getItem(index)).getPendingGCMRequests().size();
+        	   boolean showPending = cnt>0? true:false;
+        	   buttons.add(new BAPopupMenu.PopupButton("Show Pending Requests",showPending));
         	   buttons.add(new BAPopupMenu.PopupButton("Re-pair",true));
         	   buttons.add(new BAPopupMenu.PopupButton("Rename",true));
         	   buttons.add(new BAPopupMenu.PopupButton("Delete",true));
