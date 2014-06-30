@@ -74,27 +74,6 @@ public class Settings extends Activity {
 					settingseditor.putBoolean("testnet", false);
 					settingseditor.commit();
 				}
-				
-				/**
-				 * Let user know that the effects will only take place on restart
-				 * 
-				 */
-				AlertDialog alertDialog = new AlertDialog.Builder(
-						Settings.this).create();
-					// Setting Dialog Title
-					alertDialog.setTitle("Alert");
-					// Setting Dialog Message
-					alertDialog.setMessage("Please restart the Authenticator application for the changes to take effect.");
-					// Setting Icon to Dialog
-					alertDialog.setIcon(R.drawable.ic_error);
-					// Setting OK Button
-					alertDialog.setButton("OK", new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int which) {
-							dialog.cancel();
-						}
-					});
-					// Showing Alert Message
-					alertDialog.show();
 			}	
 		});
 	}
