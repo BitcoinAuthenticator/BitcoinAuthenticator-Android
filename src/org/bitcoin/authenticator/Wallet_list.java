@@ -301,7 +301,8 @@ public class Wallet_list extends Activity {
     		WalletItem walletData = new WalletItem();
     		Boolean deleted = data.getBoolean("Deleted", false);
     		int networkType = data.getInt("NetworkType", 1); // default main net
-    		if(isTestnet && networkType == 1) // get only current network type wallets
+    		if(deleted) continue;
+    		if((isTestnet && networkType == 1) || (isTestnet == false && networkType == 0)) // get only current network type wallets
     			continue;
     		
     		String wID = ("ID"				);
@@ -320,7 +321,7 @@ public class Wallet_list extends Activity {
     		else if (data.getString(wTP, "null").equals("armory")){walletData.setIcon(R.drawable.armory_logo);}
         	else if (data.getString(wTP, "null").equals("darkwallet")){walletData.setIcon(R.drawable.darkwallet_logo);}
         	else {walletData.setIcon(R.drawable.authenticator_logo);}
-    		if (!deleted){results.add(walletData);}
+    		results.add(walletData);
     	}
         return getGCMPendingRequests(results);
     }
