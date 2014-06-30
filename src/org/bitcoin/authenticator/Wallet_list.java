@@ -291,6 +291,7 @@ public class Wallet_list extends Activity {
     	//Open shared preferences and get the number of wallets
     	SharedPreferences settings = getSharedPreferences("ConfigFile", 0);	
 	    int num = settings.getInt("numwallets", 0);
+	    boolean isTestnet = settings.getBoolean("testnet", false);
     	ArrayList results = new ArrayList();
     	
     	//Load the data for each wallet and add it to a WalletItem object
@@ -299,9 +300,13 @@ public class Wallet_list extends Activity {
     		SharedPreferences data = getSharedPreferences(wdata, 0);	
     		WalletItem walletData = new WalletItem();
     		Boolean deleted = data.getBoolean("Deleted", false);
-    		String wID = ("ID");
-    		String wFP = ("Fingerprint");
-    		String wTP = ("Type");
+    		int networkType = data.getInt("NetworkType", 1); // default main net
+    		if(isTestnet && networkType == 1) // get only current network type wallets
+    			continue;
+    		
+    		String wID = ("ID"				);
+    		String wFP = ("Fingerprint"		);
+    		String wTP = ("Type"			);
     		walletData.setWalletNum(i);
     		walletData.setWalletLabel(data.getString(wID, "null"));
     		String fingerprint = data.getString(wFP, "null");
