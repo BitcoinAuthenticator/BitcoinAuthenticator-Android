@@ -9,7 +9,9 @@ import org.bitcoin.authenticator.Events.GlobalEvents;
 import org.bitcoin.authenticator.GcmUtil.GcmIntentService;
 import org.bitcoin.authenticator.GcmUtil.ProcessGCMRequest;
 import org.bitcoin.authenticator.dialogs.BAAlertDialogBase;
+import org.bitcoin.authenticator.dialogs.BAAlertDialogBase.DeleteOnClickListener;
 import org.bitcoin.authenticator.dialogs.BAAlertDialogBase.SingleInputOnClickListener;
+import org.bitcoin.authenticator.dialogs.BADeleteDialog;
 import org.bitcoin.authenticator.dialogs.BAPopupMenu;
 import org.bitcoin.authenticator.dialogs.BASingleInputDialog;
 import org.json.JSONException;
@@ -25,6 +27,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.text.Html;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -34,6 +37,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
@@ -204,38 +208,37 @@ public class Wallet_list extends Activity {
     				
     			}
     		});
-    		alert.show();
     		
-    		/*AlertDialog.Builder alert = new AlertDialog.Builder(this);
-    		alert.setTitle("Rename");
-    		alert.setMessage("Enter a name for this wallet:");
-    		// Set an EditText view to get user input 
-    		final EditText input = new EditText(this);
-    		alert.setView(input);
-    		alert.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-    		public void onClick(DialogInterface dialog, int whichButton) {
-    			String value = input.getText().toString();
-    			Object o = lv1.getItemAtPosition(index);
-    			WalletItem Data = (WalletItem) o;
-    			String wdata = "WalletData" + Data.getWalletNum();
-    			SharedPreferences data = getSharedPreferences(wdata, 0);
-    			SharedPreferences.Editor editor = data.edit();	
-    			editor.putString("ID", value);
-    			editor.commit();
-    	        try { setListView(); } catch (InterruptedException e) { e.printStackTrace(); } catch (JSONException e) { e.printStackTrace(); }
-    			}
-    		});
-    		alert.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-    			public void onClick(DialogInterface dialog, int whichButton) {
-    		    // Canceled.
-    			}
-    		});
-    		alert.show();*/
-    		
+    		alert.show();    
     	}
        	//Displays a dialog prompting the user to confirm they want to delete a wallet from the listview
     	else if(title=="Delete"){
-    		AlertDialog.Builder alert = new AlertDialog.Builder(this);
+    		BADeleteDialog alert = new BADeleteDialog(this);
+    		alert.setTitle("Delete");
+    		alert.setSecondaryTitle("Are you sure you want to delete this wallet?");
+    		alert.setDeleteText("Do not continue if this wallet has a positive balance as you will not be able to sign any more transactions.");
+    		alert.setDialogCenterIcon(R.drawable.ic_alert_icon);
+    		alert.setDeleteButtonListener(new DeleteOnClickListener(){
+				@Override
+				public void onClick(BAAlertDialogBase alert) {
+					Object o = lv1.getItemAtPosition(index);
+        			WalletItem Data = (WalletItem) o;
+        			String wdata = "WalletData" + Data.getWalletNum();
+        			SharedPreferences data = getSharedPreferences(wdata, 0);
+        			SharedPreferences.Editor editor = data.edit();	
+        			editor.clear();
+        			editor.putBoolean("Deleted", true);
+        			editor.commit();
+        	        try { setListView(); } catch (InterruptedException e) { e.printStackTrace(); } catch (JSONException e) { e.printStackTrace(); }
+				}
+    		});
+    		alert.setCancelButtonListener(new DeleteOnClickListener(){
+				@Override
+				public void onClick(BAAlertDialogBase alert) { }
+    		});
+    		alert.show();
+    		
+    		/*AlertDialog.Builder alert = new AlertDialog.Builder(this);
     	    alert.setTitle("Delete");
     	    alert.setMessage(Html.fromHtml("Are you sure you want to delete this wallet?<br><br> Do not continue if this wallet has a positive balance as you will not be able to sign any more transactions."));
     	    alert.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
@@ -257,7 +260,7 @@ public class Wallet_list extends Activity {
     	        }
     	     })
     	    .setIcon(android.R.drawable.ic_dialog_alert)
-    	     .show();
+    	     .show();*/
     	}
     	
 	}
