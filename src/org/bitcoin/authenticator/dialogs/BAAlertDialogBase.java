@@ -71,4 +71,8 @@ public class BAAlertDialogBase extends AlertDialog{
 	public interface DeleteOnClickListener{
 		public void onClick(BAAlertDialogBase alert);
 	}
+	
+	public interface ConfirmTxOnClickListener{
+		public void onClick(BAAlertDialogBase alert);
+	}
 }

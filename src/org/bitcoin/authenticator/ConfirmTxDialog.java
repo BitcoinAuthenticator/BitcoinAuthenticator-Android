@@ -16,6 +16,9 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.bitcoin.authenticator.GcmUtil.GcmIntentService;
+import org.bitcoin.authenticator.dialogs.BAAlertDialogBase;
+import org.bitcoin.authenticator.dialogs.BAAlertDialogBase.ConfirmTxOnClickListener;
+import org.bitcoin.authenticator.dialogs.BAConfirmTxDialog;
 import org.bitcoin.authenticator.Wallet_list.ConnectToWallets;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -50,9 +53,13 @@ import com.google.common.collect.ImmutableList;
  * Loads the seed from internal storage to derive the private key needed for signing.
  * Asks user for authorization. If yes, it signs the transaction and sends it back to the wallet.
  */
-public class ShowDialog {
+public class ConfirmTxDialog {
 
-	public ShowDialog(final Connection conn, final TxData tx, Activity activity, final int walletnum) throws InterruptedException{
+	public ConfirmTxDialog(final Connection conn, 
+			final TxData tx, 
+			Activity activity, 
+			final int walletnum,
+			final TxDialogResponse responseListener) throws InterruptedException{
 		//Close the notification if it is still open
 		/*NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		mNotificationManager.cancel((int)GcmIntentService.uniqueId);
@@ -124,7 +131,113 @@ public class ShowDialog {
 			if (i<outputs.size()-1){display = display + "<br>";}
 		}
 		//Create the dialog box
-		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity);
+		BAConfirmTxDialog alert = new BAConfirmTxDialog(activity);
+		alert.setTitle("Authorize Transaction");
+		alert.setDeleteText(Html.fromHtml("Bitcoin Authenticator has received a transaction<br><br>From: <br>" + name + "<br><br>To:<br>" + display));
+		alert.setConfirmButtonListener(new ConfirmTxOnClickListener(){
+			@Override
+			public void onClick(BAAlertDialogBase alert) {
+				//Prep the JSON object we will fill with the signatures.
+				Map obj=new LinkedHashMap();
+				obj.put("version", 1);
+				obj.put("sigs_n", tx.numInputs);
+				JSONArray siglist = new JSONArray();
+				//Loop creating a signature for each input
+				for (int j=0; j<tx.numInputs; j++){
+					//Derive the private key needed to sign the transaction
+					ArrayList<Integer> index = tx.getIndexes();
+					ArrayList<String> walpubkeys = tx.getPublicKeys();
+					HDKeyDerivation HDKey = null;
+					DeterministicKey masterKey = HDKey.createMasterPrivateKey(authseed);
+					DeterministicKey walletMasterKey = HDKey.deriveChildKey(masterKey, walletnum);
+					DeterministicKey childKey = HDKey.deriveChildKey(walletMasterKey,index.get(j));
+					byte[] privKey = childKey.getPrivKeyBytes();
+					byte[] pubKey = childKey.getPubKey();
+					ECKey authenticatorKey = new ECKey(privKey, pubKey);
+					ECKey walletPubKey = new ECKey(null, Utils.hexStringToByteArray(walpubkeys.get(j))); 							
+					List<ECKey> keys = ImmutableList.of(authenticatorKey, walletPubKey);
+					//Create the multisig script we will be using for signing. 
+					Script scriptpubkey = ScriptBuilder.createMultiSigOutputScript(2,keys);
+					//Create the signature.
+					TransactionSignature sig2 = unsignedTx.calculateSignature(j, authenticatorKey, scriptpubkey, Transaction.SigHash.ALL, false);
+					byte[] signature = sig2.encodeToBitcoin();
+					JSONObject sigobj = new JSONObject();
+					try {sigobj.put("signature", Utils.bytesToHex(signature));} 
+					catch (JSONException e) {e.printStackTrace();}
+					//Add key object to array
+					siglist.add(sigobj);					
+				}
+				obj.put("siglist", siglist);
+				StringWriter jsonOut = new StringWriter();
+				try {JSONValue.writeJSONString(obj, jsonOut);} 
+				catch (IOException e1) {e1.printStackTrace();}
+				String jsonText = jsonOut.toString();
+				System.out.println(jsonText);
+				byte[] jsonBytes = jsonText.getBytes();
+				//Create a new message object
+				Message msg = null;
+	        	try {msg = new Message(conn);} 
+	        	catch (IOException e) {e.printStackTrace();}
+	        	//Send the signature
+				try {msg.sendEncrypted(jsonBytes, sharedsecret);} 
+				catch (InvalidKeyException e) {e.printStackTrace();} 
+				catch (NoSuchAlgorithmException e) {e.printStackTrace();} 
+				catch (IOException e) {e.printStackTrace();							}
+				//Reload the ConnectionToWallets task to set up to receive another transaction.
+				try {conn.close();} 
+				catch (IOException e) {e.printStackTrace();}
+				//new ConnectToWallets().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+				
+				
+				responseListener.onAuthorizedTx();
+			}
+		});
+		alert.setDontAuthorizeButtonListener(new ConfirmTxOnClickListener(){
+			@Override
+			public void onClick(BAAlertDialogBase alert) {
+				JSONObject obj = new JSONObject();
+				try {
+					obj.put("result", "0");
+					obj.put("reason", "Authenticator refused to autherize the transaction");
+					//
+					Message msg = new Message(conn);
+					msg.sendEncrypted(obj.toString().getBytes(), sharedsecret);
+				} 
+				catch (JSONException e) { e.printStackTrace(); } 
+				catch (IOException e) { e.printStackTrace(); } 
+				catch (InvalidKeyException e) { e.printStackTrace(); } 
+				catch (NoSuchAlgorithmException e) { e.printStackTrace(); }
+				finally{
+					try { conn.close(); } catch (IOException e) { e.printStackTrace(); }
+				}
+				
+				responseListener.onNotAuthorizedTx();
+			}
+		});
+		alert.setCancelButtonListener(new ConfirmTxOnClickListener(){
+			@Override
+			public void onClick(BAAlertDialogBase alert) { 
+				JSONObject obj = new JSONObject();
+				try {
+					obj.put("justCancelled", "0");
+					//
+					Message msg = new Message(conn);
+					msg.sendEncrypted(obj.toString().getBytes(), sharedsecret);
+				} 
+				catch (JSONException e) { e.printStackTrace(); } 
+				catch (IOException e) { e.printStackTrace(); } 
+				catch (InvalidKeyException e) { e.printStackTrace(); } 
+				catch (NoSuchAlgorithmException e) { e.printStackTrace(); }
+				finally{
+					try { conn.close(); } catch (IOException e) { e.printStackTrace(); }
+				}
+				
+				responseListener.onCancel();
+			}
+		});
+		alert.show();
+		
+		/*AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity);
 		alertDialogBuilder.setInverseBackgroundForced(true);
 			//Set title
 		alertDialogBuilder.setTitle("Authorize Transaction");
@@ -213,12 +326,25 @@ public class ShowDialog {
 			});
 			// create and show the alert dialog
 			AlertDialog alertDialog = alertDialogBuilder.create();
-			alertDialog.show();
+			alertDialog.show();*/
 		
 	}
 
 
-
+	public interface TxDialogResponse{
+		/**
+		 * Will notify the wallet the transaction was authorized
+		 */
+		public void onAuthorizedTx();
+		/**
+		 * Will notify the wallet the transaction was not authorized
+		 */
+		public void onNotAuthorizedTx();
+		/**
+		 * Will not do anything
+		 */
+		public void onCancel();
+	}
 
 
 

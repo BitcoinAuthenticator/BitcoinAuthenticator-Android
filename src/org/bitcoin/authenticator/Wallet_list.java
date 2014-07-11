@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import javax.crypto.SecretKey;
 
+import org.bitcoin.authenticator.ConfirmTxDialog.TxDialogResponse;
 import org.bitcoin.authenticator.Events.GlobalEvents;
 import org.bitcoin.authenticator.GcmUtil.GcmIntentService;
 import org.bitcoin.authenticator.GcmUtil.ProcessGCMRequest;
@@ -237,30 +238,6 @@ public class Wallet_list extends Activity {
 				public void onClick(BAAlertDialogBase alert) { }
     		});
     		alert.show();
-    		
-    		/*AlertDialog.Builder alert = new AlertDialog.Builder(this);
-    	    alert.setTitle("Delete");
-    	    alert.setMessage(Html.fromHtml("Are you sure you want to delete this wallet?<br><br> Do not continue if this wallet has a positive balance as you will not be able to sign any more transactions."));
-    	    alert.setPositiveButton("Delete", new DialogInterface.OnClickListener() {
-    	        public void onClick(DialogInterface dialog, int which) { 
-    	        	Object o = lv1.getItemAtPosition(index);
-        			WalletItem Data = (WalletItem) o;
-        			String wdata = "WalletData" + Data.getWalletNum();
-        			SharedPreferences data = getSharedPreferences(wdata, 0);
-        			SharedPreferences.Editor editor = data.edit();	
-        			editor.clear();
-        			editor.putBoolean("Deleted", true);
-        			editor.commit();
-        	        try { setListView(); } catch (InterruptedException e) { e.printStackTrace(); } catch (JSONException e) { e.printStackTrace(); }
-    	        }
-    	     })
-    	    .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-    	        public void onClick(DialogInterface dialog, int which) { 
-    	            // do nothing
-    	        }
-    	     })
-    	    .setIcon(android.R.drawable.ic_dialog_alert)
-    	     .show();*/
     	}
     	
 	}
@@ -584,20 +561,47 @@ public class Wallet_list extends Activity {
            if (tx != null) {
         	   try 
         	   {
-        		   new ShowDialog(conn, tx, Wallet_list.this, ret.walletnum);
-        		   System.out.println("a6");
-        		   SharedPreferences settings2 = getSharedPreferences("ConfigFile", 0);
-        		   // set request as seen
-           		   String req = settings2.getString(getIntent().getStringExtra("RequestID"), null);
-           		   SharedPreferences.Editor editor = settings2.edit();
-           		   JSONObject jo = new JSONObject(req);
-           		   jo.put("seen", true);
-	           	   editor.putString(jo.getString("RequestID"), jo.toString());
-	    		   editor.commit();
-	    		   // remove from pending requests
-	    		   removePendingRequestFromListAndThenUpdate(getIntent().getStringExtra("RequestID"));
+        		   new ConfirmTxDialog(conn, 
+        				   tx, 
+        				   Wallet_list.this, 
+        				   ret.walletnum, 
+        				   new TxDialogResponse(){
+											@Override
+											public void onAuthorizedTx() {
+												proccessReq();
+											}
+						
+											@Override
+											public void onNotAuthorizedTx() {
+												proccessReq();
+											}
+						
+											@Override
+											public void onCancel() {
+												// TODO Auto-generated method stub
+												
+											}
+											
+											public void proccessReq(){
+												try {
+												   System.out.println("a6");
+								        		   SharedPreferences settings2 = getSharedPreferences("ConfigFile", 0);
+								        		   // set request as seen
+								           		   String req = settings2.getString(getIntent().getStringExtra("RequestID"), null);
+								           		   SharedPreferences.Editor editor = settings2.edit();
+								           		   JSONObject jo = new JSONObject(req);
+								           		   jo.put("seen", true);
+									           	   editor.putString(jo.getString("RequestID"), jo.toString());
+									    		   editor.commit();
+									    		   // remove from pending requests
+									    		   removePendingRequestFromListAndThenUpdate(getIntent().getStringExtra("RequestID"));
+												} catch (JSONException e) { e.printStackTrace(); }
+											}
+						        			   
+						        		   });
+        		   
         	   } 
-        	   catch (InterruptedException e) {e.printStackTrace();} catch (JSONException e) { e.printStackTrace(); }
+        	   catch (InterruptedException e) {e.printStackTrace();}
            }
         }
     }

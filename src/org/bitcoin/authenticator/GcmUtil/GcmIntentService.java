@@ -83,11 +83,13 @@ public class GcmIntentService extends IntentService {
 		SharedPreferences.Editor editor = settings.edit();	
 		// update RequestID list
 		JSONArray o;
+		String reqID = "";
 		if(settings.getString("pendingList", null) !=null){
 			o = new JSONArray(settings.getString("pendingList", ""));
 			 for(int i = 0 ; i < o.length(); i++){
 				String pendingID = o.get(i).toString();
 				if(pendingID.equals(obj.getString("RequestID"))){
+					reqID = obj.getString("RequestID").substring(0, 6);
 					JSONObject pendingObj = new JSONObject(settings.getString(pendingID, null));
 					// update
 					JSONObject pendingPayload = new JSONObject(pendingObj.getString("ReqPayload"));
@@ -112,7 +114,7 @@ public class GcmIntentService extends IntentService {
 		mNotificationManager = (NotificationManager)
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
 		//
-		String customMsg = "Pending Notification Update";
+		String customMsg = "Pending Notification Update - " + reqID;
 		NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
         .setSmallIcon(R.drawable.authenticator_logo)

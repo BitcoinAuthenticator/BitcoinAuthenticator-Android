@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 import javax.crypto.SecretKey;
 
+import org.bitcoin.authenticator.ConfirmTxDialog.TxDialogResponse;
 import org.bitcoin.authenticator.Wallet_list.ConnectToWallets;
 import org.bitcoin.authenticator.Wallet_list.WalletItem;
 import org.bitcoin.authenticator.Wallet_list.CustomListAdapter.ViewHolder;
@@ -244,13 +245,35 @@ public class ActivityPendingRequests extends Activity {
         protected void onPostExecute(Connection result) {
         	// Show Tx dialog
 			try {
-				new ShowDialog(conn, tx, ActivityPendingRequests.this, ret.walletnum);
+				new ConfirmTxDialog(conn, 
+						tx, 
+						ActivityPendingRequests.this, 
+						ret.walletnum, 
+						new TxDialogResponse(){
+								@Override
+								public void onAuthorizedTx() {
+									 try {
+									   markPendingRequestAsSeen(data.getReqID());
+									   adapter.removePendigRequestAt(index);
+									 } catch (JSONException e) { e.printStackTrace(); }
+								}
+			
+								@Override
+								public void onNotAuthorizedTx() {
+									try {
+									   markPendingRequestAsSeen(data.getReqID());
+									   adapter.removePendigRequestAt(index);
+									} catch (JSONException e) { e.printStackTrace(); }
+								}
+			
+								@Override
+								public void onCancel() {
+									// do nothing
+								}
+							});
 			} catch (InterruptedException e) { e.printStackTrace(); }
  		   // Update pending tx    			
-		   try {
-			   markPendingRequestAsSeen(data.getReqID());
-			   adapter.removePendigRequestAt(index);
-		   	} catch (JSONException e) { e.printStackTrace(); }
+		  
 		}
     }
 	
