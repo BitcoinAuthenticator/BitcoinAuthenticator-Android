@@ -8,6 +8,10 @@ import javax.crypto.SecretKey;
 import org.bitcoin.authenticator.Events.GlobalEvents;
 import org.bitcoin.authenticator.GcmUtil.GcmIntentService;
 import org.bitcoin.authenticator.GcmUtil.ProcessGCMRequest;
+import org.bitcoin.authenticator.dialogs.BAAlertDialogBase;
+import org.bitcoin.authenticator.dialogs.BAAlertDialogBase.SingleInputOnClickListener;
+import org.bitcoin.authenticator.dialogs.BAPopupMenu;
+import org.bitcoin.authenticator.dialogs.BASingleInputDialog;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONArray;
@@ -20,6 +24,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.text.Html;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -28,6 +33,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
@@ -172,7 +178,35 @@ public class Wallet_list extends Activity {
        	}
        	//Displays a dialog allowing the user to rename the wallet in the listview
     	else if(title=="Rename"){
-    		AlertDialog.Builder alert = new AlertDialog.Builder(this);
+    		BASingleInputDialog alert = new BASingleInputDialog(this);
+    		alert.setTitle("Rename");
+    		alert.setSecondaryTitle("Enter a name for this wallet:");
+    		alert.requestWindowFeature(Window.FEATURE_NO_TITLE);
+    		alert.setOkButtonListener(new SingleInputOnClickListener(){
+				@Override
+				public void onClick(BAAlertDialogBase alert, String input) {
+					if(input.length() > 3){
+						Object o = lv1.getItemAtPosition(index);
+		    			WalletItem Data = (WalletItem) o;
+		    			String wdata = "WalletData" + Data.getWalletNum();
+		    			SharedPreferences data = getSharedPreferences(wdata, 0);
+		    			SharedPreferences.Editor editor = data.edit();	
+		    			editor.putString("ID", input);
+		    			editor.commit();
+		    	        try { setListView(); } 
+		    	        catch (InterruptedException e) { e.printStackTrace(); } catch (JSONException e) { e.printStackTrace(); }
+					}
+				}
+    		});
+    		alert.setCancelButtonListener(new SingleInputOnClickListener(){
+    			@Override
+				public void onClick(BAAlertDialogBase alert, String input) {
+    				
+    			}
+    		});
+    		alert.show();
+    		
+    		/*AlertDialog.Builder alert = new AlertDialog.Builder(this);
     		alert.setTitle("Rename");
     		alert.setMessage("Enter a name for this wallet:");
     		// Set an EditText view to get user input 
@@ -196,7 +230,8 @@ public class Wallet_list extends Activity {
     		    // Canceled.
     			}
     		});
-    		alert.show();
+    		alert.show();*/
+    		
     	}
        	//Displays a dialog prompting the user to confirm they want to delete a wallet from the listview
     	else if(title=="Delete"){

@@ -1,4 +1,4 @@
-package org.bitcoin.authenticator;
+package org.bitcoin.authenticator.dialogs;
 
 import java.util.ArrayList;
 

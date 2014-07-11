@@ -125,6 +125,7 @@ public class ShowDialog {
 		}
 		//Create the dialog box
 		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity);
+		alertDialogBuilder.setInverseBackgroundForced(true);
 			//Set title
 		alertDialogBuilder.setTitle("Authorize Transaction");
 		//Set dialog message

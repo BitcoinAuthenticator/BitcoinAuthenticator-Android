@@ -6,4 +6,8 @@
     <color name="ui_background_color">#292A2E</color>
     <color name="ui_text_color">#BFDAEF</color>
     <color name="red_UI">#c62f2f</color>
+    <!-- Custom alert dialog colors -->
+    <color name="Alert_Dialog_Text_Color">#292A2E</color>
+    <color name="Alert_Dialog_BG_Color">#ffffff</color>
+    <color name="Alert_Dialog_Input_BG_Color">#e4e3e3</color>
 </resources>

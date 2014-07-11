@@ -8,6 +8,7 @@ import javax.crypto.SecretKey;
 import org.bitcoin.authenticator.Wallet_list.ConnectToWallets;
 import org.bitcoin.authenticator.Wallet_list.WalletItem;
 import org.bitcoin.authenticator.Wallet_list.CustomListAdapter.ViewHolder;
+import org.bitcoin.authenticator.dialogs.BAPopupMenu;
 import org.bitcoin.authenticator.Events.GlobalEvents;
 import org.bitcoin.authenticator.GcmUtil.ProcessGCMRequest;
 import org.bitcoin.authenticator.GcmUtil.RequestType;
