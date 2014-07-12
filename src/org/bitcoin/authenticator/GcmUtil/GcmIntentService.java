@@ -51,7 +51,7 @@ public class GcmIntentService extends IntentService {
 		            Log.v(GcmUtilGlobal.TAG, "Received: " + extras.getString("data"));
 		        }
 		        else if(messageType == RequestType.updateIpAddressesForPreviousMessage){
-		        	processUpdateIpAddressesForPreviousMessage(extras.getString("data"));
+		        	processUpdateIpAddresses(extras.getString("data"));
 		        	Log.v(GcmUtilGlobal.TAG, "Received: " + extras.getString("data"));
 		        }
 		    }
@@ -75,21 +75,42 @@ public class GcmIntentService extends IntentService {
     	return null;
     }
 
-    private void processUpdateIpAddressesForPreviousMessage(String msg) throws JSONException {
+    private void processUpdateIpAddresses(String msg) throws JSONException {
     	obj = new JSONObject(msg);
     	JSONObject payload = new JSONObject(obj.getString("ReqPayload"));
     	// search notification
     	SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
 		SharedPreferences.Editor editor = settings.edit();	
-		// update RequestID list
+		/**
+		 * Update all pending requests IPs from the received pairingID
+		 */
 		JSONArray o;
-		String reqID = "";
+		boolean didFind = false;
 		if(settings.getString("pendingList", null) !=null){
+			o = new JSONArray(settings.getString("pendingList", ""));
+			for(int i = 0 ; i < o.length(); i++){
+				String pendingID = o.get(i).toString();
+				JSONObject pendingObj = new JSONObject(settings.getString(pendingID, null));
+				if(pendingObj.getString("PairingID").equals(obj.getString("PairingID"))){
+					didFind = true;
+					// update
+					JSONObject pendingPayload = new JSONObject(pendingObj.getString("ReqPayload"));
+					pendingPayload.put("ExternalIP", payload.getString("ExternalIP"));
+					pendingPayload.put("LocalIP", payload.getString("LocalIP"));
+					pendingObj.put("ReqPayload",pendingPayload );
+					editor.putString(pendingObj.getString("RequestID"), pendingObj.toString());
+					editor.commit();
+				}
+			}
+		}
+		
+		
+		
+		/*if(settings.getString("pendingList", null) !=null){
 			o = new JSONArray(settings.getString("pendingList", ""));
 			 for(int i = 0 ; i < o.length(); i++){
 				String pendingID = o.get(i).toString();
 				if(pendingID.equals(obj.getString("RequestID"))){
-					reqID = obj.getString("RequestID").substring(0, 6);
 					JSONObject pendingObj = new JSONObject(settings.getString(pendingID, null));
 					// update
 					JSONObject pendingPayload = new JSONObject(pendingObj.getString("ReqPayload"));
@@ -102,34 +123,39 @@ public class GcmIntentService extends IntentService {
 					break;
 				}
 			 }
-		}
+		}*/
 		
-		Intent intent = new Intent(this, Main.class);
-		intent.putExtra("RequestID", obj.getString("RequestID"));
-		intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
-		
-		PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                intent, PendingIntent.FLAG_UPDATE_CURRENT);
-		
-		mNotificationManager = (NotificationManager)
-                this.getSystemService(Context.NOTIFICATION_SERVICE);
-		//
-		String customMsg = "Pending Notification Update - " + reqID;
-		NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(this)
-        .setSmallIcon(R.drawable.authenticator_logo)
-        .setContentTitle("New Message To Sign")
-        .setStyle(new NotificationCompat.BigTextStyle()
-        .bigText(customMsg))
-        .setContentText(customMsg)
-        .setDefaults(Notification.DEFAULT_SOUND)
-        .setDefaults(Notification.DEFAULT_VIBRATE)
-        .setTicker(customMsg).setWhen(System.currentTimeMillis());
+		/**
+		 * Notify user if found a relevant pending request
+		 */
+		if(didFind){
+			/*Intent intent = new Intent(this, Main.class);
+			intent.putExtra("RequestID", obj.getString("RequestID"));
+			intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);*/
+			
+			/*PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+	                intent, PendingIntent.FLAG_UPDATE_CURRENT);*/
+			
+			mNotificationManager = (NotificationManager)
+	                this.getSystemService(Context.NOTIFICATION_SERVICE);
+			//
+			String customMsg = "Pending Notification Update";
+			NotificationCompat.Builder mBuilder =
+	                new NotificationCompat.Builder(this)
+	        .setSmallIcon(R.drawable.authenticator_logo)
+	        .setContentTitle("New Message To Sign")
+	        .setStyle(new NotificationCompat.BigTextStyle()
+	        .bigText(customMsg))
+	        .setContentText(customMsg)
+	        .setDefaults(Notification.DEFAULT_SOUND)
+	        .setDefaults(Notification.DEFAULT_VIBRATE)
+	        .setTicker(customMsg).setWhen(System.currentTimeMillis());
 
-		mBuilder.setContentIntent(contentIntent);
-        Notification notif = mBuilder.build();
-        notif.flags |= Notification.FLAG_AUTO_CANCEL;
-        mNotificationManager.notify((int)uniqueId, notif);
+			//mBuilder.setContentIntent(contentIntent);
+	        Notification notif = mBuilder.build();
+	        notif.flags |= Notification.FLAG_AUTO_CANCEL;
+	        mNotificationManager.notify((int)uniqueId, notif);
+		}		
     }
     
     private void processNewSigningNotification(String msg) throws JSONException {
