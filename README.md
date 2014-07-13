@@ -68,11 +68,9 @@ Package Explorer -> Properties -> Android -> under Library -> Add google_play_se
 
 ## TODO
 
-This app is maybe 50% of the way to an alpha release at the moment. Here is a TODO list (in no particular order). 
-
 * The "How it works" activity is more or less just a placeholder. It needs to be made pretty. I'm thinking maybe some clipart explaining how it works where the user can swipe to view the next image.
 * The "Pair wallet" activity is very ugly. It needs to be made pretty as well.
-* The "Settings", "About", and "Donate" activities found in the menu need to be created/ improved. 
+* The "About", and "Donate" activities found in the menu need to be created/ improved. 
 * Add some basic "auto-approve" functionality for transactions below a certain amount or below a daily/weekly total, etc. Also, I would like to add the ability to auto-approve BIP70 payment requests from trusted parties (like Bitpay), but this functionality isn't a high priorty and can be added to a future release. 
 
 If you have any questions feel free to contact us: ctpacia@gmail.com (Chris Pacia), alonmuroch@gmail.com (Alon Muroch).
