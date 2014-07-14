@@ -64,26 +64,26 @@
     
     <ImageView
         android:id="@+id/imgNum2"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
  		android:layout_below="@+id/txtLabel"
  		android:layout_marginTop="28dp"
-        android:src="@drawable/numbertwo" />
+        android:src="@drawable/ic_numbertwo" />
 
     <ImageView
         android:id="@+id/imgNum1"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_alignParentTop="true"
-        android:src="@drawable/numberone" />
+        android:src="@drawable/ic_numberone" />
     
     <ImageView
         android:id="@+id/imgNum3"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
 		android:layout_below="@+id/imgNum2"
 		android:layout_marginTop="97dp"
-        android:src="@drawable/numberthree" />
+        android:src="@drawable/ic_numberthree" />
     
     <TextView
         android:id="@+id/lblClickPairWallet"
