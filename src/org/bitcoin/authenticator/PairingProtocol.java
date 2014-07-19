@@ -41,7 +41,8 @@ public class PairingProtocol {
      * Uses the AES key to calculate the message authentication code for the payload and concatenates 
      * it with the master public key and chaincode. The payload is encrypted and sent over to the wallet.
      */
-    public void run(byte[] seed, SecretKey AESKey, String pairingID, byte[] regID, int num) throws IOException, NoSuchAlgorithmException, InvalidKeyException  {
+    @SuppressWarnings({ "unchecked", "rawtypes", "static-access" })
+	public void run(byte[] seed, SecretKey AESKey, String pairingID, byte[] regID, int num) throws IOException, NoSuchAlgorithmException, InvalidKeyException  {
     	//Derive the key and chaincode from the seed.
     	HDKeyDerivation HDKey = null;
     	DeterministicKey masterkey = HDKey.createMasterPrivateKey(seed);

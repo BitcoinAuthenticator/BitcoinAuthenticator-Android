@@ -128,80 +128,29 @@ public class Pair_wallet extends Activity {
 				mProgressDialog.setIndeterminate(false);
 	            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 	            mProgressDialog.show();
-            try {
-	            //
-				QRInput = intent.getStringExtra("SCAN_RESULT");
-				//Checking to see what type of data was included in the QR code.
-					String AESKey = QRInput.substring(QRInput.indexOf("AESKey=")+7, QRInput.indexOf("&PublicIP="));
-					String IPAddress = QRInput.substring(QRInput.indexOf("&PublicIP=")+10, QRInput.indexOf("&LocalIP="));
-					String LocalIP = QRInput.substring(QRInput.indexOf("&LocalIP=")+9, QRInput.indexOf("&WalletType="));
-					String walletType = QRInput.substring(QRInput.indexOf("&WalletType=")+12, QRInput.indexOf("&NetworkType="));
-					/**
-					 * 1 for main net, 0 for testnet
-					 */
-					int networkType = Integer.parseInt(QRInput.substring(QRInput.indexOf("&NetworkType=")+13, QRInput.length()));
-					//Increment the counter for the number of paired wallet in shared preferences
-					SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
-					SharedPreferences.Editor settingseditor = settings.edit();	
-				    int num = (settings.getInt("numwallets", 0))+1;
-				    String fingerprint = getPairingIDDigest(num, GcmUtilGlobal.gcmRegistrationToken);
-					completePairing(AESKey, IPAddress, LocalIP, walletType, num, networkType,fingerprint);
-					//Start the pairing protocol
-					connectTask conx = new connectTask(AESKey, IPAddress, LocalIP, walletType, num, networkType,fingerprint);
-		            conx.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-				} catch (NoSuchAlgorithmException e) { e.printStackTrace(); }
+            //
+			QRInput = intent.getStringExtra("SCAN_RESULT");
+			//Checking to see what type of data was included in the QR code.
+			String AESKey = QRInput.substring(QRInput.indexOf("AESKey=")+7, QRInput.indexOf("&PublicIP="));
+			String IPAddress = QRInput.substring(QRInput.indexOf("&PublicIP=")+10, QRInput.indexOf("&LocalIP="));
+			String LocalIP = QRInput.substring(QRInput.indexOf("&LocalIP=")+9, QRInput.indexOf("&WalletType="));
+			String walletType = QRInput.substring(QRInput.indexOf("&WalletType=")+12, QRInput.indexOf("&NetworkType="));
+			/**
+			 * 1 for main net, 0 for testnet
+			 */
+			int networkType = Integer.parseInt(QRInput.substring(QRInput.indexOf("&NetworkType=")+13, QRInput.length()));
+			//Increment the counter for the number of paired wallet in shared preferences
+			SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
+			SharedPreferences.Editor settingseditor = settings.edit();	
+		    int num = (settings.getInt("numwallets", 0))+1;
+		    String fingerprint = getPairingIDDigest(num, GcmUtilGlobal.gcmRegistrationToken);
+			//Start the pairing protocol
+			connectTask conx = new connectTask(AESKey, IPAddress, LocalIP, walletType, num, networkType,fingerprint);
+		    conx.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 			} 
 			else if (resultCode == RESULT_CANCELED) {
 				QRInput = "Scan canceled.";
 			}
-	}
-	
-	/**
-	 * This method executes the final step in pairing. It saves the following metadata to shared preferences: 
-	 * Wallet ID, Fingerprint of the AES key, Type (for wallet_list icon), External IP, Local IP
-	 * Saves the AES key to private internal storage.
-	 */
-	private void completePairing(String AESKey, 
-			String IPAddress, 
-			String LocalIP, 
-			String walletType, 
-			int num, 
-			int networkType,
-			String fingerprint) throws NoSuchAlgorithmException{
-		//Calculate the fingerprint of the AES key to serve as the wallet identifier.
-	  	SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
-	  	SharedPreferences.Editor settingseditor = settings.edit();	
-	    String walletData = "WalletData" + num;
-	    SharedPreferences data = getSharedPreferences(walletData, 0);
-	    SharedPreferences.Editor editor = data.edit();	
-	    String wID = "ID";
-	    String wFP = "Fingerprint";	
-	    String wTP = "Type";
-	    String wEIP = "ExternalIP";
-	    String wLIP = "LocalIP";
-	    String wNT = "NetworkType";
-	    //Save the metadata for this wallet to shared preferences
-	    editor.putString(wID, txtID.getText().toString());
-	    editor.putString(wFP, fingerprint);
-	    editor.putString(wTP, walletType);
-	    editor.putString(wEIP, IPAddress);
-	    editor.putString(wLIP, LocalIP);
-	    editor.putInt(wNT, networkType);
-	    settingseditor.putInt("numwallets", num);
-	    //Set paired to true so that the Authenticator knows to display the wallet_list activity at startup.
-	    settingseditor.putBoolean("paired", true);
-	    editor.commit();
-	    settingseditor.commit();
-	    //Save the AES key to internal storage.
-	    String FILENAME = "AESKey" + num;
-	    byte[] keyBytes = Utils.hexStringToByteArray(AESKey);
-	    FileOutputStream outputStream = null;
-		try {outputStream = openFileOutput(FILENAME, Context.MODE_PRIVATE);} 
-		catch (FileNotFoundException e1) {e1.printStackTrace();}
-		try {outputStream.write(keyBytes);} 
-		catch (IOException e) {e.printStackTrace();}
-		try {outputStream.close();} 
-		catch (IOException e) {e.printStackTrace();} 		
 	}
 	
 	/**
@@ -215,7 +164,8 @@ public class Pair_wallet extends Activity {
 		private String walletType;
 		private String LocalIP;
 		private String AESKey;
-		public  int num;
+		private  int num;
+		private int networkType;
 		public connectTask(String AESKey, 
 				String IPAddress, 
 				String LocalIP, 
@@ -229,6 +179,7 @@ public class Pair_wallet extends Activity {
 			this.LocalIP = LocalIP;
 			this.AESKey = AESKey;
 			this.num = num;
+			this.networkType = networkType;
 		}
 		
         @Override
@@ -265,7 +216,10 @@ public class Pair_wallet extends Activity {
     		//Run pairing protocol
             SecretKey secretkey = new SecretKeySpec(Utils.hexStringToByteArray(AESKey), "AES");
             byte[] regID = (GcmUtilGlobal.gcmRegistrationToken).getBytes();
-			try {pair2wallet.run(seed, secretkey, getPairingIDDigest(num, GcmUtilGlobal.gcmRegistrationToken), regID, num);} 
+			try {
+				pair2wallet.run(seed, secretkey, getPairingIDDigest(num, GcmUtilGlobal.gcmRegistrationToken), regID, num);
+				completePairing(AESKey, IPAddress, LocalIP, walletType, num, networkType,fingerprint);
+			} 
 			catch (InvalidKeyException e) {e.printStackTrace();} 
 			catch (NoSuchAlgorithmException e) {e.printStackTrace();} 
 			catch (IOException e) {e.printStackTrace();}
@@ -279,6 +233,54 @@ public class Pair_wallet extends Activity {
             super.onPostExecute(result);
     		startActivity(new Intent(Pair_wallet.this, Wallet_list.class));
         }
+        
+        /**
+    	 * This method executes the final step in pairing. It saves the following metadata to shared preferences: 
+    	 * Wallet ID, Fingerprint of the AES key, Type (for wallet_list icon), External IP, Local IP
+    	 * Saves the AES key to private internal storage.
+    	 */
+		private void completePairing(String AESKey, 
+    			String IPAddress, 
+    			String LocalIP, 
+    			String walletType, 
+    			int num, 
+    			int networkType,
+    			String fingerprint) throws NoSuchAlgorithmException{
+    		//Calculate the fingerprint of the AES key to serve as the wallet identifier.
+    	  	SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
+    	  	SharedPreferences.Editor settingseditor = settings.edit();	
+    	    String walletData = "WalletData" + num;
+    	    SharedPreferences data = getSharedPreferences(walletData, 0);
+    	    SharedPreferences.Editor editor = data.edit();	
+    	    String wID = "ID";
+    	    String wFP = "Fingerprint";	
+    	    String wTP = "Type";
+    	    String wEIP = "ExternalIP";
+    	    String wLIP = "LocalIP";
+    	    String wNT = "NetworkType";
+    	    //Save the metadata for this wallet to shared preferences
+    	    editor.putString(wID, txtID.getText().toString());
+    	    editor.putString(wFP, fingerprint);
+    	    editor.putString(wTP, walletType);
+    	    editor.putString(wEIP, IPAddress);
+    	    editor.putString(wLIP, LocalIP);
+    	    editor.putInt(wNT, networkType);
+    	    settingseditor.putInt("numwallets", num);
+    	    //Set paired to true so that the Authenticator knows to display the wallet_list activity at startup.
+    	    settingseditor.putBoolean("paired", true);
+    	    editor.commit();
+    	    settingseditor.commit();
+    	    //Save the AES key to internal storage.
+    	    String FILENAME = "AESKey" + num;
+    	    byte[] keyBytes = Utils.hexStringToByteArray(AESKey);
+    	    FileOutputStream outputStream = null;
+    		try {outputStream = openFileOutput(FILENAME, Context.MODE_PRIVATE);} 
+    		catch (FileNotFoundException e1) {e1.printStackTrace();}
+    		try {outputStream.write(keyBytes);} 
+    		catch (IOException e) {e.printStackTrace();}
+    		try {outputStream.close();} 
+    		catch (IOException e) {e.printStackTrace();} 		
+    	}
     }
 	
 	public static String getPairingIDDigest(int num, String gcmRegID)
@@ -304,7 +306,6 @@ public class Pair_wallet extends Activity {
 	    //Log.v("ASDF","Reg id: " + ret);
 	    return ret;
 	}
-	
 }
 
 
