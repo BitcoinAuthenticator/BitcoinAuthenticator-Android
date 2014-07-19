@@ -10,37 +10,19 @@ Bitcoin Authenticator is a P2P bitcoin wallet and android application for creati
 ####How do i get the wallet application ? 
 [Click here](https://github.com/negedzuregal/BitcoinAuthWallet/tree/basewallet) 
 
-#### Building requirements
+#### General Building requirements
 1. We use Apache Maven as the build system. If you don't have it already, you can [download it](http://maven.apache.org) and follow the installation instructions. 
 
-####Building with Maven
-1. Clone the project:
+#### Eclipse  Building requirements
+1. Download Eclipse Kepler bundle
+2. Install the Eclipse ADT plugin [From Here](http://developer.android.com/sdk/installing/installing-adt.html)
+3. Install the [m2e](http://www.eclipse.org/m2e/download/) plugin : 
  ```
- $ git clone https://github.com/cpacia/BitcoinAuthenticator.git
+help -> install new software -> add -> http://download.eclipse.org/technology/m2e/releases
  ```
-2. 
- ```
- $ cd BitcoinAuthenticator
- ```
-3. build: 
- ```
-$mvn clean package
- ```
+4. Install the Maven [android Configurator](http://rgladwell.github.io/m2e-android/)
 
-#### Importing BitcoinAuthenticator Into Eclipse 
-1. Get a copy of the project and its submoodules
-
-   ```
-   git clone --recursive https://github.com/cpacia/BitcoinAuthenticator.git
-   ```
-
-2. In Eclipse:
-
-  ```
-  File -> Import -> existing maven project
-   ```
-
-3. Install Google Play Services
+5.  Install Google Play Services
   In Eclipse:
 
   ```
@@ -48,27 +30,56 @@ $mvn clean package
   -Extras -> Install Google Play Services, Google Play Services for Froyo
   -Anroid 4.x -> Install Google API
   ```
-
-4. Import the google play services for froyo project, in Eclipse: 
+6. Import the google play services for froyo project, in Eclipse: 
 
    ```
   File -> Import -> existing android code into workspace -> 
   search the project under <your sdk folder>extras/google_play_services_froyo/libproject/google-play-services_lib 
    ```
-   
-4. Right click on the BitcoinAuthenticator project:
+
+
+#### Building
+1. Clone bitcoinj to your workspace (master branch)<br>
+```
+ $ git clone https://github.com/bitcoinj/bitcoinj.git
+ ```
+2. 
+```
+$ cd bitcoinj
+```
+3. build bitcoinj:<br>
+```
+$ mvn clean install
+```
+4. Clone the Bitcoin Authenticator project:<br>
+ ```
+ $ git clone https://github.com/cpacia/BitcoinAuthenticator.git
+ ```
+5. 
+ ```
+ $ cd BitcoinAuthenticator
+ ```
+6. build: <br>
+ ```
+$ mvn clean package
+ ```
+7. open Eclipse and import the project as an Existing maven project
+8. make sure the src folder is marked as source:<Br> 
+ ```
+right click on project -> build path -> use as source folder
+ ```
+9. Right click on the BitcoinAuthenticator project:
 
  ```
 Package Explorer -> Properties -> Android -> under Library -> Add google_play_services_froyo 
 ```
 
-5. Rick click on the BitcoinAuthenticator project:
+10. Right click on the BitcoinAuthenticator project:
 	
- ```Package Explorer -> Properties -> Java Build Path -> Order and Export -> check Android Private Libraries and move it (by clicking up) to the top of the list```
+ ```Package Explorer -> Properties -> Java Build Path -> Order and Export -> check Android Private Libraries```
 
 ## TODO
 
-* The "How it works" activity is more or less just a placeholder. It needs to be made pretty. I'm thinking maybe some clipart explaining how it works where the user can swipe to view the next image.
 * The "Pair wallet" activity is very ugly. It needs to be made pretty as well.
 * The "About", and "Donate" activities found in the menu need to be created/ improved. 
 * Add some basic "auto-approve" functionality for transactions below a certain amount or below a daily/weekly total, etc. Also, I would like to add the ability to auto-approve BIP70 payment requests from trusted parties (like Bitpay), but this functionality isn't a high priorty and can be added to a future release. 
