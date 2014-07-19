@@ -1,5 +1,6 @@
 package org.bitcoin.authenticator;
 
+import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
 import org.bitcoin.authenticator.GcmUtil.GCMRegister;
 import org.bitcoin.authenticator.GcmUtil.GcmUtilGlobal;
 
@@ -19,8 +20,11 @@ public class Main extends Activity {
 	public void onNewIntent(Intent intent){
 		gcmInit();
 		
-		SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
-	    Boolean paired = settings.getBoolean("paired", false);
+		// init preferences
+		new BAPreferences(this);
+		
+		//SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
+	    Boolean paired = BAPreferences.ConfigPreference().getPaired(false);//settings.getBoolean("paired", false);
 	    Boolean pendingReq = false;
 	    
 		{
@@ -52,16 +56,7 @@ public class Main extends Activity {
 	
 	private void gcmInit()
 	{
-		/* GCM Registration 
-		 * GCM depends on google play services library.
-		 * Build Instructions - 
-		 * 1) download the git submodule of this project
-		 * 2) import the project from /libs/google-play-services/libproject/google-play-services_lib into eclipse
-		 * via "file -> import -> Existing android code
-		 * 3) in BitoinAuthenticator, right click properties -> android -> library (add)
-		 * 4) you are done !
-		 * */
-		{ /*  */
+		{ 
 			GCMRegister regClass = new GCMRegister(this);
 			try {
 				regClass.runRegistrationSequence();

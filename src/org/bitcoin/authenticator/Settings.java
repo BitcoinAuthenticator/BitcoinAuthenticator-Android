@@ -1,5 +1,7 @@
 package org.bitcoin.authenticator;
 
+import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -22,12 +24,11 @@ public class Settings extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_settings);
-		SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
-		GCM = settings.getBoolean("GCM", true);
+		GCM = BAPreferences.ConfigPreference().getGCM(true);
 		CheckBox GCMChkBx = ( CheckBox ) findViewById( R.id.chkGCM );
 		if (GCM){GCMChkBx.setChecked(true);}
 	    else{GCMChkBx.setChecked(false);}
-	    Testnet = settings.getBoolean("testnet", false);
+	    Testnet = BAPreferences.ConfigPreference().getTestnet(false);
 	    CheckBox TestnetChkBx = ( CheckBox ) findViewById( R.id.chkTestnet );
 		if (Testnet){TestnetChkBx.setChecked(true);}
 	    else{TestnetChkBx.setChecked(false);}
@@ -45,15 +46,11 @@ public class Settings extends Activity {
 		ChkBx.setOnCheckedChangeListener(new OnCheckedChangeListener(){
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
 			{    
-				SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
-				SharedPreferences.Editor settingseditor = settings.edit();	
 				if ( isChecked ) {
-					settingseditor.putBoolean("GCM", true);
-					settingseditor.commit();
+					BAPreferences.ConfigPreference().setGCM(true);
 				}
 				else {
-					settingseditor.putBoolean("GCM", false);
-					settingseditor.commit();
+					BAPreferences.ConfigPreference().setGCM(false);
 				}
 			}	
 		});
@@ -64,15 +61,11 @@ public class Settings extends Activity {
 		ChkBx.setOnCheckedChangeListener(new OnCheckedChangeListener(){
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
 			{    
-				SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
-				SharedPreferences.Editor settingseditor = settings.edit();	
 				if ( isChecked ) {
-					settingseditor.putBoolean("testnet", true);
-					settingseditor.commit();
+					BAPreferences.ConfigPreference().setTestnet(true);
 				}
 				else {
-					settingseditor.putBoolean("testnet", false);
-					settingseditor.commit();
+					BAPreferences.ConfigPreference().setTestnet(false);
 				}
 			}	
 		});

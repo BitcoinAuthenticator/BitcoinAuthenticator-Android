@@ -13,6 +13,7 @@ import java.security.NoSuchAlgorithmException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
 import org.bitcoin.authenticator.GcmUtil.GcmUtilGlobal;
 
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -45,12 +46,6 @@ public class Pair_wallet extends Activity {
 	
 	ProgressDialog mProgressDialog;
 	private EditText txtID;
-	/*private String IPAddress;
-	private String fingerprint;
-	private String walletType;
-	private String LocalIP;
-	private String AESKey;
-	public static int num;*/
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -140,9 +135,7 @@ public class Pair_wallet extends Activity {
 			 */
 			int networkType = Integer.parseInt(QRInput.substring(QRInput.indexOf("&NetworkType=")+13, QRInput.length()));
 			//Increment the counter for the number of paired wallet in shared preferences
-			SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
-			SharedPreferences.Editor settingseditor = settings.edit();	
-		    int num = (settings.getInt("numwallets", 0))+1;
+		    int num = (BAPreferences.ConfigPreference().getWalletCount(0)) + 1;
 		    String fingerprint = getPairingIDDigest(num, GcmUtilGlobal.gcmRegistrationToken);
 			//Start the pairing protocol
 			connectTask conx = new connectTask(AESKey, IPAddress, LocalIP, walletType, num, networkType,fingerprint);
@@ -245,31 +238,20 @@ public class Pair_wallet extends Activity {
     			String walletType, 
     			int num, 
     			int networkType,
-    			String fingerprint) throws NoSuchAlgorithmException{
-    		//Calculate the fingerprint of the AES key to serve as the wallet identifier.
-    	  	SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
-    	  	SharedPreferences.Editor settingseditor = settings.edit();	
-    	    String walletData = "WalletData" + num;
-    	    SharedPreferences data = getSharedPreferences(walletData, 0);
-    	    SharedPreferences.Editor editor = data.edit();	
-    	    String wID = "ID";
-    	    String wFP = "Fingerprint";	
-    	    String wTP = "Type";
-    	    String wEIP = "ExternalIP";
-    	    String wLIP = "LocalIP";
-    	    String wNT = "NetworkType";
-    	    //Save the metadata for this wallet to shared preferences
-    	    editor.putString(wID, txtID.getText().toString());
-    	    editor.putString(wFP, fingerprint);
-    	    editor.putString(wTP, walletType);
-    	    editor.putString(wEIP, IPAddress);
-    	    editor.putString(wLIP, LocalIP);
-    	    editor.putInt(wNT, networkType);
-    	    settingseditor.putInt("numwallets", num);
-    	    //Set paired to true so that the Authenticator knows to display the wallet_list activity at startup.
-    	    settingseditor.putBoolean("paired", true);
-    	    editor.commit();
-    	    settingseditor.commit();
+    			String fingerprint) throws NoSuchAlgorithmException{	
+    	    String walletData = Integer.toString(num);
+    	    BAPreferences.WalletPreference().setWallet(walletData,
+    	    		txtID.getText().toString(), 
+    	    		fingerprint, 
+    	    		walletType, 
+    	    		IPAddress, 
+    	    		LocalIP,
+    	    		networkType,
+    	    		false);
+    	    //
+    	    BAPreferences.ConfigPreference().setWalletCount(num);
+    	    BAPreferences.ConfigPreference().setPaired(true);
+    	    
     	    //Save the AES key to internal storage.
     	    String FILENAME = "AESKey" + num;
     	    byte[] keyBytes = Utils.hexStringToByteArray(AESKey);

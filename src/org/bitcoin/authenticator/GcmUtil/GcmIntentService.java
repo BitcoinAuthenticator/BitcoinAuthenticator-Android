@@ -91,7 +91,7 @@ public class GcmIntentService extends IntentService {
 			for(int i = 0 ; i < o.length(); i++){
 				String pendingID = o.get(i).toString();
 				JSONObject pendingObj = new JSONObject(settings.getString(pendingID, null));
-				if(pendingObj.getString("PairingID").equals(obj.getString("PairingID"))){
+				if(pendingObj.getString("PairingID").equals(obj.getString("PairingID")) && pendingObj.getBoolean("seen") == false){
 					didFind = true;
 					// update
 					JSONObject pendingPayload = new JSONObject(pendingObj.getString("ReqPayload"));
@@ -105,37 +105,10 @@ public class GcmIntentService extends IntentService {
 		}
 		
 		
-		
-		/*if(settings.getString("pendingList", null) !=null){
-			o = new JSONArray(settings.getString("pendingList", ""));
-			 for(int i = 0 ; i < o.length(); i++){
-				String pendingID = o.get(i).toString();
-				if(pendingID.equals(obj.getString("RequestID"))){
-					JSONObject pendingObj = new JSONObject(settings.getString(pendingID, null));
-					// update
-					JSONObject pendingPayload = new JSONObject(pendingObj.getString("ReqPayload"));
-					pendingPayload.put("ExternalIP", payload.getString("ExternalIP"));
-					pendingPayload.put("LocalIP", payload.getString("LocalIP"));
-					pendingObj.put("ReqPayload",pendingPayload );
-					editor.putString(pendingObj.getString("RequestID"), pendingObj.toString());
-					editor.commit();
-					//
-					break;
-				}
-			 }
-		}*/
-		
 		/**
 		 * Notify user if found a relevant pending request
 		 */
 		if(didFind){
-			/*Intent intent = new Intent(this, Main.class);
-			intent.putExtra("RequestID", obj.getString("RequestID"));
-			intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);*/
-			
-			/*PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-	                intent, PendingIntent.FLAG_UPDATE_CURRENT);*/
-			
 			mNotificationManager = (NotificationManager)
 	                this.getSystemService(Context.NOTIFICATION_SERVICE);
 			//

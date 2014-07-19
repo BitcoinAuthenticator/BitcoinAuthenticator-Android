@@ -12,6 +12,7 @@ import java.security.NoSuchAlgorithmException;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
 import org.bitcoin.authenticator.GcmUtil.GcmUtilGlobal;
 
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -26,13 +27,15 @@ import android.os.Bundle;
 import android.widget.Toast;
 
 public class Re_pair_wallet extends Activity{
-	static int walletNum;
+	int walletNum;
 	String AESKey;
 	String IPAddress;
 	String LocalIP;
 	
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		walletNum = getIntent().getIntExtra("walletNum", -1);
+		if (walletNum == -1) throw new AssertionError("Wrong wallet number !");
 		try {launchScanActivity();} 
 		catch (Exception e) {e.printStackTrace();}
 		catch (Error e){
@@ -64,14 +67,10 @@ public class Re_pair_wallet extends Activity{
 				try {md = MessageDigest.getInstance("SHA-1");} 
 				catch (NoSuchAlgorithmException e) {e.printStackTrace();}
 			    String fingerprint = Pair_wallet.getPairingIDDigest(walletNum, GcmUtilGlobal.gcmRegistrationToken);
-				String walletData = "WalletData" + walletNum;
-				SharedPreferences data = getSharedPreferences(walletData, 0);
-				SharedPreferences.Editor editor = data.edit();	
-				//Save the metadata for this wallet to shared preferences
-				editor.putString("Fingerprint", fingerprint);
-				editor.putString("ExternalIP", IPAddress);
-				editor.putString("LocalIP", LocalIP);
-				editor.commit();
+				String walletData = Integer.toString(walletNum);
+				BAPreferences.WalletPreference().setFingerprint(walletData, fingerprint);
+				BAPreferences.WalletPreference().setExternalIP(walletData, IPAddress);
+				BAPreferences.WalletPreference().setLocalIP(walletData, LocalIP);
 				//Save the AES key to internal storage.
 			    String FILENAME = "AESKey" + walletNum;
 			    byte[] keyBytes = Utils.hexStringToByteArray(AESKey);

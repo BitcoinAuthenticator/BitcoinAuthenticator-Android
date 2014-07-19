@@ -1,5 +1,7 @@
 package org.bitcoin.authenticator;
 
+import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -34,8 +36,7 @@ public class How_it_works extends Activity {
 		//The user can access this activity from two places ― the welcome activity and the menu in the 
 		//wallet_list activity. If she's accessing it from the welcome activity (ie. the device isn't paired)
 		//the button text should say "Begin Setup". If she's accessing it from the menu it should just say "Continue" 
-		SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
-	    paired = settings.getBoolean("paired", false);
+	    paired = BAPreferences.ConfigPreference().getPaired(false);
 	    ImageButton btn = (ImageButton) findViewById(R.id.btnBeginSetup);
 	    /*if (paired==true){
 	    	btn.setText("Continue");

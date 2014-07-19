@@ -9,6 +9,8 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.List;
 
+import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
+
 import com.google.bitcoin.crypto.MnemonicCode;
 import com.google.bitcoin.crypto.MnemonicException.MnemonicLengthException;
 
@@ -31,23 +33,17 @@ import android.widget.TextView;
  * Creates the activity which displays the seed to the user.
  */
 public class Show_seed extends Activity {
-	
-	public static final String PREFS_NAME = "ConfigFile";
-	
+		
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_show_seed);
 		setupConfirmationCheckbox();
 		setupContinueButton();
-		//Load shared preferences to determine if the seed has already been generated.
-		SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-	    Boolean initialized = settings.getBoolean("initialized", false);
-	    SharedPreferences.Editor editor = settings.edit();
+	    Boolean initialized = BAPreferences.ConfigPreference().getInitialized(false);//settings.getBoolean("initialized", false);
 	    if (initialized == false){
 	    	generateSeed();
-	    	editor.putBoolean("initialized", true);
-	    	editor.commit();
+	    	BAPreferences.ConfigPreference().setInitialized(true);
 	    }
 	    else {
 	    	displaySeed();
@@ -164,8 +160,7 @@ public class Show_seed extends Activity {
 		ContinueButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
-			    Boolean paired = settings.getBoolean("paired", false);
+			    Boolean paired = BAPreferences.ConfigPreference().getPaired(false);
 			    if (paired == false){
 			    	startActivity (new Intent(Show_seed.this, Pair_wallet.class));
 			    	}

@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 
 /**	
  * This class creates a new TCP socket connection to the wallet as well as the data stream input/output objects.
@@ -17,11 +19,17 @@ public class Connection {
     public DataInputStream IN;
     public DataOutputStream OUT;
     
-    /**	Takes in the wallet IP address as a string and connects to it.*/
+    /**	Takes in the wallet IP address as a string and connects to it.
+     * @throws IOException */
 	public Connection(String IP) throws IOException{
+		/**
+		 * Try and connect with a timeout, if fails throw an exception.
+		 * If doesn't fail, remove timeout for connection.
+		 */
 		InetAddress walletAddr = InetAddress.getByName(IP);
 		SOCKET = new Socket();//(walletAddr, PORT);
-		SOCKET.connect(new InetSocketAddress(walletAddr, PORT), 300);
+		SOCKET.connect(new InetSocketAddress(walletAddr, PORT), 500);
+		SOCKET.setSoTimeout(0);
 		IN = new DataInputStream(SOCKET.getInputStream());
 		OUT = new DataOutputStream(SOCKET.getOutputStream());
 	}

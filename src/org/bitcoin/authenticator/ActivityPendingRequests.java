@@ -10,6 +10,7 @@ import org.bitcoin.authenticator.Wallet_list.ConnectToWallets;
 import org.bitcoin.authenticator.Wallet_list.WalletItem;
 import org.bitcoin.authenticator.Wallet_list.CustomListAdapter.ViewHolder;
 import org.bitcoin.authenticator.dialogs.BAPopupMenu;
+import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
 import org.bitcoin.authenticator.Events.GlobalEvents;
 import org.bitcoin.authenticator.GcmUtil.ProcessGCMRequest;
 import org.bitcoin.authenticator.GcmUtil.RequestType;
@@ -131,13 +132,14 @@ public class ActivityPendingRequests extends Activity {
 	}
 	
 	private void markPendingRequestAsSeen(String reqID) throws JSONException{
-	   SharedPreferences settings2 = getSharedPreferences("ConfigFile", 0);
-	   String req = settings2.getString(reqID, null);
-	   SharedPreferences.Editor editor = settings2.edit();
-	   JSONObject jo = new JSONObject(req);
+	   //SharedPreferences settings2 = getSharedPreferences("ConfigFile", 0);
+	   //String req = settings2.getString(reqID, null);
+	   //SharedPreferences.Editor editor = settings2.edit();
+	   JSONObject jo = BAPreferences.ConfigPreference().getPendingRequestAsJsonObject(reqID);//new JSONObject(req);
 	   jo.put("seen", true);
-	   editor.putString(jo.getString("RequestID"), jo.toString());
-	   editor.commit();
+	   BAPreferences.ConfigPreference().setPendingRequest(reqID, jo);
+	   //editor.putString(jo.getString("RequestID"), jo.toString());
+	   //editor.commit();
 	   
 	   //
 	   this.singletonEvents.onSetPendingGCMRequestToSeen.Raise(this, null);
@@ -203,12 +205,12 @@ public class ActivityPendingRequests extends Activity {
     	dataClass data;
 		@Override
 		protected Connection doInBackground(String... params) {
-			SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
-            Boolean GCM = settings.getBoolean("GCM", true);
+			//SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
+            Boolean GCM = BAPreferences.ConfigPreference().getGCM(true);//settings.getBoolean("GCM", true);
             data = (dataClass)lv1.getItemAtPosition(index);
             if(GCM){
-            	SharedPreferences settings2 = getSharedPreferences("ConfigFile", 0);
-        		String reqString = settings2.getString(data.getReqID(), null);
+            	//SharedPreferences settings2 = getSharedPreferences("ConfigFile", 0);
+        		String reqString = BAPreferences.ConfigPreference().getPendingRequestAsString(data.getReqID());//settings2.getString(data.getReqID(), null);
         		ProcessGCMRequest processor = new ProcessGCMRequest(getApplicationContext());
         		ret = processor.ProcessRequest(reqString);
         		//Open a new connection
