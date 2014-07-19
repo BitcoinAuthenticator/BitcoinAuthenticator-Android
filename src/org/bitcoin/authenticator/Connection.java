@@ -4,6 +4,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 
 /**	
@@ -19,7 +20,8 @@ public class Connection {
     /**	Takes in the wallet IP address as a string and connects to it.*/
 	public Connection(String IP) throws IOException{
 		InetAddress walletAddr = InetAddress.getByName(IP);
-		SOCKET = new Socket(walletAddr, PORT);
+		SOCKET = new Socket();//(walletAddr, PORT);
+		SOCKET.connect(new InetSocketAddress(walletAddr, PORT), 300);
 		IN = new DataInputStream(SOCKET.getInputStream());
 		OUT = new DataOutputStream(SOCKET.getOutputStream());
 	}
