@@ -14,4 +14,6 @@
     <color name="Alert_Dialog_Input_Alert_Green_Color">#06d03f</color>
     <!-- Explanation view -->
     <color name="Explanation_Text_Color">#dddddd</color>
+    <!-- Pull Refresh -->
+    <color name="Pull_Refresh_Color">#b2aeae</color>
 </resources>

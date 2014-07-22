@@ -30,6 +30,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.text.Html;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -60,7 +62,6 @@ import android.widget.Toast;
  */
 public class Wallet_list extends Activity {
 	ListView lv1;
-	private PopupMenu popupMenu;
 	public static JSONObject req;
 	public static Connection conn; 
 	private CustomListAdapter listAdapter;
@@ -69,6 +70,19 @@ public class Wallet_list extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_wallet_list);
+        
+        // swipe listener
+        final SwipeRefreshLayout swipeLayout = (SwipeRefreshLayout) findViewById(R.id.wallet_list_swipe_container);
+        swipeLayout.setColorScheme(R.color.Pull_Refresh_Color,R.color.Pull_Refresh_Color,R.color.Pull_Refresh_Color,R.color.Pull_Refresh_Color);
+        swipeLayout.setOnRefreshListener(new OnRefreshListener(){
+			@Override
+			public void onRefresh() {
+				updateListViewData();
+				swipeLayout.setRefreshing(false);
+			}
+        });
+        
+        
         //Create the list view
         try { setListView(true); } catch (InterruptedException e) { e.printStackTrace(); } catch (JSONException e) { e.printStackTrace(); }
         //Start the AsyncTask which waits for new transactions
@@ -124,7 +138,7 @@ public class Wallet_list extends Activity {
         	new ProcessGCMInBackground().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 	}
 	
-	public void updatePendingGCMRequest(){
+	public void updateListViewData(){
 		try {
 			listAdapter.updateData(getGCMPendingRequests(listAdapter.listData));
 		} catch (InterruptedException e) { e.printStackTrace(); } catch (JSONException e) { e.printStackTrace(); }
@@ -576,9 +590,10 @@ public class Wallet_list extends Activity {
 					String reqID = GcmIntentService.takeRequest();
 					if(reqID != null)
 						runOnUiThread(new Runnable() {
-	        				public void run() {
-	        					updatePendingGCMRequest();
-	        				}
+							@Override
+							public void run() {
+								updateListViewData();
+							}
 						});
 						
 				} catch (InterruptedException e) { e.printStackTrace(); }
@@ -592,6 +607,6 @@ public class Wallet_list extends Activity {
      */
     public void onSetPendingGCMRequestToSeen(Object Sender, Object Arguments)
 	{
-    	updatePendingGCMRequest();
+    	updateListViewData();
 	}
 }

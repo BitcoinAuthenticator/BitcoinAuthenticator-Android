@@ -24,15 +24,20 @@
 				        
     </LinearLayout>
     
- 
-    <ListView
-        android:id="@+id/custom_list"
-        android:layout_width="fill_parent"
-        android:layout_marginTop="7dp"
-        android:layout_height="wrap_content"
-        android:dividerHeight="5.0dp" 
-        android:divider="@color/transparent"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"/>
+ 	<android.support.v4.widget.SwipeRefreshLayout
+		 	    	android:id="@+id/wallet_list_swipe_container"
+				    android:layout_width="match_parent"
+				    android:layout_height="match_parent">
+	    <ListView
+	        android:id="@+id/custom_list"
+	        android:layout_width="fill_parent"
+	        android:layout_marginTop="7dp"
+	        android:layout_height="wrap_content"
+	        android:dividerHeight="5.0dp" 
+	        android:divider="@color/transparent"
+	        android:paddingLeft="10dp"
+	        android:paddingRight="10dp"/>
+    
+    </android.support.v4.widget.SwipeRefreshLayout>
  
 </LinearLayout>
