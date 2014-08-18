@@ -37,6 +37,14 @@ public class WalletPreference extends BAPreferenceBase{
 		setDeleted(walletID, deleted);
 	}
 	
+	/**
+	 * will return true if wallet id is not been used
+	 * @param walletID
+	 * @return
+	 */
+	public boolean checkIFWalletNumAvailable(String walletID){
+		return getID(walletID, null) == null? true:false;
+	}
 	
 	/**
 	 * ID

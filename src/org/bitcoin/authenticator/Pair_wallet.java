@@ -32,6 +32,9 @@ import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
+import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -46,32 +49,46 @@ public class Pair_wallet extends Activity {
 	
 	ProgressDialog mProgressDialog;
 	private EditText txtID;
+	private CheckBox chkForceAccountID;
+	private EditText accountID;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_pair_wallet);
 		setupScanButton();
+		
+		chkForceAccountID = (CheckBox) findViewById(R.id.checkBox1);
+		chkForceAccountID.setOnCheckedChangeListener(new OnCheckedChangeListener(){
+			@Override
+			public void onCheckedChanged(CompoundButton buttonView,
+					boolean isChecked) {
+				accountID.setEnabled(isChecked);
+				accountID.setAlpha(isChecked? 1.0f:0.3f);
+			}
+		});
+		accountID = (EditText) findViewById(R.id.editText1);
+		if(!chkForceAccountID.isChecked()){
+			accountID.setEnabled(false);
+			accountID.setAlpha(0.3f);
+		}
 	}
 	
 	/**Sets up the Scan button component*/
 	private void setupScanButton(){
 		Button scanBtn = (Button) findViewById(R.id.btnScan);
 		txtID = (EditText) findViewById(R.id.txtLabel);
+		
 		//Check and make sure the user entered a name, if not display a warning dialog.
 		scanBtn.setOnClickListener(new OnClickListener() {
-			@SuppressLint("ShowToast")
-			@SuppressWarnings("deprecation")
-			@Override
-			public void onClick(View v) {
-				String check = txtID.getText().toString();
-				if (check.matches("")){
-					AlertDialog alertDialog = new AlertDialog.Builder(
+			
+			private void showError(String msg){
+				AlertDialog alertDialog = new AlertDialog.Builder(
 		                  Pair_wallet.this).create();
 					// Setting Dialog Title
-					alertDialog.setTitle("Alert");
+					alertDialog.setTitle("Error");
 					// Setting Dialog Message
-					alertDialog.setMessage("Please enter a label for this wallet");
+					alertDialog.setMessage(msg);
 					// Setting Icon to Dialog
 					alertDialog.setIcon(R.drawable.ic_error);
 					// Setting OK Button
@@ -82,9 +99,46 @@ public class Pair_wallet extends Activity {
 					});
 					// Showing Alert Message
 					alertDialog.show();
+			}
+			
+			private boolean validateForm(){
+				/**
+				 * check name
+				 */
+				String check = txtID.getText().toString();
+				if (check.matches("")){
+					showError("Please enter a label for this wallet");
+					return false;
 				}
-				//If a name has been entered then open the QR code scanner.
-				else {
+				
+				/**
+				 * check force account id
+				 */
+				if(chkForceAccountID.isChecked()){
+					try{
+						Integer.parseInt(accountID.getText().toString());
+					}
+					catch(Exception e){
+						showError("Please enter a valid account ID");
+						return false;
+					}
+					
+					boolean ret = BAPreferences.WalletPreference().checkIFWalletNumAvailable(accountID.getText().toString());
+					if(!ret)
+					{
+						showError("Wallet ID is used");
+						return false;
+					}
+				}
+				
+				return true;
+			}
+			
+			@SuppressLint("ShowToast")
+			@SuppressWarnings("deprecation")
+			@Override
+			public void onClick(View v) {			
+				if(validateForm()) {
 					try {
 						launchScanActivity();
 					} catch (Exception e) {
@@ -135,7 +189,11 @@ public class Pair_wallet extends Activity {
 			 */
 			int networkType = Integer.parseInt(QRInput.substring(QRInput.indexOf("&NetworkType=")+13, QRInput.length()));
 			//Increment the counter for the number of paired wallet in shared preferences
-		    int num = (BAPreferences.ConfigPreference().getWalletCount(0)) + 1;
+		    int num ;
+		    if(!chkForceAccountID.isChecked())
+		    	num = (BAPreferences.ConfigPreference().getWalletCount(0)) + 1;
+		    else
+		    	num = Integer.parseInt(accountID.getText().toString());
 		    String fingerprint = getPairingIDDigest(num, GcmUtilGlobal.gcmRegistrationToken);
 			//Start the pairing protocol
 			connectTask conx = new connectTask(AESKey, IPAddress, LocalIP, walletType, num, networkType,fingerprint);

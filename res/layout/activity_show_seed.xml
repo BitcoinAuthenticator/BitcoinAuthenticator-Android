@@ -40,6 +40,7 @@
         android:layout_alignLeft="@+id/btnContinue"
         android:layout_alignRight="@+id/btnContinue"
         android:layout_marginBottom="30dp"
+        android:button="@drawable/cb_selector"
         android:text="I confirm that my seed is saved and secured"
         android:textColor="#FFFFFF"
         android:textStyle="italic" />
