@@ -30,7 +30,7 @@
 
         <!-- GCM -->
         <receiver
-            android:name="org.bitcoin.authenticator.GcmUtil.GcmBroadcastReceiver"
+            android:name=".GcmUtil.GcmBroadcastReceiver"
             android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
@@ -39,10 +39,10 @@
             </intent-filter>
         </receiver>
 
-        <service android:name="org.bitcoin.authenticator.GcmUtil.GcmIntentService" />
+        <service android:name=".GcmUtil.GcmIntentService" />
 
         <activity
-            android:name="org.bitcoin.authenticator.Main"
+            android:name=".Main"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -51,38 +51,38 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="org.bitcoin.authenticator.How_it_works"
+            android:name=".How_it_works"
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name="org.bitcoin.authenticator.Show_seed"
+            android:name=".Show_seed"
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name="org.bitcoin.authenticator.Pair_wallet"
+            android:name=".Pair_wallet"
             android:label="@string/app_name"
             android:theme="@style/AppTheme" >
         </activity>
         <activity
-            android:name="org.bitcoin.authenticator.Settings"
+            android:name=".Settings"
             android:label="@string/app_name"
             android:theme="@style/AppTheme" >
         </activity>
         <activity
-            android:name="org.bitcoin.authenticator.Wallet_list"
+            android:name=".Wallet_list"
             android:label="@string/app_name"
             android:theme="@style/AppTheme" >
         </activity>
         <activity
-            android:name="org.bitcoin.authenticator.TCPClient"
+            android:name=".TCPClient"
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name="org.bitcoin.authenticator.Welcome"
+            android:name=".Welcome"
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name="org.bitcoin.authenticator.Re_pair_wallet"
+            android:name=".Re_pair_wallet"
             android:label="@string/app_name" >
         </activity>
         <activity
@@ -103,8 +103,12 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="org.bitcoin.authenticator.ActivityPendingRequests"
+            android:name=".ActivityPendingRequests"
             android:label="@string/title_activity_activity_pending_requests" >
+        </activity>
+        <activity
+            android:name=".PairingDetails"
+            android:label="@string/title_activity_pairing_details" >
         </activity>
     </application>
 

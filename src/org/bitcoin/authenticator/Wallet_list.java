@@ -122,6 +122,7 @@ public class Wallet_list extends Activity {
         	   buttons.add(new BAPopupMenu.PopupButton("Show Pending Requests",showPending));
         	   buttons.add(new BAPopupMenu.PopupButton("Re-pair",true));
         	   buttons.add(new BAPopupMenu.PopupButton("Rename",true));
+        	   buttons.add(new BAPopupMenu.PopupButton("Details",true));
         	   buttons.add(new BAPopupMenu.PopupButton("Delete",true));
         	   
                 new BAPopupMenu(getApplicationContext(),v)
@@ -218,6 +219,15 @@ public class Wallet_list extends Activity {
     		});
     		
     		alert.show();    
+    	}
+    	else if(title=="Details"){
+    		Intent i = new Intent(Wallet_list.this, PairingDetails.class);
+        	WalletItem wi = (WalletItem)lv1.getItemAtPosition(index);
+        	i.putExtra("fingerprint", wi.getFingerprint());
+        	i.putExtra("walletName", wi.getWalletLabel());
+        	i.putExtra("accountID", Integer.toString(wi.getWalletNum()));
+        	i.putExtra("icon", wi.getIcon());
+        	startActivity (i);
     	}
        	//Displays a dialog prompting the user to confirm they want to delete a wallet from the listview
     	else if(title=="Delete"){
