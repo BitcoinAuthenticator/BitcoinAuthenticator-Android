@@ -433,8 +433,6 @@ public class Wallet_list extends Activity {
     			holder = (ViewHolder) convertView.getTag();
     		}
     		holder.walletIcon.setImageResource(((WalletItem) listData.get(position)).getIcon());
-    		holder.walletIcon.getLayoutParams().height = 300;
-    		holder.walletIcon.getLayoutParams().width = 300;
     		holder.walletLabelView.setText(((WalletItem) listData.get(position)).getWalletLabel());
     		holder.walletFingerprintView.setText(((WalletItem) listData.get(position)).getFingerprint());
     		int cnt = ((WalletItem) listData.get(position)).getPendingGCMRequests().size();
