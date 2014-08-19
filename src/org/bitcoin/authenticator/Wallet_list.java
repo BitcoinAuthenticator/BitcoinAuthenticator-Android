@@ -424,14 +424,17 @@ public class Wallet_list extends Activity {
     		if (convertView == null) {
     			convertView = layoutInflater.inflate(R.layout.list_item, null);
     			holder = new ViewHolder();
+    			holder.walletIcon = (ImageView) convertView.findViewById(R.id.wallet_icon);
     			holder.walletLabelView = (TextView) convertView.findViewById(R.id.wallet_label);
     			holder.walletFingerprintView = (TextView) convertView.findViewById(R.id.wallet_fingerprint);
     			holder.walletPendingRequestCntView = (TextView) convertView.findViewById(R.id.wallet_new_requests);
-    			holder.walletIcon = (ImageView) convertView.findViewById(R.id.wallet_icon);
     			convertView.setTag(holder);
     		} else {
     			holder = (ViewHolder) convertView.getTag();
     		}
+    		holder.walletIcon.setImageResource(((WalletItem) listData.get(position)).getIcon());
+    		holder.walletIcon.getLayoutParams().height = 300;
+    		holder.walletIcon.getLayoutParams().width = 300;
     		holder.walletLabelView.setText(((WalletItem) listData.get(position)).getWalletLabel());
     		holder.walletFingerprintView.setText(((WalletItem) listData.get(position)).getFingerprint());
     		int cnt = ((WalletItem) listData.get(position)).getPendingGCMRequests().size();
@@ -439,9 +442,6 @@ public class Wallet_list extends Activity {
     			holder.walletPendingRequestCntView.setText(Integer.toString(cnt) + " Pending Requests");
     		else
     			holder.walletPendingRequestCntView.setText("");
-    		holder.walletIcon.setImageResource(((WalletItem) listData.get(position)).getIcon());
-    		holder.walletIcon.getLayoutParams().height = 300;
-    		holder.walletIcon.getLayoutParams().width = 300;
  
     		return convertView;
     	}
