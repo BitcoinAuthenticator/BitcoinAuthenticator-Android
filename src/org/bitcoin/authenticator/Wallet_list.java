@@ -440,15 +440,18 @@ public class Wallet_list extends Activity {
     		else
     			holder.walletPendingRequestCntView.setText("");
     		holder.walletIcon.setImageResource(((WalletItem) listData.get(position)).getIcon());
+    		holder.walletIcon.getLayoutParams().height = 300;
+    		holder.walletIcon.getLayoutParams().width = 300;
  
     		return convertView;
     	}
  
     	class ViewHolder {
+    		ImageView walletIcon;
     		TextView walletLabelView;
     		TextView walletFingerprintView;
     		TextView walletPendingRequestCntView;
-    		ImageView walletIcon;
+    		
     	}
     }
     

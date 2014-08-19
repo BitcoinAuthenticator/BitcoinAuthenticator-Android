@@ -125,12 +125,16 @@ public class ConfirmTxDialog {
 			if (i<outputs.size()-1){display = display + "<br>";}
 		}
 		//Create the dialog box
-		BAConfirmTxDialog alert = new BAConfirmTxDialog(activity);
-		alert.setTitle("Authorize Transaction");
-		alert.setDeleteText(Html.fromHtml("Bitcoin Authenticator has received a transaction<br><br>From: <br>" + name + "<br><br>To:<br>" + display));
-		alert.setConfirmButtonListener(new ConfirmTxOnClickListener(){
-			@Override
-			public void onClick(BAAlertDialogBase alert) {
+		AlertDialog alertDialog = new AlertDialog.Builder(
+				activity, android.R.style.Theme_Holo_Dialog).create();
+			//Set title
+			alertDialog.setTitle("Authorize Transaction");
+			//Set dialog message
+			alertDialog.setMessage(Html.fromHtml("Bitcoin Authenticator has received a transaction<br><br>From: <br>" + name + "<br><br>To:<br>" + display));
+					
+			alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Authorize", new DialogInterface.OnClickListener() {
+
+				public void onClick(DialogInterface dialog, int id) {
 				//Prep the JSON object we will fill with the signatures.
 				Map obj=new LinkedHashMap();
 				obj.put("version", 1);
@@ -186,9 +190,9 @@ public class ConfirmTxDialog {
 				responseListener.onAuthorizedTx();
 			}
 		});
-		alert.setDontAuthorizeButtonListener(new ConfirmTxOnClickListener(){
-			@Override
-			public void onClick(BAAlertDialogBase alert) {
+		alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Reject", new DialogInterface.OnClickListener() {
+
+			public void onClick(DialogInterface dialog, int id) {
 				JSONObject obj = new JSONObject();
 				try {
 					obj.put("result", "0");
@@ -208,9 +212,10 @@ public class ConfirmTxDialog {
 				responseListener.onNotAuthorizedTx();
 			}
 		});
-		alert.setCancelButtonListener(new ConfirmTxOnClickListener(){
-			@Override
-			public void onClick(BAAlertDialogBase alert) { 
+		
+		alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Save for later", new DialogInterface.OnClickListener() {
+
+		      public void onClick(DialogInterface dialog, int id) {
 				JSONObject obj = new JSONObject();
 				try {
 					obj.put("justCancelled", "0");
@@ -229,7 +234,8 @@ public class ConfirmTxDialog {
 				responseListener.onCancel();
 			}
 		});
-		alert.show();
+		
+		alertDialog.show();
 		
 	}
 
