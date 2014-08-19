@@ -79,7 +79,7 @@ public class Show_seed extends Activity {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		TextView tv = (TextView)findViewById(R.id.txtMnemonicSeed);
+		TextView tv = (TextView)findViewById(R.id.show_seed_MnemonicSeed);
 		tv.setText(temp);
 	}
 
@@ -139,11 +139,11 @@ public class Show_seed extends Activity {
 	
 	/**These last two methods setup the activity components*/
 	private void setupConfirmationCheckbox(){
-		CheckBox repeatChkBx = ( CheckBox ) findViewById( R.id.chkConfirmation );
+		CheckBox repeatChkBx = ( CheckBox ) findViewById( R.id.show_seed_chk_Confirmation );
 		repeatChkBx.setOnCheckedChangeListener(new OnCheckedChangeListener(){
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
 			{
-				Button cont = (Button)findViewById(R.id.btnContinue);	    
+				Button cont = (Button)findViewById(R.id.show_seed_btn_Continue);	    
 				if ( isChecked )
 				{
 				cont.setEnabled(true);
@@ -156,7 +156,7 @@ public class Show_seed extends Activity {
 	}
 	
 	private void setupContinueButton(){
-		Button ContinueButton = (Button) findViewById(R.id.btnContinue);
+		Button ContinueButton = (Button) findViewById(R.id.show_seed_btn_Continue);
 		ContinueButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
