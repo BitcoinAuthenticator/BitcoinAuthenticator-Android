@@ -110,6 +110,10 @@
             android:name=".PairingDetails"
             android:label="@string/title_activity_pairing_details" >
         </activity>
+        <activity
+            android:name="org.bitcoin.authenticator.backup.PaperWallet"
+            android:label="@string/title_activity_paper_wallet" >
+        </activity>
     </application>
 
 </manifest>
