@@ -10,6 +10,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
+import org.bitcoin.authenticator.core.WalletCore;
+import org.bitcoin.authenticator.core.exceptions.NoSeedOrMnemonicsFound;
 
 import com.google.bitcoin.crypto.MnemonicCode;
 import com.google.bitcoin.crypto.MnemonicException.MnemonicLengthException;
@@ -42,11 +44,19 @@ public class Show_seed extends Activity {
 		setupContinueButton();
 	    Boolean initialized = BAPreferences.ConfigPreference().getInitialized(false);//settings.getBoolean("initialized", false);
 	    if (initialized == false){
-	    	generateSeed();
+	    	try {
+				generateSeed();
+			} catch (NoSeedOrMnemonicsFound e) {
+				e.printStackTrace();
+			}
 	    	BAPreferences.ConfigPreference().setInitialized(true);
 	    }
 	    else {
-	    	displaySeed();
+	    	try {
+				displaySeed();
+			} catch (NoSeedOrMnemonicsFound e) {
+				e.printStackTrace();
+			}
 	    }
 	}
 	
@@ -55,95 +65,103 @@ public class Show_seed extends Activity {
 	public void onBackPressed() {
 	}
 	
-	/**Loads the mnemonic encoded seed from internal storage and displays it in a textview.*/
-	private void displaySeed(){
-		String FILENAME = "mnemonic";
-		FileInputStream fin = null;
-		try {
-			fin = openFileInput(FILENAME);
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		}
-		int c;
-		String temp="";
-		try {
-			while( (c = fin.read()) != -1){
-			   temp = temp + Character.toString((char)c);
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		//String temp contains all the data of the file.
-		try {
-			fin.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		TextView tv = (TextView)findViewById(R.id.txtMnemonicSeed);
-		tv.setText(temp);
+	/**Loads the mnemonic encoded seed from internal storage and displays it in a textview.
+	 * @throws NoSeedOrMnemonicsFound */
+	private void displaySeed() throws NoSeedOrMnemonicsFound{
+//		String FILENAME = "mnemonic";
+//		FileInputStream fin = null;
+//		try {
+//			fin = openFileInput(FILENAME);
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		}
+//		int c;
+//		String temp="";
+//		try {
+//			while( (c = fin.read()) != -1){
+//			   temp = temp + Character.toString((char)c);
+//			}
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		//String temp contains all the data of the file.
+//		try {
+//			fin.close();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+		
+		WalletCore wc = new WalletCore();
+		
+		TextView tv = (TextView)findViewById(R.id.show_seed_MnemonicSeed);
+		tv.setText(wc.getMnemonicString(getApplicationContext()));
 	}
 
 	/**
 	 * This method implements BIP39 to generate a 512 bit seed from 128 bit checksummed entropy. The seed and the
 	 * mnemonic encoded entropy are saved to internal storage.
+	 * @throws NoSeedOrMnemonicsFound 
 	 */
 	@SuppressLint("TrulyRandom")
-	private void generateSeed(){
-		//Generate 128 bits entropy.
-        SecureRandom secureRandom = null;
-		try {
-			secureRandom = SecureRandom.getInstance("SHA1PRNG");
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-		}
-		byte[] bytes = new byte[16];
-		secureRandom.nextBytes(bytes);
-		MnemonicCode ms = null;
-		try {
-			ms = new MnemonicCode();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		List<String> mnemonic = null;
-		try {
-		mnemonic = ms.toMnemonic(bytes);
-		} catch (MnemonicLengthException e) {
-			e.printStackTrace();
-		}
-		byte[] seed = MnemonicCode.toSeed(mnemonic, "");	
-		String[] strArray = mnemonic.toArray(new String[0]);
-		String strMnemonic = Arrays.toString(strArray);
-		strMnemonic = strMnemonic.replace("[", "");
-		strMnemonic = strMnemonic.replace("]", "");
-		strMnemonic = strMnemonic.replace(",", "");
-		//Save to private internal storage.
-		try
-		{
-		    String FILENAME = "mnemonic";
-		    FileOutputStream outputStream = openFileOutput(FILENAME, Context.MODE_PRIVATE);
-		    outputStream.write(strMnemonic.getBytes());
-		    outputStream.close();
-		}
-		catch (final Exception ex) { Log.e("JAVA_DEBUGGING", "Exception while creating save file!"); ex.printStackTrace(); }
-		try
-		{
-		    String FILENAME = "seed";
-		    FileOutputStream outputStream = openFileOutput(FILENAME, Context.MODE_PRIVATE);
-		    outputStream.write(seed);
-		    outputStream.close();
-		}
-		catch (final Exception ex) { Log.e("JAVA_DEBUGGING", "Exception while creating save file!"); ex.printStackTrace(); }
-	    //Display the seed.
+	private void generateSeed() throws NoSeedOrMnemonicsFound{
+//		//Generate 128 bits entropy.
+//        SecureRandom secureRandom = null;
+//		try {
+//			secureRandom = SecureRandom.getInstance("SHA1PRNG");
+//		} catch (NoSuchAlgorithmException e) {
+//			e.printStackTrace();
+//		}
+//		byte[] bytes = new byte[16];
+//		secureRandom.nextBytes(bytes);
+//		MnemonicCode ms = null;
+//		try {
+//			ms = new MnemonicCode();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		List<String> mnemonic = null;
+//		try {
+//		mnemonic = ms.toMnemonic(bytes);
+//		} catch (MnemonicLengthException e) {
+//			e.printStackTrace();
+//		}
+//		byte[] seed = MnemonicCode.toSeed(mnemonic, "");	
+//		String[] strArray = mnemonic.toArray(new String[0]);
+//		String strMnemonic = Arrays.toString(strArray);
+//		strMnemonic = strMnemonic.replace("[", "");
+//		strMnemonic = strMnemonic.replace("]", "");
+//		strMnemonic = strMnemonic.replace(",", "");
+//		//Save to private internal storage.
+//		try
+//		{
+//		    String FILENAME = "mnemonic";
+//		    FileOutputStream outputStream = openFileOutput(FILENAME, Context.MODE_PRIVATE);
+//		    outputStream.write(strMnemonic.getBytes());
+//		    outputStream.close();
+//		}
+//		catch (final Exception ex) { Log.e("JAVA_DEBUGGING", "Exception while creating save file!"); ex.printStackTrace(); }
+//		try
+//		{
+//		    String FILENAME = "seed";
+//		    FileOutputStream outputStream = openFileOutput(FILENAME, Context.MODE_PRIVATE);
+//		    outputStream.write(seed);
+//		    outputStream.close();
+//		}
+//		catch (final Exception ex) { Log.e("JAVA_DEBUGGING", "Exception while creating save file!"); ex.printStackTrace(); }
+//	    //Display the seed.
+		
+		WalletCore wc = new WalletCore();
+		wc.generateSeed(getApplicationContext(), true);		
 		displaySeed();
 	}
 	
 	/**These last two methods setup the activity components*/
 	private void setupConfirmationCheckbox(){
-		CheckBox repeatChkBx = ( CheckBox ) findViewById( R.id.chkConfirmation );
+		CheckBox repeatChkBx = ( CheckBox ) findViewById( R.id.show_seed_chk_Confirmation );
 		repeatChkBx.setOnCheckedChangeListener(new OnCheckedChangeListener(){
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
 			{
-				Button cont = (Button)findViewById(R.id.btnContinue);	    
+				Button cont = (Button)findViewById(R.id.show_seed_btn_Continue);	    
 				if ( isChecked )
 				{
 				cont.setEnabled(true);
@@ -156,7 +174,7 @@ public class Show_seed extends Activity {
 	}
 	
 	private void setupContinueButton(){
-		Button ContinueButton = (Button) findViewById(R.id.btnContinue);
+		Button ContinueButton = (Button) findViewById(R.id.show_seed_btn_Continue);
 		ContinueButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {

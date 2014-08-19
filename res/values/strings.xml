@@ -18,5 +18,6 @@
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_activity_pending_requests">Pending Requests</string>
     <string name="title_activity_pairing_details">Pairing Details</string>
+    <string name="title_activity_paper_wallet">Paper Wallet</string>
 
 </resources>

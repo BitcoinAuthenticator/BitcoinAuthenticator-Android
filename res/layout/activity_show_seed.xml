@@ -1,6 +1,7 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/container3"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:paddingBottom="@dimen/activity_vertical_margin"
@@ -9,58 +10,117 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="org.bitcoin.authenticator.Show_seed"
     tools:ignore="MergeRootFrame" >
-
-    <TextView
-        android:id="@+id/lblAboutSeed"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/txtMnemonicSeed"
-        android:layout_marginTop="18dp"
-        android:text="This is your Authenticator Seed. If your mobile device is lost or damaged, you can use it to recover your keys. Please write it down and keep it in a safe place."
-        android:textColor="#FFFFFF"
-        android:textSize="16sp" />
-
-    <Button
-        android:id="@+id/btnContinue"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/txtMnemonicSeed"
-        android:layout_alignParentBottom="true"
-        android:layout_alignRight="@+id/txtMnemonicSeed"
-        android:layout_marginBottom="18dp"
-        android:enabled="false"
-        android:text="Continue"
-        android:textColor="#FFFFFF" />
-
-    <CheckBox
-        android:id="@+id/chkConfirmation"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/btnContinue"
-        android:layout_alignLeft="@+id/btnContinue"
-        android:layout_alignRight="@+id/btnContinue"
-        android:layout_marginBottom="30dp"
-        android:button="@drawable/cb_selector"
-        android:text="I confirm that my seed is saved and secured"
-        android:textColor="#FFFFFF"
-        android:textStyle="italic" />
-
-    <TextView
-        android:id="@+id/txtMnemonicSeed"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/lblAboutSeed"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/rounded_corners"
-        android:ems="10"
-        android:paddingBottom="5dp"
-        android:paddingLeft="5dp"
-        android:paddingRight="5dp"
-        android:paddingTop="5dp"
-        android:textColor="#000000"
-        android:textIsSelectable="true"
-        android:textSize="30sp"
-        android:textStyle="bold" />
-
-</RelativeLayout>
+  				
+  	  <LinearLayout android:layout_width="match_parent"
+			            android:layout_height="wrap_content"
+			            android:orientation="vertical">
+			   
+  	     
+  	        
+  	        <TextView
+		        android:id="@+id/show_seed_AboutSeed"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="This is your Authenticator Seed. If your mobile device is lost or damaged, you can use it to recover your keys. Please write it down and keep it in a safe place."
+		        android:textColor="#FFFFFF"
+		        android:textSize="16sp" />
+  	        
+  	        <!-- Spacer -->
+	    	<View android:layout_width="fill_parent"
+		        android:layout_height="20dp"
+		        android:background="@color/transparent"/>
+	
+	    	<TextView
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="Seed:"
+		        android:textColor="#FFFFFF"
+		        android:textSize="20sp" />
+	    	
+  	        <TextView
+		        android:id="@+id/show_seed_MnemonicSeed"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:background="@drawable/rounded_corners"
+		        android:ems="10"
+		        android:paddingLeft="5dp"
+		        android:paddingRight="5dp"
+		        android:textColor="#000000"
+		        android:textIsSelectable="true"
+		        android:textSize="30sp"
+		        android:textStyle="bold" />
+  	        
+  	        <!-- Spacer -->
+	    	<View android:layout_width="fill_parent"
+		        android:layout_height="20dp"
+		        android:background="@color/transparent"/>
+	    	
+	    	<TextView
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:text="Backup Options:"
+		        android:textColor="#FFFFFF"
+		        android:textSize="20sp" />
+	    	
+	    	<HorizontalScrollView android:layout_width="match_parent"
+  				android:layout_height="wrap_content">
+  				
+		  	    <LinearLayout android:layout_width="wrap_content"
+					            android:layout_height="wrap_content"
+					            android:orientation="horizontal">
+					     
+		  	        <Button
+				        android:id="@+id/show_seed_backup_QR"
+				        android:layout_width="wrap_content"
+				        android:layout_height="wrap_content"
+				        android:enabled="true"
+				        android:text="QR Backup"
+				        android:textColor="#FFFFFF" />
+		  	        
+		  	        <Button
+				        android:id="@+id/show_seed_backup_copy_seed"
+				        android:layout_width="wrap_content"
+				        android:layout_height="wrap_content"
+				        android:text="Copy Seed"
+				        android:enabled="true"
+				        android:textColor="#FFFFFF" />
+		  	        
+		  	        <Button
+				        android:id="@+id/show_seed_backup_SSS"
+				        android:layout_width="wrap_content"
+				        android:layout_height="wrap_content"
+				        android:text="SSS Backup"
+				        android:enabled="false"
+				        android:textColor="#FFFFFF" />
+		  	        
+		        </LinearLayout>
+	       	 </HorizontalScrollView>
+  	        
+  	        
+  	        <!-- Spacer -->
+	    	<View android:layout_width="fill_parent"
+		        android:layout_height="60dp"
+		        android:background="@color/transparent"/>
+  	        
+		    <!-- Confirm you saved the seed -->
+		    <CheckBox
+		        android:id="@+id/show_seed_chk_Confirmation"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:button="@drawable/cb_selector"
+		        android:text="I confirm that my seed is saved and secured"
+		        android:textColor="#FFFFFF"
+		        android:textStyle="italic" />
+		
+		    <Button
+		        android:id="@+id/show_seed_btn_Continue"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:enabled="false"
+		        android:text="Continue"
+		        android:textColor="#FFFFFF" />
+		    
+  	        
+		</LinearLayout>
+  				
+ </ScrollView>
