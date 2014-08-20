@@ -26,6 +26,9 @@ import com.google.bitcoin.crypto.MnemonicException.MnemonicLengthException;
 import com.google.bitcoin.crypto.MnemonicException.MnemonicWordException;
 import com.google.bitcoin.wallet.DeterministicSeed;
 import com.google.common.base.Joiner;
+import com.google.zxing.BarcodeFormat;
+import com.google.zxing.common.BitMatrix;
+import com.google.zxing.qrcode.QRCodeWriter;
 
 import static com.google.bitcoin.core.Utils.HEX;
 
@@ -43,15 +46,16 @@ public class PaperWalletQR{
 	}
 	
 	@SuppressWarnings("restriction")
-	private Bitmap createQRSeedImage(DeterministicSeed seed, long creationTime){
+	public Bitmap createQRSeedImage(DeterministicSeed seed, long creationTime){
 		byte[] imageBytes = null;
-		imageBytes = QRCode
-				        .from(generateQRSeedDataString(seed, creationTime))
-				        .withSize(170, 170)
-				        .to(ImageType.PNG)
-				        .stream()
-				        .toByteArray();
-        return BitmapFactory.decodeByteArray(imageBytes , 0, imageBytes .length);
+//		imageBytes = QRCode
+//				        .from(generateQRSeedDataString(seed, creationTime))
+//				        .withSize(170, 170)
+//				        .to(ImageType.PNG)
+//				        .stream()
+//				        .toByteArray();
+//        return BitmapFactory.decodeByteArray(imageBytes , 0, imageBytes .length);
+		return this.generateQR(generateQRSeedDataString(seed, creationTime), 170, 170);
 	}
 	
 	private String generateQRSeedDataString(DeterministicSeed seed, long creationTime)
@@ -111,67 +115,53 @@ public class PaperWalletQR{
 		byte[] imageBytes = null;
 		DeterministicKey mprivkey = HDKeyDerivation.createMasterPrivateKey(seed.getSecretBytes());
         DeterministicKey mpubkey = mprivkey.getPubOnly();
-        imageBytes = QRCode
-			        .from(mpubkey.toString())
-			        .withSize(160, 160)
-			        .to(ImageType.PNG)
-			        .stream()
-			        .toByteArray();
-        return BitmapFactory.decodeByteArray(imageBytes , 0, imageBytes .length);
+//        imageBytes = QRCode
+//			        .from(mpubkey.toString())
+//			        .withSize(160, 160)
+//			        .to(ImageType.PNG)
+//			        .stream()
+//			        .toByteArray();
+//        return BitmapFactory.decodeByteArray(imageBytes , 0, imageBytes .length);
+        return this.generateQR(mpubkey.toString(), 160, 160);
 	}
 	
 	private Bitmap completePaperWallet(String mnemonic, Bitmap qrSeed, Bitmap qrMPubKey) throws IOException{
 		Bitmap paperwallet = BitmapFactory.decodeResource(context.getResources(), R.drawable.paperwallet);
+		Bitmap mutableBitmap = paperwallet.copy(Bitmap.Config.ARGB_8888, true);
 		
-		Canvas canvas = new Canvas(paperwallet);
-		canvas.drawBitmap(qrSeed, 401, 112, null);
-		canvas.drawBitmap(qrMPubKey, 26, 61, null);
+		
+		Canvas canvas = new Canvas(mutableBitmap);
+		canvas.drawBitmap(qrSeed, 625, 185, null);
+		canvas.drawBitmap(qrMPubKey, 37, 86, null);
 		
 		// Draw the string
 		Paint paint = new Paint();
-		paint.setColor(Color.WHITE);
 		paint.setStyle(Style.FILL);
 		paint.setColor(context.getResources().getColor(android.R.color.black));
-		paint.setTextSize(20);
-		canvas.drawText(mnemonic,62, 280, null);
+		paint.setTextSize(16);
+		canvas.drawText(mnemonic,92, 420, paint);
 
-		return paperwallet;
-//		String path3 = null;
-//        URL location = Main.class.getResource("/wallettemplate/startup/PaperWallet.png");
-//        try {path3 = new java.io.File( "." ).getCanonicalPath() + "/paperwallet.png";} 
-//        catch (IOException e1) {e1.printStackTrace();}
-//        BufferedImage a = ImageIO.read(location);
-//        BufferedImage b = SwingFXUtils.fromFXImage(qrSeed, null);
-//        BufferedImage c = SwingFXUtils.fromFXImage(qrMPubKey, null);
-//        BufferedImage d = new BufferedImage(a.getWidth(), a.getHeight(), BufferedImage.TYPE_INT_ARGB);
-//		 
-//        //Crop the QR code images
-//        int x = (int) (qrSeed.getWidth()*.055), y = (int) (qrSeed.getHeight()*.055), w = (int) (qrSeed.getWidth()*.90), h = (int) (qrSeed.getHeight()*.90);
-//        BufferedImage b2 = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-//        b2.getGraphics().drawImage(b, 0, 0, w, h, x, y, x + w, y + h, null);
-//        x = x = (int) (qrSeed.getWidth()*.05); y = (int) (qrSeed.getHeight()*.05); w = (int) (qrMPubKey.getWidth()*.90); h = (int) (qrMPubKey.getHeight()*.9);
-//        BufferedImage c2 = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-//        c2.getGraphics().drawImage(c, 0, 0, w, h, x, y, x + w, y + h, null);
-//        
-//        //Add the QR codes to the paper wallet
-//        Graphics g = d.getGraphics();
-//        g.drawImage(a, 0, 0, null);
-//        g.drawImage(b2, 401, 112, null);
-//        g.drawImage(c2, 26, 61, null);
-//		
-//        // Get the graphics instance of the buffered image
-//        Graphics2D gBuffImg = d.createGraphics();
-//
-//        // Draw the string
-//        Color aColor = new Color(0x8E6502);
-//        gBuffImg.setColor(aColor);
-//        gBuffImg.setFont(new Font("Ubuntu", Font.PLAIN, 12));
-//        gBuffImg.drawString(mnemonic, 62, 280);
-//
-//        // Draw the buffered image on the output's graphics object
-//        g.drawImage(d, 0, 0, null);
-//        gBuffImg.dispose();
-//        
-//        return d;
+		return mutableBitmap;
+	}
+	
+	private Bitmap generateQR(String content, int w, int h){
+		QRCodeWriter writer = new QRCodeWriter();
+	    try {
+	        BitMatrix bitMatrix = writer.encode(content, BarcodeFormat.QR_CODE, w, h);
+	        int width = bitMatrix.getWidth();
+	        int height = bitMatrix.getHeight();
+	        Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565);
+	        for (int x = 0; x < width; x++) {
+	            for (int y = 0; y < height; y++) {
+	                bmp.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.WHITE);
+	            }
+	        }
+	        
+	        return bmp;
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    
+	    return null;
 	}
 }
