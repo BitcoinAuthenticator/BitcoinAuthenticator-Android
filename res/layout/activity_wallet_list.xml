@@ -4,25 +4,30 @@
     android:layout_height="fill_parent"
     android:orientation="vertical">
 
-    <LinearLayout android:layout_width="fill_parent"
+    <RelativeLayout android:layout_width="fill_parent"
 				    android:layout_height="wrap_content"
 				    android:orientation="horizontal"
 				    android:padding="10dp">
-			
-        	<ImageView android:layout_width="60dp"
-				    android:layout_height="60dp"
-				    android:background="@drawable/ic_wallet_white"/>
-	        <TextView
-		        android:id="@+id/lblWalletList"
-		        android:layout_width="match_parent"
-		        android:layout_marginTop="7dp"
-		        android:layout_marginLeft="12dp"
-		        android:layout_height="wrap_content"
-		        android:text="You will be asked to approve transactions from these wallets. Long press for menu."
-		        android:textColor="@color/ui_text_color"
-		        android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/lblWalletList"
+            android:layout_width="188dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="12dp"
+            android:layout_marginTop="7dp"
+            android:text="You will be asked to approve transactions from these wallets. Long press for menu."
+            android:textColor="@color/ui_text_color"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="17dp"
+            android:layout_toRightOf="@+id/lblWalletList"
+            android:background="@drawable/ic_wallet_white" />
 				        
-    </LinearLayout>
+    </RelativeLayout>
     
  	<android.support.v4.widget.SwipeRefreshLayout
 		 	    	android:id="@+id/wallet_list_swipe_container"
@@ -36,7 +41,8 @@
 	        android:dividerHeight="5.0dp" 
 	        android:divider="@color/transparent"
 	        android:paddingLeft="10dp"
-	        android:paddingRight="10dp"/>
+	        android:paddingRight="10dp"
+	        android:background="#e3e3e3"/>
     
     </android.support.v4.widget.SwipeRefreshLayout>
  

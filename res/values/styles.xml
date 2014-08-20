@@ -11,12 +11,11 @@
             backward-compatibility can go here.
         -->
     </style>
-    
 
     <!-- Application theme. -->
     <style name="AppTheme" parent="AppBaseTheme">
         <!-- General -->
-        <item name="android:background">@color/ui_background_color</item>
+        
 	    <item name="android:windowBackground">@color/ui_background_color</item>
 	    <item name="android:colorBackground">@color/ui_background_color</item>
         
@@ -26,13 +25,13 @@
     
     <!-- Action bar style -->
     <style name="AppTheme.ActionBarStyle" parent="@android:style/Widget.Holo.Light.ActionBar.Solid.Inverse">
-        <item name="android:background">@color/ui_background_color</item>
+        <item name="android:background">@color/ui_title_bar_color</item>
         <item name="android:titleTextStyle">@style/AppTheme.ActionBar.TitleTextStyle</item>
         <!-- Icon -->
         <item name="android:icon">@drawable/ic_icon_action_bar</item>
     </style>
     <style name="AppTheme.ActionBar.TitleTextStyle" parent="@android:style/TextAppearance.Holo.Widget.ActionBar.Title">
-	    <item name="android:textColor">@color/ui_text_color</item>
+	    <item name="android:textColor">@color/black</item>
   	</style>
     
     <style name="CustomDialogSpinner" parent="android:Theme.Holo.Dialog">
@@ -45,7 +44,7 @@
 	    <item name="android:textSize">12sp</item>
 	</style>
 	
-    <style name="CustomAlertDialogStyle">
+    <style name="CustomAlertDialogStyle" parent="android:Theme.Holo.Dialog">
 	    <item name="android:bottomBright">@color/transparent</item>
 	    <item name="android:bottomDark">@color/transparent</item>
 	    <item name="android:bottomMedium">@color/transparent</item>
