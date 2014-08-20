@@ -34,6 +34,8 @@ import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.text.Html;
+import android.view.WindowManager;
+import android.view.WindowManager.LayoutParams;
 import android.widget.Toast;
 
 import com.google.bitcoin.core.ECKey;
@@ -126,7 +128,8 @@ public class ConfirmTxDialog {
 		}
 		//Create the dialog box
 		AlertDialog alertDialog = new AlertDialog.Builder(
-				activity, android.R.style.Theme_Holo_Dialog).create();
+				activity, R.style.CustomAlertDialogStyle).create();
+			alertDialog.getWindow().getAttributes().width = LayoutParams.WRAP_CONTENT;
 			//Set title
 			alertDialog.setTitle("Authorize Transaction");
 			//Set dialog message
