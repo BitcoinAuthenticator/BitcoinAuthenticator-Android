@@ -17,7 +17,9 @@ import android.util.Log;
 
 import com.google.bitcoin.core.Utils;
 import com.google.bitcoin.crypto.MnemonicCode;
+import com.google.bitcoin.crypto.MnemonicException.MnemonicChecksumException;
 import com.google.bitcoin.crypto.MnemonicException.MnemonicLengthException;
+import com.google.bitcoin.crypto.MnemonicException.MnemonicWordException;
 import com.google.bitcoin.wallet.DeterministicSeed;
 
 public class WalletCore {
@@ -56,14 +58,14 @@ public class WalletCore {
 		DeterministicSeed HDSeed = new DeterministicSeed(mnemonic, "", Utils.currentTimeSeconds());
 		
 		if(shouldSave){
-			saveSeed(c, MnemonicCode.toSeed(mnemonic, ""));
+			saveSeedBytes(c, MnemonicCode.toSeed(mnemonic, ""));
 			saveMnemonic(c, mnemonic.toArray(new String[0]));
 		}
 		
 		return HDSeed;
 	}
 	
-	private void saveSeed(Context c, byte[] seed){
+	private void saveSeedBytes(Context c, byte[] seed){
 		try
 		{
 		    //String FILENAME = "seed";
@@ -90,6 +92,10 @@ public class WalletCore {
 		catch (final Exception ex) { Log.e("JAVA_DEBUGGING", "Exception while creating save file!"); ex.printStackTrace(); }
 	}
 	
+	public List<String> getMnemonic(Context c) throws NoSeedOrMnemonicsFound{
+		String mnemonicStr = getMnemonicString(c);
+		return Arrays.asList(mnemonicStr.split(" "));
+	}
 	public String getMnemonicString(Context c) throws NoSeedOrMnemonicsFound{
 		FileInputStream fin = null;
 		try {
@@ -115,6 +121,14 @@ public class WalletCore {
 		}
 		
 		return temp;
+	}
+	
+	public DeterministicSeed getDeterministicSeed(Context c) throws Exception{
+		List<String> mnemonic = getMnemonic(c);
+		MnemonicCode ms = new MnemonicCode();
+		byte[] entropy = ms.toEntropy(mnemonic);
+		DeterministicSeed seed = new DeterministicSeed(entropy, "", Utils.currentTimeSeconds());
+		return seed;
 	}
 		
 }

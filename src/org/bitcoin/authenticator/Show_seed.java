@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
+import org.bitcoin.authenticator.backup.PaperWallet;
 import org.bitcoin.authenticator.core.WalletCore;
 import org.bitcoin.authenticator.core.exceptions.NoSeedOrMnemonicsFound;
 
@@ -24,6 +25,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -42,6 +44,8 @@ public class Show_seed extends Activity {
 		setContentView(R.layout.activity_show_seed);
 		setupConfirmationCheckbox();
 		setupContinueButton();
+		setupBackupButtons();
+		
 	    Boolean initialized = BAPreferences.ConfigPreference().getInitialized(false);//settings.getBoolean("initialized", false);
 	    if (initialized == false){
 	    	try {
@@ -68,29 +72,6 @@ public class Show_seed extends Activity {
 	/**Loads the mnemonic encoded seed from internal storage and displays it in a textview.
 	 * @throws NoSeedOrMnemonicsFound */
 	private void displaySeed() throws NoSeedOrMnemonicsFound{
-//		String FILENAME = "mnemonic";
-//		FileInputStream fin = null;
-//		try {
-//			fin = openFileInput(FILENAME);
-//		} catch (FileNotFoundException e) {
-//			e.printStackTrace();
-//		}
-//		int c;
-//		String temp="";
-//		try {
-//			while( (c = fin.read()) != -1){
-//			   temp = temp + Character.toString((char)c);
-//			}
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		//String temp contains all the data of the file.
-//		try {
-//			fin.close();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-		
 		WalletCore wc = new WalletCore();
 		
 		TextView tv = (TextView)findViewById(R.id.show_seed_MnemonicSeed);
@@ -104,55 +85,20 @@ public class Show_seed extends Activity {
 	 */
 	@SuppressLint("TrulyRandom")
 	private void generateSeed() throws NoSeedOrMnemonicsFound{
-//		//Generate 128 bits entropy.
-//        SecureRandom secureRandom = null;
-//		try {
-//			secureRandom = SecureRandom.getInstance("SHA1PRNG");
-//		} catch (NoSuchAlgorithmException e) {
-//			e.printStackTrace();
-//		}
-//		byte[] bytes = new byte[16];
-//		secureRandom.nextBytes(bytes);
-//		MnemonicCode ms = null;
-//		try {
-//			ms = new MnemonicCode();
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//		}
-//		List<String> mnemonic = null;
-//		try {
-//		mnemonic = ms.toMnemonic(bytes);
-//		} catch (MnemonicLengthException e) {
-//			e.printStackTrace();
-//		}
-//		byte[] seed = MnemonicCode.toSeed(mnemonic, "");	
-//		String[] strArray = mnemonic.toArray(new String[0]);
-//		String strMnemonic = Arrays.toString(strArray);
-//		strMnemonic = strMnemonic.replace("[", "");
-//		strMnemonic = strMnemonic.replace("]", "");
-//		strMnemonic = strMnemonic.replace(",", "");
-//		//Save to private internal storage.
-//		try
-//		{
-//		    String FILENAME = "mnemonic";
-//		    FileOutputStream outputStream = openFileOutput(FILENAME, Context.MODE_PRIVATE);
-//		    outputStream.write(strMnemonic.getBytes());
-//		    outputStream.close();
-//		}
-//		catch (final Exception ex) { Log.e("JAVA_DEBUGGING", "Exception while creating save file!"); ex.printStackTrace(); }
-//		try
-//		{
-//		    String FILENAME = "seed";
-//		    FileOutputStream outputStream = openFileOutput(FILENAME, Context.MODE_PRIVATE);
-//		    outputStream.write(seed);
-//		    outputStream.close();
-//		}
-//		catch (final Exception ex) { Log.e("JAVA_DEBUGGING", "Exception while creating save file!"); ex.printStackTrace(); }
-//	    //Display the seed.
 		
 		WalletCore wc = new WalletCore();
 		wc.generateSeed(getApplicationContext(), true);		
 		displaySeed();
+	}
+	
+	private void setupBackupButtons(){
+		Button btnQR = ( Button ) findViewById( R.id.show_seed_backup_QR );
+		btnQR.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				startActivity (new Intent(Show_seed.this, PaperWallet.class));
+			}
+		});
 	}
 	
 	/**These last two methods setup the activity components*/
