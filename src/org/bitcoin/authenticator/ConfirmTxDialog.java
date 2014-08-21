@@ -32,10 +32,14 @@ import android.app.NotificationManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.content.res.Resources;
+import android.graphics.Color;
 import android.os.AsyncTask;
 import android.text.Html;
+import android.view.View;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.bitcoin.core.ECKey;
@@ -123,18 +127,25 @@ public class ConfirmTxDialog {
 			String strOutput = multisigOutput.toString();
 			String addr = strOutput.substring(strOutput.indexOf("to ")+3, strOutput.indexOf(" script"));
 			String amount = strOutput.substring(9, strOutput.indexOf(" to"));
-			display = display + addr + " <font color='#009933'>" + amount + " BTC</font>";
+			display = display + addr + " <font color='#98d947'>" + amount + "</font>";
 			if (i<outputs.size()-1){display = display + "<br>";}
 		}
 		//Create the dialog box
 		AlertDialog alertDialog = new AlertDialog.Builder(
 				activity, R.style.CustomAlertDialogStyle).create();
-			alertDialog.getWindow().getAttributes().width = LayoutParams.WRAP_CONTENT;
+		
+			TextView tv = new TextView(activity);
+			tv.setText("Authorize Transaction");
+			tv.setTextSize(25);	
+			tv.setPadding(50, 50, 0, 50);
+			tv.setTextColor(Color.parseColor("#33b5e5"));
+			
 			//Set title
-			alertDialog.setTitle("Authorize Transaction");
+			alertDialog.setCustomTitle(tv);
+			
 			//Set dialog message
 			alertDialog.setMessage(Html.fromHtml("Bitcoin Authenticator has received a transaction<br><br>From: <br>" + name + "<br><br>To:<br>" + display));
-					
+			
 			alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Authorize", new DialogInterface.OnClickListener() {
 
 				public void onClick(DialogInterface dialog, int id) {
@@ -193,7 +204,7 @@ public class ConfirmTxDialog {
 				responseListener.onAuthorizedTx();
 			}
 		});
-		alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Reject", new DialogInterface.OnClickListener() {
+		alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Decline", new DialogInterface.OnClickListener() {
 
 			public void onClick(DialogInterface dialog, int id) {
 				JSONObject obj = new JSONObject();
@@ -216,7 +227,7 @@ public class ConfirmTxDialog {
 			}
 		});
 		
-		alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Save for later", new DialogInterface.OnClickListener() {
+		alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Save", new DialogInterface.OnClickListener() {
 
 		      public void onClick(DialogInterface dialog, int id) {
 				JSONObject obj = new JSONObject();
@@ -237,7 +248,6 @@ public class ConfirmTxDialog {
 				responseListener.onCancel();
 			}
 		});
-		
 		alertDialog.show();
 		
 	}
