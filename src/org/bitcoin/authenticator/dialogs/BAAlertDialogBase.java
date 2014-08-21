@@ -75,4 +75,8 @@ public class BAAlertDialogBase extends AlertDialog{
 	public interface ConfirmTxOnClickListener{
 		public void onClick(BAAlertDialogBase alert);
 	}
+	
+	public interface ReadyToScanQROnClickListener{
+		public void onClick(BAAlertDialogBase alert);
+	}
 }

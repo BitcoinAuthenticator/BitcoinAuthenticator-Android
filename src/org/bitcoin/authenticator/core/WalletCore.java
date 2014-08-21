@@ -65,7 +65,7 @@ public class WalletCore {
 		return HDSeed;
 	}
 	
-	private void saveSeedBytes(Context c, byte[] seed){
+	public void saveSeedBytes(Context c, byte[] seed){
 		try
 		{
 		    //String FILENAME = "seed";
@@ -76,7 +76,7 @@ public class WalletCore {
 		catch (final Exception ex) { Log.e("JAVA_DEBUGGING", "Exception while creating save file!"); ex.printStackTrace(); }
 	}
 	
-	private void saveMnemonic(Context c, String[] strArray){
+	public void saveMnemonic(Context c, String[] strArray){
 		String strMnemonic = Arrays.toString(strArray);
 		strMnemonic = strMnemonic.replace("[", "");
 		strMnemonic = strMnemonic.replace("]", "");
