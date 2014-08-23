@@ -1,5 +1,6 @@
 package org.bitcoin.authenticator.GcmUtil;
 
+import java.io.InputStream;
 import java.util.Date;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -20,6 +21,9 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
@@ -109,13 +113,16 @@ public class GcmIntentService extends IntentService {
 		 * Notify user if found a relevant pending request
 		 */
 		if(didFind){
+			InputStream is = this.getResources().openRawResource(R.drawable.authenticator_logo);
+	        Bitmap logo = BitmapFactory.decodeStream(is);  
 			mNotificationManager = (NotificationManager)
 	                this.getSystemService(Context.NOTIFICATION_SERVICE);
 			//
 			String customMsg = "Pending Notification Update";
 			NotificationCompat.Builder mBuilder =
 	                new NotificationCompat.Builder(this)
-	        .setSmallIcon(R.drawable.authenticator_logo)
+	        .setSmallIcon(R.drawable.ic_icon_action_bar)
+	        .setLargeIcon(logo)
 	        .setContentTitle("New Message To Sign")
 	        .setStyle(new NotificationCompat.BigTextStyle()
 	        .bigText(customMsg))
@@ -160,10 +167,14 @@ public class GcmIntentService extends IntentService {
   
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
                 intent, PendingIntent.FLAG_UPDATE_CURRENT);
-         
+        
+        InputStream is = this.getResources().openRawResource(R.drawable.authenticator_logo);
+        Bitmap logo = BitmapFactory.decodeStream(is);  
+        
         NotificationCompat.Builder mBuilder =
                 new NotificationCompat.Builder(this)
-        .setSmallIcon(R.drawable.authenticator_logo)
+        .setSmallIcon(R.drawable.ic_icon_action_bar)
+        .setLargeIcon(logo)
         .setContentTitle("New Message To Sign")
         .setStyle(new NotificationCompat.BigTextStyle()
         .bigText(customMsg))
