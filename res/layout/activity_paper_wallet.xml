@@ -53,6 +53,14 @@
 	       android:enabled="true"
 	       android:text="Save Paper Wallet"
 	       android:textColor="#FFFFFF" />
+	   	
+	   	<Button
+	       android:id="@+id/paper_wallet_btn_send_email"
+	       android:layout_width="wrap_content"
+	       android:layout_height="wrap_content"
+	       android:enabled="true"
+	       android:text="Send Paper Wallet via Email"
+	       android:textColor="#FFFFFF" />
      </LinearLayout>
    
 

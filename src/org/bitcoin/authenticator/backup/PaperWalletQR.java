@@ -90,6 +90,8 @@ public class PaperWalletQR{
 	}
 	
 	public class SeedQRData{
+		public byte[] entropy;
+		public List<String> mnemonic;
 		public DeterministicSeed seed;
 		public long creationTime;
 		
@@ -100,14 +102,21 @@ public class PaperWalletQR{
 			MnemonicCode ms = null;
 			try {
 	 			ms = new MnemonicCode();
-	 			byte[] entropy = HEX.decode(entropyHex);
-	 			List<String> mnemonic = ms.toMnemonic(entropy);
+	 			entropy = HEX.decode(entropyHex);
+	 			mnemonic = ms.toMnemonic(entropy);
 	 			seed = new DeterministicSeed(mnemonic, "", creationTime);
 	 			String mnemonicStr = Joiner.on(" ").join(seed.getMnemonicCode());
 	 		} catch (Exception e) {
 	 			e.printStackTrace();
 	 		}
-			
+		}
+		
+		public byte[] getSeedFromMnemonics(){
+			return MnemonicCode.toSeed(mnemonic, "");
+		}
+		
+		public String[] toMnemonicArray(){
+			return mnemonic.toArray(new String[0]);
 		}
 	}
 	

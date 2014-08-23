@@ -11,7 +11,7 @@
     tools:context="org.bitcoin.authenticator.Welcome"
     tools:ignore="MergeRootFrame" >
 
- <TextView
+ 	<TextView
         android:id="@+id/tvWelcome"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -42,13 +42,24 @@
          android:textColor="#FFFFFF" />
 
      <Button
-         android:id="@+id/btnPairWallet"
+         android:id="@+id/btnNewWallet"
          android:layout_width="fill_parent"
          android:layout_height="wrap_content"
          android:layout_alignLeft="@+id/btnHowItWorks"
          android:layout_below="@+id/btnHowItWorks"
          android:layout_marginTop="8dp"
-         android:text="@string/button_pair_wallet"
+         android:text="@string/button_new_wallet"
          android:textColor="#FFFFFF" />
+
+     <Button
+         android:id="@+id/btnRestoreWallet"
+         android:layout_width="wrap_content"
+         android:layout_height="wrap_content"
+         android:layout_alignLeft="@+id/btnNewWallet"
+         android:layout_alignRight="@+id/btnNewWallet"
+         android:layout_marginTop="8dp"
+         android:layout_below="@+id/btnNewWallet"
+         android:textColor="#FFFFFF"
+         android:text="@string/button_restore_wallet" />
 
  </RelativeLayout>

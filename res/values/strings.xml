@@ -12,7 +12,8 @@
     <string name="action_about">About</string>
     <string name="action_test">Test</string>
     <string name="button_see_how_it_works">See how it works</string>
-    <string name="button_pair_wallet">Pair wallet</string>
+    <string name="button_new_wallet">New wallet</string>
+    <string name="button_restore_wallet">Restore wallet</string>
     <string name="button_begin_setup">Begin setup</string>
     <string name="title_activity_how_it_works">How it works</string>
     <string name="hello_world">Hello world!</string>
