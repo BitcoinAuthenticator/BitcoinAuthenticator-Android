@@ -24,12 +24,15 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 /**
@@ -44,7 +47,6 @@ public class Show_seed extends Activity {
 		setContentView(R.layout.activity_show_seed);
 		setupConfirmationCheckbox();
 		setupContinueButton();
-		setupBackupButtons();
 		
 	    Boolean initialized = BAPreferences.ConfigPreference().getInitialized(false);//settings.getBoolean("initialized", false);
 	    if (initialized == false){
@@ -62,6 +64,32 @@ public class Show_seed extends Activity {
 				e.printStackTrace();
 			}
 	    }
+	}
+	
+	/**Inflates the menu and adds it to the action bar*/
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.show_seed_menu, menu);
+		return true;
+	}
+
+	/**This method handles the clicks in the option menu*/
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		int id = item.getItemId();
+		if (id == R.id.action_copy){
+			
+		}
+		if (id == R.id.action_save){
+			
+		}
+		if (id == R.id.action_qr){
+			startActivity (new Intent(Show_seed.this, PaperWallet.class));
+		}
+		if (id == R.id.action_sss){
+			
+		}
+		return super.onOptionsItemSelected(item);
 	}
 	
 	/** Prevents the back button from being pressed. Forces users to confirm they have saved their mnemonic seed.*/
@@ -91,15 +119,6 @@ public class Show_seed extends Activity {
 		displaySeed();
 	}
 	
-	private void setupBackupButtons(){
-		Button btnQR = ( Button ) findViewById( R.id.show_seed_backup_QR );
-		btnQR.setOnClickListener(new OnClickListener(){
-			@Override
-			public void onClick(View v) {
-				startActivity (new Intent(Show_seed.this, PaperWallet.class));
-			}
-		});
-	}
 	
 	/**These last two methods setup the activity components*/
 	private void setupConfirmationCheckbox(){

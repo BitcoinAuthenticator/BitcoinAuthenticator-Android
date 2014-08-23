@@ -45,6 +45,7 @@ import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -116,10 +117,25 @@ public class Wallet_list extends Activity {
                  long arg3) 
            {
         	   final int index = position;
-        	   ArrayList<BAPopupMenu.PopupButton> buttons = new ArrayList<BAPopupMenu.PopupButton>();
         	   int cnt = ((WalletItem)listAdapter.getItem(index)).getPendingGCMRequests().size();
         	   boolean showPending = cnt>0? true:false;
-        	   buttons.add(new BAPopupMenu.PopupButton("Show Pending Requests",showPending));
+        	   if (showPending){
+        		   Intent i = new Intent(Wallet_list.this, ActivityPendingRequests.class);
+        		   WalletItem wi = (WalletItem)lv1.getItemAtPosition(index);
+        		   i.putExtra("fingerprint", wi.getFingerprint());
+        		   i.putExtra("walletName", wi.getWalletLabel());
+        		   startActivity (i);
+        	   }
+           }
+        });
+        lv1.setOnItemLongClickListener(new OnItemLongClickListener()
+        {
+           @Override
+           public boolean onItemLongClick(AdapterView<?> adapter, View v, int position,
+                 long arg3) 
+           {
+        	   final int index = position;
+        	   ArrayList<BAPopupMenu.PopupButton> buttons = new ArrayList<BAPopupMenu.PopupButton>();
         	   buttons.add(new BAPopupMenu.PopupButton("Re-pair",true));
         	   buttons.add(new BAPopupMenu.PopupButton("Rename",true));
         	   buttons.add(new BAPopupMenu.PopupButton("Details",true));
@@ -133,6 +149,7 @@ public class Wallet_list extends Activity {
 						onPopupMenuItemSelected(item.getTitle().toString(),index);
 					}
                 }).show();
+				return true;
            }
         });
         if(launchNewGCMListener)
@@ -425,21 +442,22 @@ public class Wallet_list extends Activity {
     			convertView = layoutInflater.inflate(R.layout.list_item, null);
     			holder = new ViewHolder();
     			holder.walletIcon = (ImageView) convertView.findViewById(R.id.wallet_icon);
+    			holder.walletPendingRequestCntView = (TextView) convertView.findViewById(R.id.wallet_new_requests);
     			holder.walletLabelView = (TextView) convertView.findViewById(R.id.wallet_label);
     			holder.walletFingerprintView = (TextView) convertView.findViewById(R.id.wallet_fingerprint);
-    			holder.walletPendingRequestCntView = (TextView) convertView.findViewById(R.id.wallet_new_requests);
+    			
     			convertView.setTag(holder);
     		} else {
     			holder = (ViewHolder) convertView.getTag();
     		}
     		holder.walletIcon.setImageResource(((WalletItem) listData.get(position)).getIcon());
+    		int cnt = ((WalletItem) listData.get(position)).getPendingGCMRequests().size();
+    		if (cnt > 0) {holder.walletPendingRequestCntView.setText("  " + Integer.toString(cnt) + "  ");}
+    		else {holder.walletPendingRequestCntView.setText("");}
     		holder.walletLabelView.setText(((WalletItem) listData.get(position)).getWalletLabel());
     		holder.walletFingerprintView.setText(((WalletItem) listData.get(position)).getFingerprint());
-    		int cnt = ((WalletItem) listData.get(position)).getPendingGCMRequests().size();
-    		if( cnt > 0)
-    			holder.walletPendingRequestCntView.setText(Integer.toString(cnt) + " Pending Requests");
-    		else
-    			holder.walletPendingRequestCntView.setText("");
+    		
+    		
  
     		return convertView;
     	}

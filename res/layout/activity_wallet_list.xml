@@ -7,16 +7,17 @@
     <RelativeLayout android:layout_width="fill_parent"
 				    android:layout_height="wrap_content"
 				    android:orientation="horizontal"
-				    android:padding="10dp">
+				    android:padding="22dp"
+				    android:layout_marginBottom="15dp">
 
         <TextView
             android:id="@+id/lblWalletList"
-            android:layout_width="188dp"
+            android:layout_width="225dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="12dp"
             android:layout_marginTop="7dp"
             android:text="You will be asked to approve transactions from these wallets. Long press for menu."
-            android:textColor="@color/ui_text_color"
+            android:textColor="#e3e3e3"
             android:textSize="16sp" />
 
         <ImageView

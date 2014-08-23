@@ -35,97 +35,37 @@
         android:textColor="#FFFFFF"
         android:visibility="invisible" />
 
-    <requestFocus />
+    <requestFocus/>
 
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="18dp"
+        android:text="Enter a name for this wallet and scan the pairing QR code."
+        android:textColor="#e3e3e3"
+        android:textSize="20dp" />
+    
     <EditText
         android:id="@+id/txtLabel"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/imgNum1"
-        android:layout_below="@+id/imgNum1"
-        android:layout_marginTop="25dp"
-        android:ems="10"
-        android:hint="Wallet Name"
-        android:singleLine="true"
-        android:textColor="#FFFFFF"
-        android:textSize="30dp" />
-
-    <ImageView
-        android:id="@+id/imgNum2"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_below="@+id/txtLabel"
+        android:layout_alignLeft="@+id/textView1"
+        android:layout_below="@+id/textView1"
         android:layout_marginTop="28dp"
-        android:src="@drawable/ic_numbertwo" />
+        android:textSize="30dp"
+        android:background="#e3e3e3"
+        android:singleLine="true"
+        android:ems="10" />
 
-    <ImageView
-        android:id="@+id/imgNum1"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_alignParentTop="true"
-        android:src="@drawable/ic_numberone" />
-
-    <TextView
-        android:id="@+id/lblClickPairWallet"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/txtLabel"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="23dp"
-        android:layout_toRightOf="@+id/imgNum2"
-        android:text="Click &apos;Pair Wallet&apos; in your wallet settings"
-        android:textColor="#FFFFFF"
-        android:textSize="22dp" />
-
-    <TextView
-        android:id="@+id/lblLabelDescription"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="15dp"
-        android:layout_marginTop="4dp"
-        android:layout_toRightOf="@+id/imgNum1"
-        android:text="Enter a name for this wallet"
-        android:textColor="#FFFFFF"
-        android:textSize="22dp" />
-
-    <Button
+    <ImageButton
         android:id="@+id/btnScan"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/lblClickPairWallet"
-        android:layout_alignTop="@+id/tvResult"
-        android:text="Scan QR Code"
-        android:textColor="#FFFFFF" />
-
-    <ImageView
-        android:id="@+id/imgNum3"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_alignTop="@+id/tvResult"
-        android:layout_toLeftOf="@+id/lblClickPairWallet"
-        android:src="@drawable/ic_numberthree" />
-
-    <CheckBox
-        android:id="@+id/checkBox1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/editText1"
-        android:layout_alignLeft="@+id/imgNum3"
-        android:button="@drawable/cb_selector"
-        android:text="Force Account ID (For restoring)"
-        android:textColor="#FFFFFF" />
-
-    <EditText
-        android:id="@+id/editText1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/tvResult"
-        android:layout_alignLeft="@+id/imgNum3"
-        android:layout_marginBottom="22dp"
-        android:ems="10"
-        android:hint="AccountID"
-        android:textColor="#FFFFFF"
-        android:inputType="numberSigned" />
+        android:layout_alignBottom="@+id/tvStatus"
+        android:layout_centerHorizontal="true"
+        android:src="@drawable/qr" />
 
 </RelativeLayout>

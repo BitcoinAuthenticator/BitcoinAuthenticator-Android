@@ -9,7 +9,7 @@
 				    android:layout_height="wrap_content"
 				    android:orientation="horizontal">
 			<!-- Image -->
-			<LinearLayout android:layout_width="fill_parent"
+			<RelativeLayout android:layout_width="fill_parent"
 				    android:layout_height="wrap_content"
 				    android:orientation="vertical"
 				    android:layout_weight="70"
@@ -21,8 +21,19 @@
 					      android:layout_width="90dip"
 					      android:layout_height="90dip"
 					      android:paddingLeft="-5dip" />
+			    	
+			    	<TextView
+			      	      android:id="@+id/wallet_new_requests"
+			              android:layout_width="wrap_content"
+			      		  android:layout_height="wrap_content"
+			      		  android:text="10"
+			     		  android:layout_marginLeft="63dip"
+			     		  android:layout_marginTop="3dip"
+			     	      android:textColor="#FFFFFF"
+			     	      android:background="@drawable/pendingrequest_rounded_corners"
+			     	      android:textSize="14sp" />	
 			    
-		    </LinearLayout>		    
+		    </RelativeLayout>		    
 	    
 			<!-- Text -->
 			<LinearLayout android:layout_width="fill_parent"
@@ -52,14 +63,7 @@
 				    android:textColor="@color/ui_listview_color"
 				    android:textSize="20dip" />
 			    
-			    <TextView
-			        android:id="@+id/wallet_new_requests"
-			        android:layout_width="wrap_content"
-			        android:layout_height="wrap_content"
-			        android:text="10"
-			        android:layout_marginLeft="1dip"
-			        android:textColor="@color/ui_listview_color"
-			        android:textSize="14sp" />	
+			   
 			    
 			</LinearLayout>
 			

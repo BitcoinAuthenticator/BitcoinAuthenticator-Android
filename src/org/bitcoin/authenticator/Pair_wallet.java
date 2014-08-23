@@ -36,6 +36,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 /**
@@ -58,7 +59,7 @@ public class Pair_wallet extends Activity {
 		setContentView(R.layout.activity_pair_wallet);
 		setupScanButton();
 		
-		chkForceAccountID = (CheckBox) findViewById(R.id.checkBox1);
+		/*chkForceAccountID = (CheckBox) findViewById(R.id.checkBox1);
 		chkForceAccountID.setOnCheckedChangeListener(new OnCheckedChangeListener(){
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView,
@@ -71,12 +72,12 @@ public class Pair_wallet extends Activity {
 		if(!chkForceAccountID.isChecked()){
 			accountID.setEnabled(false);
 			accountID.setAlpha(0.3f);
-		}
+		}*/
 	}
 	
 	/**Sets up the Scan button component*/
 	private void setupScanButton(){
-		Button scanBtn = (Button) findViewById(R.id.btnScan);
+		ImageButton scanBtn = (ImageButton) findViewById(R.id.btnScan);
 		txtID = (EditText) findViewById(R.id.txtLabel);
 		
 		//Check and make sure the user entered a name, if not display a warning dialog.
@@ -114,7 +115,7 @@ public class Pair_wallet extends Activity {
 				/**
 				 * check force account id
 				 */
-				if(chkForceAccountID.isChecked()){
+				/*if(chkForceAccountID.isChecked()){
 					try{
 						Integer.parseInt(accountID.getText().toString());
 					}
@@ -129,7 +130,7 @@ public class Pair_wallet extends Activity {
 						showError("Wallet ID is used");
 						return false;
 					}
-				}
+				}*/
 				
 				return true;
 			}
@@ -190,10 +191,11 @@ public class Pair_wallet extends Activity {
 			int networkType = Integer.parseInt(QRInput.substring(QRInput.indexOf("&NetworkType=")+13, QRInput.length()));
 			//Increment the counter for the number of paired wallet in shared preferences
 		    int num ;
-		    if(!chkForceAccountID.isChecked())
+		    /*if(!chkForceAccountID.isChecked())
 		    	num = (BAPreferences.ConfigPreference().getWalletCount(0)) + 1;
 		    else
-		    	num = Integer.parseInt(accountID.getText().toString());
+		    	num = Integer.parseInt(accountID.getText().toString());*/
+		    num = (BAPreferences.ConfigPreference().getWalletCount(0)) + 1;
 		    String fingerprint = getPairingIDDigest(num, GcmUtilGlobal.gcmRegistrationToken);
 			//Start the pairing protocol
 			connectTask conx = new connectTask(AESKey, IPAddress, LocalIP, walletType, num, networkType,fingerprint);
