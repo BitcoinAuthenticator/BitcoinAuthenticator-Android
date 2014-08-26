@@ -60,7 +60,7 @@
 				    android:layout_marginLeft="1dip"
 				    android:layout_centerHorizontal="true"
 				    android:text=""
-				    android:textColor="@color/ui_listview_color"
+				    android:textColor="#474850"
 				    android:textSize="20dip" />
 			    
 			   

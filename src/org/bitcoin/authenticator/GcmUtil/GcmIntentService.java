@@ -123,7 +123,7 @@ public class GcmIntentService extends IntentService {
 	                new NotificationCompat.Builder(this)
 	        .setSmallIcon(R.drawable.ic_icon_action_bar)
 	        .setLargeIcon(logo)
-	        .setContentTitle("Unsigned Transactions")
+	        .setContentTitle("Unsigned Transactionsi")
 	        .setStyle(new NotificationCompat.BigTextStyle()
 	        .bigText(customMsg))
 	        .setContentText(customMsg)
