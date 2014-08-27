@@ -130,7 +130,13 @@ public class Re_pair_wallet extends Activity{
         	}
             SecretKey secretkey = new SecretKeySpec(Utils.hexStringToByteArray(AESKey), "AES");
             byte[] regID = (GcmUtilGlobal.gcmRegistrationToken).getBytes();
-			try {pair2wallet.run(seed, secretkey, Pair_wallet.getPairingIDDigest(walletNum, GcmUtilGlobal.gcmRegistrationToken), regID, walletNum);} 
+			try {
+				pair2wallet.run(seed, 
+						secretkey, 
+						Pair_wallet.getPairingIDDigest(walletNum,GcmUtilGlobal.gcmRegistrationToken), 
+						regID, walletNum);
+				pair2wallet.closeConnection();
+			} 
 			catch (InvalidKeyException e) {e.printStackTrace();} 
 			catch (NoSuchAlgorithmException e) {e.printStackTrace();} 
 			catch (IOException e) {e.printStackTrace();}

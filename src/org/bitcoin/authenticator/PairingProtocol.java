@@ -87,7 +87,13 @@ public class PairingProtocol {
     	catch (IOException e) {e.printStackTrace();}
     	try {out.write(cipherBytes);} 
     	catch (IOException e) {e.printStackTrace();}
-    	conn.close();
+    	closeConnection();
 	  }
 	  
+    /**
+     * Try and close the connection
+     */
+    public void  closeConnection(){
+    	try { conn.close(); } catch (IOException e) { }
+    }
 }

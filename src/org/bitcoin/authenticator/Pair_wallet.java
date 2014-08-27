@@ -57,22 +57,7 @@ public class Pair_wallet extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_pair_wallet);
-		setupScanButton();
-		
-		/*chkForceAccountID = (CheckBox) findViewById(R.id.checkBox1);
-		chkForceAccountID.setOnCheckedChangeListener(new OnCheckedChangeListener(){
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView,
-					boolean isChecked) {
-				accountID.setEnabled(isChecked);
-				accountID.setAlpha(isChecked? 1.0f:0.3f);
-			}
-		});
-		accountID = (EditText) findViewById(R.id.editText1);
-		if(!chkForceAccountID.isChecked()){
-			accountID.setEnabled(false);
-			accountID.setAlpha(0.3f);
-		}*/
+		setupScanButton();	
 	}
 	
 	/**Sets up the Scan button component*/
@@ -272,6 +257,7 @@ public class Pair_wallet extends Activity {
 			try {
 				pair2wallet.run(seed, secretkey, getPairingIDDigest(num, GcmUtilGlobal.gcmRegistrationToken), regID, num);
 				completePairing(AESKey, IPAddress, LocalIP, walletType, num, networkType,fingerprint);
+				pair2wallet.closeConnection();
 			} 
 			catch (InvalidKeyException e) {e.printStackTrace();} 
 			catch (NoSuchAlgorithmException e) {e.printStackTrace();} 
