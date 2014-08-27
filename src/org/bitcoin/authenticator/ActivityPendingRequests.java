@@ -238,11 +238,12 @@ public class ActivityPendingRequests extends Activity {
     			} 
     			catch (IOException e) {e.printStackTrace();}
     			
-    			try {tx = msg.receiveTX(sharedsecret);} 
+    			try {
+    				tx = msg.receiveTX(sharedsecret);
+    			} 
     			catch (Exception e) {e.printStackTrace(); }
-    			
-    			try {conn.close();
-				} catch (IOException e) {e.printStackTrace();}
+
+
             }
 			return null;
 		}

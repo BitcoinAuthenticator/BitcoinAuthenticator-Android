@@ -22,13 +22,15 @@ import org.json.simple.JSONObject;
  */
 public class Message {
 	
-	static DataInputStream in;
-	static DataOutputStream out ;
+	private Connection conn;
+	private DataInputStream in;
+	private DataOutputStream out ;
 	
 	/**Constructor takes in active Connection object to the wallet*/
 	public Message(Connection conn) throws IOException{
-		in = conn.getInputStream();
-		out = conn.getOutputStream();
+		this.conn = conn;
+		in = this.conn.getInputStream();
+		out = this.conn.getOutputStream();
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -103,4 +105,7 @@ public class Message {
 		out.write(cipherBytes);
     }
 	
+	public void closeConnection() throws IOException{
+		this.conn.close();
+	}
 }
