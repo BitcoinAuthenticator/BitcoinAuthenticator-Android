@@ -1,11 +1,14 @@
 package org.bitcoin.authenticator;
 
 import java.io.IOException;
+import java.net.Socket;
 import java.util.ArrayList;
 
 import javax.crypto.SecretKey;
 
 import org.bitcoin.authenticator.ConfirmTxDialog.TxDialogResponse;
+import org.bitcoin.authenticator.Connection.CannotConnectToWalletException;
+import org.bitcoin.authenticator.Message.CouldNotSendRequestIDException;
 import org.bitcoin.authenticator.Wallet_list.ConnectToWallets;
 import org.bitcoin.authenticator.Wallet_list.WalletItem;
 import org.bitcoin.authenticator.Wallet_list.CustomListAdapter.ViewHolder;
@@ -14,6 +17,7 @@ import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
 import org.bitcoin.authenticator.Events.GlobalEvents;
 import org.bitcoin.authenticator.GcmUtil.ProcessGCMRequest;
 import org.bitcoin.authenticator.GcmUtil.RequestType;
+import org.bitcoin.authenticator.Message.CouldNotGetTransactionException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -21,6 +25,7 @@ import org.json.JSONObject;
 import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -48,6 +53,8 @@ public class ActivityPendingRequests extends Activity {
 	TextView walletName;
 	public Adapter adapter;
 	public GlobalEvents singletonEvents;
+	
+	private ProgressDialog mProgressDialog;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -93,6 +100,15 @@ public class ActivityPendingRequests extends Activity {
 		 * Events
 		 */
 		this.singletonEvents = GlobalEvents.SharedGlobal();
+		
+		/**
+		 * Waiting indicator
+		 */
+		mProgressDialog = new ProgressDialog(this, R.style.CustomDialogSpinner);
+		mProgressDialog.setIndeterminate(false);
+		mProgressDialog.setCancelable(false);
+		mProgressDialog.setCanceledOnTouchOutside(false);
+        mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 	}
 
 	private ArrayList<dataClass> getData(ArrayList<JSONObject> jsonobj) throws JSONException{
@@ -182,7 +198,7 @@ public class ActivityPendingRequests extends Activity {
         //Re-pairs with the wallet
     public void onPopupMenuItemSelected(String title, final int index){
         if(title == "Open"){
-        	new ConnectToWallet(index).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR); 
+        	new ConnectToWallet(index, getApplicationContext()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR); 
         }
         else if(title == "Delete"){
         	dataClass data = (dataClass)lv1.getItemAtPosition(index);
@@ -195,8 +211,13 @@ public class ActivityPendingRequests extends Activity {
     }
     
     public class ConnectToWallet extends AsyncTask<String,String,Connection> {
-    	public ConnectToWallet(int index){
+    	Context context;
+    	
+    	private Socket persistentSocketForTheProcess;
+    	
+    	public ConnectToWallet(int index, Context context){
     		this.index = index;
+    		this.context = context;
     	}
     	int index;
     	TxData tx;
@@ -205,6 +226,15 @@ public class ActivityPendingRequests extends Activity {
     	dataClass data;
 		@Override
 		protected Connection doInBackground(String... params) {
+			//Display a spinner while connecting
+			runOnUiThread(new Runnable() {
+				public void run() {
+		            mProgressDialog.show();
+				}
+			});
+			
+			String[] ips = new String[] { ret.IPAddress, ret.LocalIP};
+
 			//SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
             Boolean GCM = BAPreferences.ConfigPreference().getGCM(true);//settings.getBoolean("GCM", true);
             data = (dataClass)lv1.getItemAtPosition(index);
@@ -213,35 +243,32 @@ public class ActivityPendingRequests extends Activity {
         		String reqString = BAPreferences.ConfigPreference().getPendingRequestAsString(data.getReqID());//settings2.getString(data.getReqID(), null);
         		ProcessGCMRequest processor = new ProcessGCMRequest(getApplicationContext());
         		ret = processor.ProcessRequest(reqString);
-        		//Open a new connection
-            	try {conn = new Connection(ret.IPAddress);} 
-            	catch (IOException e1) {
-            		try {conn = new Connection(ret.LocalIP);} 
-            		catch (IOException e2) {
-            			runOnUiThread(new Runnable() {
-            				public void run() {
-            					Toast.makeText(getApplicationContext(), "Unable to connect to wallet", Toast.LENGTH_LONG).show();
-            				}
-            			});
-            		}
-            	}
-            	
             	
             	//Receive Tx
             	SecretKey sharedsecret = Utils.getAESSecret(getApplicationContext(), ret.walletnum); 
             	//Create a new message object for receiving the transaction.
             	Message msg = null;
+            	persistentSocketForTheProcess = null;
     			try {
-    				msg = new Message(conn);
+    				msg = new Message(ips);
     				//send request id
-    				msg.sentRequestID(data.reqID);
+    				persistentSocketForTheProcess = msg.sentRequestID(data.reqID);
     			} 
-    			catch (IOException e) {e.printStackTrace();}
+    			catch (CouldNotSendRequestIDException e) {
+					e.printStackTrace();
+				}
     			
+    			if(persistentSocketForTheProcess != null)
     			try {
-    				tx = msg.receiveTX(sharedsecret);
+    				tx = msg.receiveTX(sharedsecret, persistentSocketForTheProcess);
+    				if(tx == null) // couldn't get tx
+    					runOnUiThread(new Runnable() {
+            				public void run() {
+            					Toast.makeText(getApplicationContext(), "Failed to get transaction", Toast.LENGTH_LONG).show();
+            				}
+            			});
     			} 
-    			catch (Exception e) {e.printStackTrace(); }
+    			catch (CouldNotGetTransactionException e) {e.printStackTrace(); }
 
 
             }
@@ -250,9 +277,12 @@ public class ActivityPendingRequests extends Activity {
     	
 		/**On finish show the transaction in a dialog box*/
         protected void onPostExecute(Connection result) {
+        	mProgressDialog.hide();
+        	
         	// Show Tx dialog
+        	if(tx != null)
 			try {
-				new ConfirmTxDialog(conn, 
+				new ConfirmTxDialog(persistentSocketForTheProcess,
 						tx, 
 						ActivityPendingRequests.this, 
 						ret.walletnum, 
@@ -276,6 +306,15 @@ public class ActivityPendingRequests extends Activity {
 								@Override
 								public void onCancel() {
 									// do nothing
+								}
+
+								@Override
+								public void OnError() {
+									runOnUiThread(new Runnable() {
+			            				public void run() {
+			            					Toast.makeText(getApplicationContext(), "Failed !!", Toast.LENGTH_LONG).show();
+			            				}
+			            			});
 								}
 							});
 			} catch (InterruptedException e) { e.printStackTrace(); }

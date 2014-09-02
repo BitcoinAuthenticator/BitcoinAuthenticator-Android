@@ -11,6 +11,7 @@ import java.util.Map;
 
 import javax.crypto.*;
 
+import org.bitcoin.authenticator.Connection.CannotConnectToWalletException;
 import org.bitcoin.authenticator.GcmUtil.GcmUtilGlobal;
 import org.json.simple.JSONValue;
 
@@ -25,75 +26,74 @@ import com.google.bitcoin.crypto.HDKeyDerivation;
  */
 public class PairingProtocol {
  
-    static DataOutputStream out;
-    static DataInputStream in;
-    public static Connection conn;
+    private String[] ips;
     
     /**	Constructor creates a new connection object to connect to the wallet. */
-    public PairingProtocol(String IP) throws IOException {
-    	conn = new Connection(IP);
-    	out = conn.getOutputStream();
-    	in = conn.getInputStream();
+    public PairingProtocol(String[] ips) {
+    	this.ips = ips;
     }
     
     /**	
      * Takes in Authenticator seed and uses it to derive the master public key and chaincode.
      * Uses the AES key to calculate the message authentication code for the payload and concatenates 
      * it with the master public key and chaincode. The payload is encrypted and sent over to the wallet.
+     * @throws CouldNotPairToWalletException 
      */
     @SuppressWarnings({ "unchecked", "rawtypes", "static-access" })
-	public void run(byte[] seed, SecretKey AESKey, String pairingID, byte[] regID, int num) throws IOException, NoSuchAlgorithmException, InvalidKeyException  {
-    	//Derive the key and chaincode from the seed.
-    	HDKeyDerivation HDKey = null;
-    	DeterministicKey masterkey = HDKey.createMasterPrivateKey(seed);
-    	DeterministicKey childkey = HDKey.deriveChildKey(masterkey,num);
-    	byte[] chaincode = childkey.getChainCode(); // 32 bytes
-    	byte[] mpubkey = childkey.getPubKey(); // 32 bytes
-    	//Format data into a JSON object
-    	Map obj=new LinkedHashMap();
-    	obj.put("version", 1);
-		obj.put("mpubkey", Utils.bytesToHex(mpubkey));
-		obj.put("chaincode", Utils.bytesToHex(chaincode));
-		obj.put("pairID", pairingID);
-		obj.put("gcmID", new String (regID));
-		StringWriter jsonOut = new StringWriter();
-		try {JSONValue.writeJSONString(obj, jsonOut);} 
-		catch (IOException e1) {e1.printStackTrace();}
-		String jsonText = jsonOut.toString();
-		byte[] jsonBytes = jsonText.getBytes();
-    	//Calculate the HMAC
-    	Mac mac = Mac.getInstance("HmacSHA256");
-    	mac.init(AESKey);
-    	byte[] macbytes = mac.doFinal(jsonBytes);
-    	//Concatenate with the JSON object
-    	ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
-    	outputStream.write(jsonBytes);
-    	outputStream.write(macbytes);
-    	byte payload[] = outputStream.toByteArray();
-    	Log.v("ASDF","payload length byte[] - " + payload.length);
-    	//Encrypt the payload
-    	Cipher cipher = null;
-    	try {cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");} 
-    	catch (NoSuchAlgorithmException e) {e.printStackTrace();} 
-    	catch (NoSuchPaddingException e) {e.printStackTrace();}
-    	try {cipher.init(Cipher.ENCRYPT_MODE, AESKey);} 
-    	catch (InvalidKeyException e) {e.printStackTrace();}
-    	byte[] cipherBytes = null;
-    	try {cipherBytes = cipher.doFinal(payload);} 
-    	catch (IllegalBlockSizeException e) {e.printStackTrace();} 
-    	catch (BadPaddingException e) {e.printStackTrace();}
-    	//Send the payload over to the wallet
-    	try {out.writeInt(cipherBytes.length);} 
-    	catch (IOException e) {e.printStackTrace();}
-    	try {out.write(cipherBytes);} 
-    	catch (IOException e) {e.printStackTrace();}
-    	closeConnection();
+	public void run(byte[] seed, SecretKey AESKey, String pairingID, byte[] regID, int num) throws CouldNotPairToWalletException {
+    	try {
+    		//Derive the key and chaincode from the seed.
+        	HDKeyDerivation HDKey = null;
+        	DeterministicKey masterkey = HDKey.createMasterPrivateKey(seed);
+        	DeterministicKey childkey = HDKey.deriveChildKey(masterkey,num);
+        	byte[] chaincode = childkey.getChainCode(); // 32 bytes
+        	byte[] mpubkey = childkey.getPubKey(); // 32 bytes
+        	//Format data into a JSON object
+        	Map obj=new LinkedHashMap();
+        	obj.put("version", 1);
+    		obj.put("mpubkey", Utils.bytesToHex(mpubkey));
+    		obj.put("chaincode", Utils.bytesToHex(chaincode));
+    		obj.put("pairID", pairingID);
+    		obj.put("gcmID", new String (regID));
+    		StringWriter jsonOut = new StringWriter();
+    		try {JSONValue.writeJSONString(obj, jsonOut);} 
+    		catch (IOException e1) {e1.printStackTrace();}
+    		String jsonText = jsonOut.toString();
+    		byte[] jsonBytes = jsonText.getBytes();
+        	//Calculate the HMAC
+        	Mac mac = Mac.getInstance("HmacSHA256");
+        	mac.init(AESKey);
+        	byte[] macbytes = mac.doFinal(jsonBytes);
+        	//Concatenate with the JSON object
+        	ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
+        	outputStream.write(jsonBytes);
+        	outputStream.write(macbytes);
+        	byte payload[] = outputStream.toByteArray();
+        	Log.v("ASDF","payload length byte[] - " + payload.length);
+        	//Encrypt the payload
+        	Cipher cipher = null;
+        	try {cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");} 
+        	catch (NoSuchAlgorithmException e) {e.printStackTrace();} 
+        	catch (NoSuchPaddingException e) {e.printStackTrace();}
+        	try {cipher.init(Cipher.ENCRYPT_MODE, AESKey);} 
+        	catch (InvalidKeyException e) {e.printStackTrace();}
+        	byte[] cipherBytes = null;
+        	try {cipherBytes = cipher.doFinal(payload);} 
+        	catch (IllegalBlockSizeException e) {e.printStackTrace();} 
+        	catch (BadPaddingException e) {e.printStackTrace();}
+        	//Send the payload over to the wallet
+        	Connection.getInstance().writeAndClose(ips, cipherBytes);
+    	}
+    	catch (Exception e) {
+    		throw new CouldNotPairToWalletException("Could not pair to wallet");
+    	}
+    	
 	  }
-	  
-    /**
-     * Try and close the connection
-     */
-    public void  closeConnection(){
-    	try { conn.close(); } catch (IOException e) { }
-    }
+    
+    static public class CouldNotPairToWalletException extends Exception {
+		public CouldNotPairToWalletException(String str) {
+			super(str);
+		}
+	}
+	
 }

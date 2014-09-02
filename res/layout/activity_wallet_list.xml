@@ -7,7 +7,7 @@
     <RelativeLayout android:layout_width="fill_parent"
 				    android:layout_height="wrap_content"
 				    android:orientation="horizontal"
-				    android:padding="22dp"
+				    android:padding="15dp"
 				    android:layout_marginBottom="15dp">
 
         <TextView
@@ -24,7 +24,6 @@
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="17dp"
             android:layout_toRightOf="@+id/lblWalletList"
             android:background="@drawable/ic_wallet_white" />
 				        

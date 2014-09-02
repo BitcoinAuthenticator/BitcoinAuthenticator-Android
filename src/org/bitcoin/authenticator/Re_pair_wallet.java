@@ -13,6 +13,8 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
+import org.bitcoin.authenticator.Connection.CannotConnectToWalletException;
+import org.bitcoin.authenticator.PairingProtocol.CouldNotPairToWalletException;
 import org.bitcoin.authenticator.GcmUtil.GcmUtilGlobal;
 
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -115,31 +117,24 @@ public class Re_pair_wallet extends Activity{
     			try {inputStream.close();} 
     			catch (IOException e) {e.printStackTrace();}
     		}
-    		//Try to connect to wallet using either IP
-    		PairingProtocol pair2wallet = null;
-    		try {pair2wallet = new PairingProtocol(IPAddress);}
-        	catch (IOException e1) {
-        		try {pair2wallet = new PairingProtocol(LocalIP);} 
-            	catch (IOException e2) {
-            		runOnUiThread(new Runnable() {
-            			public void run() {
-    						  Toast.makeText(getApplicationContext(), "Unable to connect to wallet", Toast.LENGTH_LONG).show();
-    					}
-    				});
-            	}
-        	}
+
+    		PairingProtocol pair2wallet = new PairingProtocol(new String[]{ IPAddress, LocalIP  } );
+
             SecretKey secretkey = new SecretKeySpec(Utils.hexStringToByteArray(AESKey), "AES");
             byte[] regID = (GcmUtilGlobal.gcmRegistrationToken).getBytes();
-			try {
+            try {
 				pair2wallet.run(seed, 
 						secretkey, 
 						Pair_wallet.getPairingIDDigest(walletNum,GcmUtilGlobal.gcmRegistrationToken), 
 						regID, walletNum);
-				pair2wallet.closeConnection();
-			} 
-			catch (InvalidKeyException e) {e.printStackTrace();} 
-			catch (NoSuchAlgorithmException e) {e.printStackTrace();} 
-			catch (IOException e) {e.printStackTrace();}
+			} catch (CouldNotPairToWalletException e) {
+				e.printStackTrace();
+				runOnUiThread(new Runnable() {
+        			public void run() {
+						  Toast.makeText(getApplicationContext(), "Unable to pair", Toast.LENGTH_LONG).show();
+					}
+				});
+			}
             return null;
         }
         @Override

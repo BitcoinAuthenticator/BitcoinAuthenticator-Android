@@ -40,8 +40,8 @@ public class PaperWallet extends Activity {
 		mainLayout = (LinearLayout) findViewById(R.id.paper_wallet_main_layout); mainLayout.setVisibility(View.INVISIBLE);
 		iv = (ImageView) findViewById(R.id.paper_wallet_iv);	
 		
-		new GenerateFullQR(getApplicationContext()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR); 
-		new DisplaySeedQR().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR); 
+		generateFullQR(getApplicationContext()); 
+		displaySeedQR(); 
 		
 		Button save = (Button) findViewById(R.id.paper_wallet_btn_save_to_gallery);	
 		save.setOnClickListener(new OnClickListener(){
@@ -106,62 +106,52 @@ public class PaperWallet extends Activity {
 	}
 	
 	Bitmap fullQR = null;
-	class GenerateFullQR extends AsyncTask<Void, Integer, String>
-	{
-		Context context;
-		public GenerateFullQR(Context c){
-			context = c;
-		}
-		
-		@Override
-		protected String doInBackground(Void... params) {
-			PaperWalletQR paperwalletQR = new PaperWalletQR(context);
-			WalletCore wc = new WalletCore();
-			
-			try {
-				String mnemonicStr = wc.getMnemonicString(context);
-				DeterministicSeed seed = wc.getDeterministicSeed(context);
+	private void generateFullQR(final Context c) {
+		new Thread() {
+			@Override
+			public void run() {
+				PaperWalletQR paperwalletQR = new PaperWalletQR(c);
+				WalletCore wc = new WalletCore();
 				
-				fullQR = paperwalletQR.generatePaperWallet(mnemonicStr, seed, seed.getCreationTimeSeconds());
-			} catch (Exception e) {
-				e.printStackTrace();
+				try {
+					String mnemonicStr = wc.getMnemonicString(c);
+					DeterministicSeed seed = wc.getDeterministicSeed(c);
+					
+					fullQR = paperwalletQR.generatePaperWallet(mnemonicStr, seed, seed.getCreationTimeSeconds());
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
-			
-			return null;
-		}
-		
+		}.start();
 	}
 	
-	class DisplaySeedQR extends AsyncTask<Void, Integer, String>
-	{
+	private void displaySeedQR() {
+		new Thread() {
+			@Override
+			public void run() {
+				try {
+					PaperWalletQR paperwalletQR = new PaperWalletQR(getApplicationContext());
+					WalletCore wc = new WalletCore();
+					DeterministicSeed seed;
+					seed = wc.getDeterministicSeed(getApplicationContext());
+					final Bitmap qr = paperwalletQR.createQRSeedImage(seed, seed.getCreationTimeSeconds());
+					
 
-		@Override
-		protected String doInBackground(Void... params) {
-				
-			try {
-				PaperWalletQR paperwalletQR = new PaperWalletQR(getApplicationContext());
-				WalletCore wc = new WalletCore();
-				DeterministicSeed seed;
-				seed = wc.getDeterministicSeed(getApplicationContext());
-				Bitmap qr = paperwalletQR.createQRSeedImage(seed, seed.getCreationTimeSeconds());
-				updateUI(qr);
-				
-			} catch (Exception e) {
-				e.printStackTrace();
+					// update UI
+					PaperWallet.this.runOnUiThread(new Runnable() {
+				        @Override
+				        public void run() {
+				        	iv.setImageBitmap(qr);
+				        	mainLayout.setVisibility(View.VISIBLE);
+				        	waitingLayout.setVisibility(View.INVISIBLE);
+				        }
+					});
+					
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
-			return null;
-		}
-		
-		private void updateUI(final Bitmap qr){
-			PaperWallet.this.runOnUiThread(new Runnable() {
-		        @Override
-		        public void run() {
-		        	iv.setImageBitmap(qr);
-		        	mainLayout.setVisibility(View.VISIBLE);
-		        	waitingLayout.setVisibility(View.INVISIBLE);
-		        }
-			});
-		}
-		
+		}.start();
 	}
+	
 }

@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.net.Socket;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import org.bitcoin.authenticator.GcmUtil.GcmIntentService;
 import org.bitcoin.authenticator.dialogs.BAAlertDialogBase;
 import org.bitcoin.authenticator.dialogs.BAAlertDialogBase.ConfirmTxOnClickListener;
 import org.bitcoin.authenticator.dialogs.BAConfirmTxDialog;
+import org.bitcoin.authenticator.Message.CouldNotSendEncryptedException;
 import org.bitcoin.authenticator.Wallet_list.ConnectToWallets;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -62,7 +64,17 @@ import com.google.common.collect.ImmutableList;
  */
 public class ConfirmTxDialog {
 
-	public ConfirmTxDialog(final Connection conn, 
+	/**
+	 * Will close socket after process
+	 * 
+	 * @param s
+	 * @param tx
+	 * @param activity
+	 * @param walletnum
+	 * @param responseListener
+	 * @throws InterruptedException
+	 */
+	public ConfirmTxDialog(final Socket s, 
 			final TxData tx, 
 			Activity activity, 
 			final int walletnum,
@@ -71,6 +83,13 @@ public class ConfirmTxDialog {
 		//Load walletID from Shared Preferences
 		//SharedPreferences data = activity.getSharedPreferences("WalletData"+ walletnum, 0);
 		String name = BAPreferences.WalletPreference().getID(Integer.toString(walletnum),"Null");//data.getString("ID", "null");
+		
+		//load wallet's ips
+		final String[] ips = new String[] 
+				{ BAPreferences.WalletPreference().getExternalIP(Integer.toString(walletnum),"Null"),
+				  BAPreferences.WalletPreference().getLocalIP(Integer.toString(walletnum),"Null")};
+		
+		
 		//Load AES Key from internal storage
     	byte [] key = null;
 		String FILENAME = "AESKey" + walletnum;
@@ -149,103 +168,92 @@ public class ConfirmTxDialog {
 			alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, "Authorize", new DialogInterface.OnClickListener() {
 
 				public void onClick(DialogInterface dialog, int id) {
-				//Prep the JSON object we will fill with the signatures.
-				Map obj=new LinkedHashMap();
-				obj.put("version", 1);
-				obj.put("sigs_n", tx.numInputs);
-				JSONArray siglist = new JSONArray();
-				//Loop creating a signature for each input
-				for (int j=0; j<tx.numInputs; j++){
-					//Derive the private key needed to sign the transaction
-					ArrayList<Integer> index = tx.getIndexes();
-					ArrayList<String> walpubkeys = tx.getPublicKeys();
-					HDKeyDerivation HDKey = null;
-					DeterministicKey masterKey = HDKey.createMasterPrivateKey(authseed);
-					DeterministicKey walletMasterKey = HDKey.deriveChildKey(masterKey, walletnum);
-					DeterministicKey childKey = HDKey.deriveChildKey(walletMasterKey,index.get(j));
-					byte[] privKey = childKey.getPrivKeyBytes();
-					byte[] pubKey = childKey.getPubKey();
-					ECKey authenticatorKey = new ECKey(privKey, pubKey);
-					ECKey walletPubKey = new ECKey(null, Utils.hexStringToByteArray(walpubkeys.get(j))); 							
-					List<ECKey> keys = ImmutableList.of(authenticatorKey, walletPubKey);
-					//Create the multisig script we will be using for signing. 
-					Script scriptpubkey = ScriptBuilder.createMultiSigOutputScript(2,keys);
-					//Create the signature.
-					TransactionSignature sig2 = unsignedTx.calculateSignature(j, authenticatorKey, scriptpubkey, Transaction.SigHash.ALL, false);
-					byte[] signature = sig2.encodeToBitcoin();
-					JSONObject sigobj = new JSONObject();
-					try {sigobj.put("signature", Utils.bytesToHex(signature));} 
-					catch (JSONException e) {e.printStackTrace();}
-					//Add key object to array
-					siglist.add(sigobj);					
+					try {
+						//Prep the JSON object we will fill with the signatures.
+						Map obj=new LinkedHashMap();
+						obj.put("version", 1);
+						obj.put("sigs_n", tx.numInputs);
+						JSONArray siglist = new JSONArray();
+						//Loop creating a signature for each input
+						for (int j=0; j<tx.numInputs; j++){
+							//Derive the private key needed to sign the transaction
+							ArrayList<Integer> index = tx.getIndexes();
+							ArrayList<String> walpubkeys = tx.getPublicKeys();
+							HDKeyDerivation HDKey = null;
+							DeterministicKey masterKey = HDKey.createMasterPrivateKey(authseed);
+							DeterministicKey walletMasterKey = HDKey.deriveChildKey(masterKey, walletnum);
+							DeterministicKey childKey = HDKey.deriveChildKey(walletMasterKey,index.get(j));
+							byte[] privKey = childKey.getPrivKeyBytes();
+							byte[] pubKey = childKey.getPubKey();
+							ECKey authenticatorKey = new ECKey(privKey, pubKey);
+							ECKey walletPubKey = new ECKey(null, Utils.hexStringToByteArray(walpubkeys.get(j))); 							
+							List<ECKey> keys = ImmutableList.of(authenticatorKey, walletPubKey);
+							//Create the multisig script we will be using for signing. 
+							Script scriptpubkey = ScriptBuilder.createMultiSigOutputScript(2,keys);
+							//Create the signature.
+							TransactionSignature sig2 = unsignedTx.calculateSignature(j, authenticatorKey, scriptpubkey, Transaction.SigHash.ALL, false);
+							byte[] signature = sig2.encodeToBitcoin();
+							JSONObject sigobj = new JSONObject();
+							try {sigobj.put("signature", Utils.bytesToHex(signature));} 
+							catch (JSONException e) {e.printStackTrace();}
+							//Add key object to array
+							siglist.add(sigobj);					
+						}
+						obj.put("siglist", siglist);
+						StringWriter jsonOut = new StringWriter();
+						JSONValue.writeJSONString(obj, jsonOut);						
+
+						String jsonText = jsonOut.toString();
+						System.out.println(jsonText);
+						byte[] jsonBytes = jsonText.getBytes();
+						//Create a new message object
+						Message msg = new Message(ips);
+						
+			        	//Send the signature
+						msg.sendEncrypted(jsonBytes, sharedsecret, ips);
+						responseListener.onAuthorizedTx();
+					}
+					catch(Exception e) {
+						responseListener.OnError();
+					}
+					
 				}
-				obj.put("siglist", siglist);
-				StringWriter jsonOut = new StringWriter();
-				try {JSONValue.writeJSONString(obj, jsonOut);} 
-				catch (IOException e1) {e1.printStackTrace();}
-				String jsonText = jsonOut.toString();
-				System.out.println(jsonText);
-				byte[] jsonBytes = jsonText.getBytes();
-				//Create a new message object
-				Message msg = null;
-	        	try {msg = new Message(conn);} 
-	        	catch (IOException e) {e.printStackTrace();}
-	        	//Send the signature
-				try {msg.sendEncrypted(jsonBytes, sharedsecret);} 
-				catch (InvalidKeyException e) {e.printStackTrace();} 
-				catch (NoSuchAlgorithmException e) {e.printStackTrace();} 
-				catch (IOException e) {e.printStackTrace();							}
-				//Reload the ConnectionToWallets task to set up to receive another transaction.
-				try {conn.close();} 
-				catch (IOException e) {e.printStackTrace();}
-				//new ConnectToWallets().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-				
-				
-				responseListener.onAuthorizedTx();
-			}
 		});
 		alertDialog.setButton(AlertDialog.BUTTON_NEUTRAL, "Decline", new DialogInterface.OnClickListener() {
 
 			public void onClick(DialogInterface dialog, int id) {
-				JSONObject obj = new JSONObject();
 				try {
+					JSONObject obj = new JSONObject();
 					obj.put("result", "0");
 					obj.put("reason", "Authenticator refused to autherize the transaction");
 					//
-					Message msg = new Message(conn);
-					msg.sendEncrypted(obj.toString().getBytes(), sharedsecret);
-				} 
-				catch (JSONException e) { e.printStackTrace(); } 
-				catch (IOException e) { e.printStackTrace(); } 
-				catch (InvalidKeyException e) { e.printStackTrace(); } 
-				catch (NoSuchAlgorithmException e) { e.printStackTrace(); }
-				finally{
-					try { conn.close(); } catch (IOException e) { e.printStackTrace(); }
+					Message msg = new Message(ips);
+					msg.sendEncrypted(obj.toString().getBytes(), sharedsecret, ips);
+
+					responseListener.onNotAuthorizedTx();
+				}
+				catch (Exception e) {
+					responseListener.OnError();
 				}
 				
-				responseListener.onNotAuthorizedTx();
 			}
 		});
 		
 		alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, "Save", new DialogInterface.OnClickListener() {
 
 		      public void onClick(DialogInterface dialog, int id) {
-				JSONObject obj = new JSONObject();
-				try {
-					obj.put("justCancelled", "0");
-					//
-					Message msg = new Message(conn);
-					msg.sendEncrypted(obj.toString().getBytes(), sharedsecret);
-				} 
-				catch (JSONException e) { e.printStackTrace(); } 
-				catch (IOException e) { e.printStackTrace(); } 
-				catch (InvalidKeyException e) { e.printStackTrace(); } 
-				catch (NoSuchAlgorithmException e) { e.printStackTrace(); }
-				finally{
-					try { conn.close(); } catch (IOException e) { e.printStackTrace(); }
-				}
+		    	  try {
+		    		JSONObject obj = new JSONObject();
+		    		obj.put("justCancelled", "0");
+						//
+					Message msg = new Message(ips);
+					msg.sendEncrypted(obj.toString().getBytes(), sharedsecret, ips);
+					responseListener.onCancel();
+		    	  }
+		    	  catch (Exception e) {
+					responseListener.OnError();
+				  }
 				
-				responseListener.onCancel();
 			}
 		});
 		alertDialog.show();
@@ -266,6 +274,8 @@ public class ConfirmTxDialog {
 		 * Will not do anything
 		 */
 		public void onCancel();
+		
+		public void OnError();
 	}
 
 

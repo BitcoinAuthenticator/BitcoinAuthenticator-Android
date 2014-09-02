@@ -1,11 +1,14 @@
 package org.bitcoin.authenticator;
 
 import java.io.IOException;
+import java.net.Socket;
 import java.util.ArrayList;
 
 import javax.crypto.SecretKey;
 
 import org.bitcoin.authenticator.ConfirmTxDialog.TxDialogResponse;
+import org.bitcoin.authenticator.Connection.CannotConnectToWalletException;
+import org.bitcoin.authenticator.Message.CouldNotSendRequestIDException;
 import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
 import org.bitcoin.authenticator.Events.GlobalEvents;
 import org.bitcoin.authenticator.GcmUtil.GcmIntentService;
@@ -64,7 +67,6 @@ import android.widget.Toast;
 public class Wallet_list extends Activity {
 	ListView lv1;
 	public static JSONObject req;
-	public static Connection conn; 
 	private CustomListAdapter listAdapter;
 	public GlobalEvents singletonEvents;
 
@@ -478,6 +480,9 @@ public class Wallet_list extends Activity {
     public class ConnectToWallets extends AsyncTask<String,String,Connection> {
     	TxData tx;
     	ProcessGCMRequest.ProcessReturnObject ret;
+    	
+    	private Socket persistentSocketForTheProcess;
+    	
         @Override
         protected Connection doInBackground(String... message) {
         	System.out.println("a1");
@@ -497,58 +502,29 @@ public class Wallet_list extends Activity {
             		BAPreferences.ConfigPreference().setRequest(false);
                 	//Open a new connection
                 	System.out.println("a4");
-                	try {conn = new Connection(ret.IPAddress);} 
-                	catch (IOException e1) {
-                		try {conn = new Connection(ret.LocalIP);} 
-                		catch (IOException e2) {
-                			runOnUiThread(new Runnable() {
-                				public void run() {
-                					Toast.makeText(getApplicationContext(), "Unable to connect to wallet", Toast.LENGTH_LONG).show();
-                				}
-                			});
-                		}
-                	}
+                	String[] ips = new String[] { ret.IPAddress, ret.LocalIP};
                 	
                 	SecretKey sharedsecret = Utils.getAESSecret(getApplicationContext(), ret.walletnum); 
                 	//Create a new message object for receiving the transaction.
             		System.out.println("a5");
                 	Message msg = null;
-        			try {
-        				msg = new Message(conn);
-        				//send request id
-        				msg.sentRequestID(getIntent().getStringExtra("RequestID"));
-        			} 
-        			catch (IOException e) {e.printStackTrace();}
-        			try {tx = msg.receiveTX(sharedsecret);} 
-        			catch (Exception e) {e.printStackTrace();}
+                	
+    				//send request id
+                	persistentSocketForTheProcess = null;
+    				try {
+    					msg = new Message(ips);
+						persistentSocketForTheProcess = msg.sentRequestID(getIntent().getStringExtra("RequestID"));
+					} catch (CouldNotSendRequestIDException e1) {
+						e1.printStackTrace();
+					}
+
+    				if(persistentSocketForTheProcess != null)
+	        			try {tx = msg.receiveTX(sharedsecret, persistentSocketForTheProcess);} 
+	        			catch (Exception e) {e.printStackTrace();}
             	}            		
             }
             else { // TODO !
-            	//Load the IPs for each wallet from shared preferences.
-                /*SharedPreferences prefs = getSharedPreferences("WalletData1", 0);	
-                String IPAddress = prefs.getString("ExternalIP", "null");
-                String LocalIP = prefs.getString("LocalIP","null");
-                
-            	Boolean connected = false;
-            	while(!connected){
-                	System.out.println("#1");
-            		connected = true;
-            		try {conn = new Connection(IPAddress);} 
-                	catch (IOException e1) {
-                		System.out.println("#2");
-                		try {conn = new Connection(LocalIP);}
-                		catch (IOException e2) {
-                			connected = false;
-                        	System.out.println("#3");
-                			runOnUiThread(new Runnable() {
-                				public void run() {
-                					Toast.makeText(getApplicationContext(), "Unable to connect to wallet", Toast.LENGTH_LONG).show();
-                				}
-                			});
-                		}
-                	}	
-            	}
-            	System.out.println("#4");*/
+            	
             }
         	
 			return null;
@@ -565,7 +541,7 @@ public class Wallet_list extends Activity {
            if (tx != null) {
         	   try 
         	   {
-        		   new ConfirmTxDialog(conn, 
+        		   new ConfirmTxDialog(persistentSocketForTheProcess, 
         				   tx, 
         				   Wallet_list.this, 
         				   ret.walletnum, 
@@ -594,6 +570,15 @@ public class Wallet_list extends Activity {
 									    		   // remove from pending requests
 									    		   removePendingRequestFromListAndThenUpdate(getIntent().getStringExtra("RequestID"));
 												} catch (JSONException e) { e.printStackTrace(); }
+											}
+
+											@Override
+											public void OnError() {
+												runOnUiThread(new Runnable() {
+						            				public void run() {
+						            					Toast.makeText(getApplicationContext(), "Failed !!", Toast.LENGTH_LONG).show();
+						            				}
+						            			});
 											}
 						        			   
 						        		   });

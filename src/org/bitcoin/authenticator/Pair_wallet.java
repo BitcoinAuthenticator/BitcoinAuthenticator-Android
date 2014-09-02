@@ -14,6 +14,8 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
+import org.bitcoin.authenticator.Connection.CannotConnectToWalletException;
+import org.bitcoin.authenticator.PairingProtocol.CouldNotPairToWalletException;
 import org.bitcoin.authenticator.GcmUtil.GcmUtilGlobal;
 
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -162,6 +164,8 @@ public class Pair_wallet extends Activity {
 				mProgressDialog = new ProgressDialog(this, R.style.CustomDialogSpinner);
 				mProgressDialog.setIndeterminate(false);
 	            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+	            mProgressDialog.setCancelable(false);
+	    		mProgressDialog.setCanceledOnTouchOutside(false);
 	            mProgressDialog.show();
             //
 			QRInput = intent.getStringExtra("SCAN_RESULT");
@@ -188,9 +192,11 @@ public class Pair_wallet extends Activity {
 			} 
 			else if (resultCode == RESULT_CANCELED) {
 				QRInput = "Scan canceled.";
+			
 			}
 	}
 	
+
 	/**
 	 * This class runs in the background. It creates a connection object which connects
 	 * to the wallet and executes the core of the pairing protocol.
@@ -238,30 +244,31 @@ public class Pair_wallet extends Activity {
     			try {inputStream.close();} 
     			catch (IOException e) {e.printStackTrace();}
     		}
-    		//Try to connect to wallet using either IP
-    		PairingProtocol pair2wallet = null;
-    		try {pair2wallet = new PairingProtocol(IPAddress);}
-        	catch (IOException e1) {
-        		try {pair2wallet = new PairingProtocol(LocalIP);} 
-            	catch (IOException e2) {
-            		runOnUiThread(new Runnable() {
-            			public void run() {
-    						  Toast.makeText(getApplicationContext(), "Unable to connect to wallet", Toast.LENGTH_LONG).show();
-    					}
-    				});
-            	}
-        	}
+    		
+    		String[] ips = new String[] { IPAddress, LocalIP};
+    		PairingProtocol pair2wallet = new PairingProtocol(ips);
+    		
+
     		//Run pairing protocol
             SecretKey secretkey = new SecretKeySpec(Utils.hexStringToByteArray(AESKey), "AES");
             byte[] regID = (GcmUtilGlobal.gcmRegistrationToken).getBytes();
 			try {
-				pair2wallet.run(seed, secretkey, getPairingIDDigest(num, GcmUtilGlobal.gcmRegistrationToken), regID, num);
+				pair2wallet.run(seed, 
+						secretkey, 
+						getPairingIDDigest(num, GcmUtilGlobal.gcmRegistrationToken), 
+						regID, 
+						num);
 				completePairing(AESKey, IPAddress, LocalIP, walletType, num, networkType,fingerprint);
-				pair2wallet.closeConnection();
 			} 
-			catch (InvalidKeyException e) {e.printStackTrace();} 
-			catch (NoSuchAlgorithmException e) {e.printStackTrace();} 
-			catch (IOException e) {e.printStackTrace();}
+			catch (CouldNotPairToWalletException e) {
+				e.printStackTrace();
+				runOnUiThread(new Runnable() {
+        			public void run() {
+						  Toast.makeText(getApplicationContext(), "Unable to pair", Toast.LENGTH_LONG).show();
+					}
+				});
+			}
+
             return null;
         }
         @Override
@@ -284,7 +291,7 @@ public class Pair_wallet extends Activity {
     			String walletType, 
     			int num, 
     			int networkType,
-    			String fingerprint) throws NoSuchAlgorithmException{	
+    			String fingerprint){	
     	    String walletData = Integer.toString(num);
     	    BAPreferences.WalletPreference().setWallet(walletData,
     	    		txtID.getText().toString(), 
@@ -333,6 +340,12 @@ public class Pair_wallet extends Activity {
 	    }
 	    //Log.v("ASDF","Reg id: " + ret);
 	    return ret;
+	}
+	
+	static public class CannotScanExceptionTemp extends Exception {
+		public CannotScanExceptionTemp(String str) {
+			super(str);
+		}
 	}
 }
 
