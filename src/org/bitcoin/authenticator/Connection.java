@@ -9,6 +9,8 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
+import org.bitcoin.authenticator.net.PongPayload;
+
 import android.util.Log;
 
 /**	
@@ -48,13 +50,28 @@ public class Connection {
 		Socket s = null;
 		for(String ip:ips)
 			try {
+				Log.i("asdf", "Trying to connect to: " + ip);
+				
 				InetAddress walletAddr = InetAddress.getByName(ip);
 				s = new Socket();
 				s.connect(new InetSocketAddress(walletAddr, PORT), 1000);
 				s.setSoTimeout(0);
+				
+				// verify we are connected to an authenticator
+				try {
+					if(!PongPayload.isValidPongPayload(this.readContinuous(s))) {
+						s.close();
+						throw new CannotConnectToWalletException("");
+					}
+				} catch (Exception e) {
+					throw new Exception("");
+				}
+				
+				Log.i("asdf", "Connected to: " + ip);
+				
 				return s;		
 			}
-			catch(IOException e) { }
+			catch(Exception e) { }
 		
 		if(s == null)
 			throw new CannotConnectToWalletException("Could Not Connect to wallet");
@@ -85,6 +102,7 @@ public class Connection {
 		try {
 			write(s, payload);
 		} catch (IOException e) {
+			e.printStackTrace();
 			throw new CannotConnectToWalletException("Couldn't connect to wallet");
 		}
 		
@@ -98,6 +116,17 @@ public class Connection {
 		Socket s = writeContinuous(ips, payload);
 		this.dispose(s, null, null);
 	}
+	public void writeAndClose(Socket s, byte[] payload) throws CannotConnectToWalletException {
+		try {
+			write(s, payload);
+			
+			this.dispose(s, null, null);
+		} catch (IOException e) { 
+		
+			throw new CannotConnectToWalletException("Cannot write to wallet");
+		}
+		
+	}
 	
 	private void write(Socket s, byte[] payload) throws IOException {
 		DataOutputStream out = null;
@@ -105,10 +134,10 @@ public class Connection {
 		out.writeInt(payload.length);
 		out.write(payload);
 		
-		if(out != null)
-			try {
-				out.close();
-			} catch (IOException e) { e.printStackTrace(); }
+//		if(out != null)
+//			try {
+//				out.close();
+//			} catch (IOException e) { e.printStackTrace(); }
 	}
 	
 	public byte[] readContinuous(Socket s) throws CannotReadFromWalletException {
@@ -119,6 +148,7 @@ public class Connection {
 			return ret;
 		}
 		catch (Exception e) {
+			e.printStackTrace();
 			throw new CannotReadFromWalletException("Couldn't read from wallet");
 		}
 	}
@@ -128,12 +158,13 @@ public class Connection {
 			return readContinuous(s);
 		}
 		catch (Exception e) {
+			e.printStackTrace();
 			throw new CannotReadFromWalletException("Couldn't read from wallet");
 		}
 		finally {
-			try {
-				s.close();
-			} catch (IOException e) { }
+//			try {
+//				s.close();
+//			} catch (IOException e) { }
 		}
 	}
 	
@@ -147,10 +178,10 @@ public class Connection {
 			byte[] payload = new byte[size];
 			in.read(payload);
 			
-			if(in != null)
-				try {
-					in.close();
-				} catch (IOException e) { e.printStackTrace(); }
+//			if(in != null)
+//				try {
+//					in.close();
+//				} catch (IOException e) { e.printStackTrace(); }
 			
 			return payload;
 		}

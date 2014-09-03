@@ -245,6 +245,8 @@ public class Wallet_list extends Activity {
         	i.putExtra("fingerprint", wi.getFingerprint());
         	i.putExtra("walletName", wi.getWalletLabel());
         	i.putExtra("accountID", Integer.toString(wi.getWalletNum()));
+        	i.putExtra("externalIP", BAPreferences.WalletPreference().getExternalIP(Integer.toString(wi.getWalletNum()), ""));
+        	i.putExtra("internalIP", BAPreferences.WalletPreference().getLocalIP(Integer.toString(wi.getWalletNum()), ""));
         	i.putExtra("icon", wi.getIcon());
         	startActivity (i);
     	}
@@ -498,13 +500,16 @@ public class Wallet_list extends Activity {
             		reqString = BAPreferences.ConfigPreference().getPendingRequestAsString(getIntent().getStringExtra("RequestID"));//settings2.getString(getIntent().getStringExtra("RequestID"), null);
             		ProcessGCMRequest processor = new ProcessGCMRequest(getApplicationContext());
             		ret = processor.ProcessRequest(reqString);
+            		
             		// Connect
             		BAPreferences.ConfigPreference().setRequest(false);
-                	//Open a new connection
+                	
+            		//Open a new connection
                 	System.out.println("a4");
                 	String[] ips = new String[] { ret.IPAddress, ret.LocalIP};
                 	
                 	SecretKey sharedsecret = Utils.getAESSecret(getApplicationContext(), ret.walletnum); 
+                	
                 	//Create a new message object for receiving the transaction.
             		System.out.println("a5");
                 	Message msg = null;
@@ -513,7 +518,9 @@ public class Wallet_list extends Activity {
                 	persistentSocketForTheProcess = null;
     				try {
     					msg = new Message(ips);
-						persistentSocketForTheProcess = msg.sentRequestID(getIntent().getStringExtra("RequestID"));
+						persistentSocketForTheProcess = msg.sentRequestID(
+								getIntent().getStringExtra("RequestID"),
+								getIntent().getStringExtra("PairingID"));
 					} catch (CouldNotSendRequestIDException e1) {
 						e1.printStackTrace();
 					}

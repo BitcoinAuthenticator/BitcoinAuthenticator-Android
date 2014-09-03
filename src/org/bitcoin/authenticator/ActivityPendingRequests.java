@@ -180,22 +180,9 @@ public class ActivityPendingRequests extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
-	/**Creates the context menu that pops up on a long click in the list view*/
-    /*@Override
-    public void onCreateContextMenu(ContextMenu menu, View v,ContextMenuInfo menuInfo) {
-	super.onCreateContextMenu(menu, v, menuInfo);
-		menu.setHeaderTitle("Select Action");
-		menu.add(0, v.getId(), 0, "Open");
-		menu.add(0, v.getId(), 0, "Delete");
-	}*/
+
     
     /**Handles the clicks in the context menu*/
-    //@Override
-	//public boolean onContextItemSelected(MenuItem item) {
-    //	AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-    //    final int index = info.position;
-        //Re-pairs with the wallet
     public void onPopupMenuItemSelected(String title, final int index){
         if(title == "Open"){
         	new ConnectToWallet(index, getApplicationContext()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR); 
@@ -233,8 +220,6 @@ public class ActivityPendingRequests extends Activity {
 				}
 			});
 			
-			String[] ips = new String[] { ret.IPAddress, ret.LocalIP};
-
 			//SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
             Boolean GCM = BAPreferences.ConfigPreference().getGCM(true);//settings.getBoolean("GCM", true);
             data = (dataClass)lv1.getItemAtPosition(index);
@@ -243,6 +228,7 @@ public class ActivityPendingRequests extends Activity {
         		String reqString = BAPreferences.ConfigPreference().getPendingRequestAsString(data.getReqID());//settings2.getString(data.getReqID(), null);
         		ProcessGCMRequest processor = new ProcessGCMRequest(getApplicationContext());
         		ret = processor.ProcessRequest(reqString);
+        		String[] ips = new String[] { ret.IPAddress, ret.LocalIP};
             	
             	//Receive Tx
             	SecretKey sharedsecret = Utils.getAESSecret(getApplicationContext(), ret.walletnum); 
@@ -252,27 +238,36 @@ public class ActivityPendingRequests extends Activity {
     			try {
     				msg = new Message(ips);
     				//send request id
-    				persistentSocketForTheProcess = msg.sentRequestID(data.reqID);
+    				persistentSocketForTheProcess = msg.sentRequestID(data.reqID, data.getPairingID());
     			} 
     			catch (CouldNotSendRequestIDException e) {
 					e.printStackTrace();
+					riseError("Failed to get transaction");
+					try { persistentSocketForTheProcess.close();
+					} catch (IOException ex) { ex.printStackTrace(); }
 				}
     			
     			if(persistentSocketForTheProcess != null)
-    			try {
-    				tx = msg.receiveTX(sharedsecret, persistentSocketForTheProcess);
-    				if(tx == null) // couldn't get tx
-    					runOnUiThread(new Runnable() {
-            				public void run() {
-            					Toast.makeText(getApplicationContext(), "Failed to get transaction", Toast.LENGTH_LONG).show();
-            				}
-            			});
-    			} 
-    			catch (CouldNotGetTransactionException e) {e.printStackTrace(); }
-
-
+	    			try {
+	    				tx = msg.receiveTX(sharedsecret, persistentSocketForTheProcess);
+	    			} 
+	    			catch (CouldNotGetTransactionException e) {
+	    				e.printStackTrace(); 
+	    				riseError("Failed to get transaction");
+	    				try { persistentSocketForTheProcess.close();
+						} catch (IOException ex) { ex.printStackTrace(); }
+	    			}
+	    			
             }
 			return null;
+		}
+		
+		private void riseError(final String msg) {
+			runOnUiThread(new Runnable() {
+				public void run() {
+					Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+				}
+			});
 		}
     	
 		/**On finish show the transaction in a dialog box*/

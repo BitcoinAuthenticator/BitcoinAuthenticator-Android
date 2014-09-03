@@ -34,10 +34,11 @@ public class Message {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public Socket sentRequestID(String requestID) throws CouldNotSendRequestIDException{
+	public Socket sentRequestID(String requestID, String pairingID) throws CouldNotSendRequestIDException{
 		try {
 			JSONObject jo = new JSONObject();
 			jo.put("requestID", requestID);
+			jo.put("pairingID", pairingID);
 			byte[] payload = jo.toString().getBytes();
 			return Connection.getInstance().writeContinuous(ips, payload);
 		}
@@ -72,7 +73,7 @@ public class Message {
 			
 			// in case wallet couldn't process request
 			if(CannotProcessRequestPayload.isCannotBeProcessedPayload(testpayload))
-				return null;
+				throw new CouldNotGetTransactionException("Couldn't get transaction from wallet");
 			
 		    TxData data = new TxData(testpayload);
 		    //Verify the HMAC
@@ -85,10 +86,11 @@ public class Message {
 			}
 			else {
 				System.out.println("Message authentication code is invalid");
-				return null;
+				throw new CouldNotGetTransactionException("Couldn't get transaction from wallet");
 			}
 		}
 		catch (Exception e) {
+			e.printStackTrace();
 			throw new CouldNotGetTransactionException("Couldn't get transaction from wallet");
 		}
 		
@@ -109,7 +111,7 @@ public class Message {
 	 * @param ip
 	 * @throws CouldNotSendEncryptedException
 	 */
-	public void sendEncrypted (byte[] sig, SecretKey sharedsecret, String[] ips) throws CouldNotSendEncryptedException{
+	public void sendEncrypted (byte[] sig, SecretKey sharedsecret, Socket s) throws CouldNotSendEncryptedException{
 		try {
 			//Calculate the HMAC
 	    	Mac mac = Mac.getInstance("HmacSHA256");
@@ -132,7 +134,7 @@ public class Message {
 			catch (IllegalBlockSizeException e) {e.printStackTrace();} 
 			catch (BadPaddingException e) {e.printStackTrace();}
 			//Send the payload over to the wallet
-			Connection.getInstance().writeAndClose(ips, cipherBytes);
+			Connection.getInstance().writeAndClose(s, cipherBytes);
 		}
 		catch(Exception e) {
 			throw new CouldNotSendEncryptedException("Couldn't send encrypted payload");

@@ -20,21 +20,6 @@ public class ProcessGCMRequest {
 		ProcessReturnObject ret = new ProcessReturnObject();
 		//Wait for pending requests via GCM\
     	
-    	// Search for a new request
-    	/*while (!hasPendingReq){
-    		try {
-    			SharedPreferences settings2 = getSharedPreferences("ConfigFile", 0);
-        		hasPendingReq = settings2.getBoolean("request", false);
-        		//In case app was launched by clicking the notification
-        		reqString = settings2.getString(getIntent().getStringExtra("pairingID"), null);
-        		// case activity is already running
-        		if(reqString == null)
-        			reqString = GcmIntentService.takeRequest();
-        		
-				Thread.sleep(50);
-			} catch (InterruptedException e) { e.printStackTrace(); }
-    	}*/
-		
 		SharedPreferences settings = mContext.getSharedPreferences("ConfigFile", 0);
 		int numwallets = settings.getInt("numwallets", 0);
 		

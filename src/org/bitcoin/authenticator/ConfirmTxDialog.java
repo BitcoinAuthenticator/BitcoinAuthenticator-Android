@@ -210,7 +210,7 @@ public class ConfirmTxDialog {
 						Message msg = new Message(ips);
 						
 			        	//Send the signature
-						msg.sendEncrypted(jsonBytes, sharedsecret, ips);
+						msg.sendEncrypted(jsonBytes, sharedsecret, s);
 						responseListener.onAuthorizedTx();
 					}
 					catch(Exception e) {
@@ -228,7 +228,7 @@ public class ConfirmTxDialog {
 					obj.put("reason", "Authenticator refused to autherize the transaction");
 					//
 					Message msg = new Message(ips);
-					msg.sendEncrypted(obj.toString().getBytes(), sharedsecret, ips);
+					msg.sendEncrypted(obj.toString().getBytes(), sharedsecret, s);
 
 					responseListener.onNotAuthorizedTx();
 				}
@@ -247,7 +247,7 @@ public class ConfirmTxDialog {
 		    		obj.put("justCancelled", "0");
 						//
 					Message msg = new Message(ips);
-					msg.sendEncrypted(obj.toString().getBytes(), sharedsecret, ips);
+					msg.sendEncrypted(obj.toString().getBytes(), sharedsecret, s);
 					responseListener.onCancel();
 		    	  }
 		    	  catch (Exception e) {

@@ -159,6 +159,7 @@ public class GcmIntentService extends IntentService {
 		 */
 		// 1) 
 		intent.putExtra("RequestID", obj.getString("RequestID"));
+		intent.putExtra("PairingID", obj.getString("PairingID"));
 		intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		// 2) 
 		addRequestToQueue(obj.getString("RequestID"));
