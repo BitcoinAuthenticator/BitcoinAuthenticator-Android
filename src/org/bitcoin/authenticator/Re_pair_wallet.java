@@ -26,6 +26,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 public class Re_pair_wallet extends Activity{
@@ -84,65 +85,63 @@ public class Re_pair_wallet extends Activity{
 				try {outputStream.close();} 
 				catch (IOException e) {e.printStackTrace();} 
 				//Start the pairing protocol
-				connectTask conx = new connectTask();
-				conx.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-				startActivity(new Intent(Re_pair_wallet.this, Wallet_list.class));
+				connectToWallet();
 			}
 			else if (resultCode == RESULT_CANCELED) {
 				QRInput = "Scan canceled.";
-				startActivity(new Intent(Re_pair_wallet.this, Wallet_list.class));
+				Log.i("asdf", "Cannot Read QR");
+				Toast.makeText(getApplicationContext(), "Cannot Read QR", Toast.LENGTH_LONG).show();
 			}
+			startActivity(new Intent(Re_pair_wallet.this, Wallet_list.class));
 	}
 	
 	/**
 	 * This class runs in the background. It creates a connection object which connects
 	 * to the wallet and executes the core of the pairing protocol.
 	 */
-	public class connectTask extends AsyncTask<String,String,PairingProtocol> {
-        @Override
-        protected PairingProtocol doInBackground(String... message) {
-            //Load the seed from file
-        	byte [] seed = null;
-    		String FILENAME = "seed";
-    		File file = new File(getFilesDir(), FILENAME);
-    		int size = (int)file.length();
-    		if (size != 0)
-    		{
-    			FileInputStream inputStream = null;
-    			try {inputStream = openFileInput(FILENAME);} 
-    			catch (FileNotFoundException e1) {e1.printStackTrace();}
-    			seed = new byte[size];
-    			try {inputStream.read(seed, 0, size);} 
-    			catch (IOException e) {e.printStackTrace();}
-    			try {inputStream.close();} 
-    			catch (IOException e) {e.printStackTrace();}
-    		}
+	private void connectToWallet() {
+		new Thread() {
+			@Override
+			public void run() {
+				//Load the seed from file
+				Log.i("asdf", "Reading seed");
+		    	byte [] seed = null;
+				String FILENAME = "seed";
+				File file = new File(getFilesDir(), FILENAME);
+				int size = (int)file.length();
+				if (size != 0)
+				{
+					FileInputStream inputStream = null;
+					try {inputStream = openFileInput(FILENAME);} 
+					catch (FileNotFoundException e1) {e1.printStackTrace();}
+					seed = new byte[size];
+					try {inputStream.read(seed, 0, size);} 
+					catch (IOException e) {e.printStackTrace();}
+					try {inputStream.close();} 
+					catch (IOException e) {e.printStackTrace();}
+				}
 
-    		PairingProtocol pair2wallet = new PairingProtocol(new String[]{ IPAddress, LocalIP  } );
+				PairingProtocol pair2wallet = new PairingProtocol(new String[]{ IPAddress, LocalIP  } );
 
-            SecretKey secretkey = new SecretKeySpec(Utils.hexStringToByteArray(AESKey), "AES");
-            byte[] regID = (GcmUtilGlobal.gcmRegistrationToken).getBytes();
-            try {
-				pair2wallet.run(seed, 
-						secretkey, 
-						Pair_wallet.getPairingIDDigest(walletNum,GcmUtilGlobal.gcmRegistrationToken), 
-						regID, walletNum);
-			} catch (CouldNotPairToWalletException e) {
-				e.printStackTrace();
-				runOnUiThread(new Runnable() {
-        			public void run() {
-						  Toast.makeText(getApplicationContext(), "Unable to pair", Toast.LENGTH_LONG).show();
-					}
-				});
+		        SecretKey secretkey = new SecretKeySpec(Utils.hexStringToByteArray(AESKey), "AES");
+		        
+		        byte[] regID = (GcmUtilGlobal.gcmRegistrationToken).getBytes();
+		        
+		        try {
+					pair2wallet.run(seed, 
+							secretkey, 
+							Pair_wallet.getPairingIDDigest(walletNum,GcmUtilGlobal.gcmRegistrationToken), 
+							regID, walletNum);
+				} catch (CouldNotPairToWalletException e) {
+					e.printStackTrace();
+					runOnUiThread(new Runnable() {
+		    			public void run() {
+							  Toast.makeText(getApplicationContext(), "Unable to pair", Toast.LENGTH_LONG).show();
+						}
+					});
+				}
 			}
-            return null;
-        }
-        @Override
-        protected void onProgressUpdate(String... values) {
-            super.onProgressUpdate(values);
-        }
-        protected void onPostExecute(PairingProtocol result) {
-            super.onPostExecute(result);
-        }
-    }
+		}.start();
+	}
+	
 }

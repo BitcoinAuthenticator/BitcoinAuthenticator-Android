@@ -9,7 +9,6 @@ import javax.crypto.SecretKey;
 import org.bitcoin.authenticator.ConfirmTxDialog.TxDialogResponse;
 import org.bitcoin.authenticator.Connection.CannotConnectToWalletException;
 import org.bitcoin.authenticator.Message.CouldNotSendRequestIDException;
-import org.bitcoin.authenticator.Wallet_list.ConnectToWallets;
 import org.bitcoin.authenticator.Wallet_list.WalletItem;
 import org.bitcoin.authenticator.Wallet_list.CustomListAdapter.ViewHolder;
 import org.bitcoin.authenticator.dialogs.BAPopupMenu;
@@ -243,8 +242,8 @@ public class ActivityPendingRequests extends Activity {
     			catch (CouldNotSendRequestIDException e) {
 					e.printStackTrace();
 					riseError("Failed to get transaction");
-					try { persistentSocketForTheProcess.close();
-					} catch (IOException ex) { ex.printStackTrace(); }
+					try { persistentSocketForTheProcess.close();}
+					catch (Exception ex) { }
 				}
     			
     			if(persistentSocketForTheProcess != null)
@@ -255,7 +254,7 @@ public class ActivityPendingRequests extends Activity {
 	    				e.printStackTrace(); 
 	    				riseError("Failed to get transaction");
 	    				try { persistentSocketForTheProcess.close();
-						} catch (IOException ex) { ex.printStackTrace(); }
+						} catch (IOException ex) { }
 	    			}
 	    			
             }

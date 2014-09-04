@@ -22,7 +22,6 @@ import org.bitcoin.authenticator.dialogs.BAAlertDialogBase;
 import org.bitcoin.authenticator.dialogs.BAAlertDialogBase.ConfirmTxOnClickListener;
 import org.bitcoin.authenticator.dialogs.BAConfirmTxDialog;
 import org.bitcoin.authenticator.Message.CouldNotSendEncryptedException;
-import org.bitcoin.authenticator.Wallet_list.ConnectToWallets;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.simple.JSONArray;

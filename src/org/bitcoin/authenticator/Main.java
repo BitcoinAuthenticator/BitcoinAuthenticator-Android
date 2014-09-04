@@ -1,5 +1,8 @@
 package org.bitcoin.authenticator;
 
+import org.bitcoin.authenticator.R;
+import org.bitcoin.authenticator.Wallet_list;
+import org.bitcoin.authenticator.Welcome;
 import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
 import org.bitcoin.authenticator.GcmUtil.GCMRegister;
 import org.bitcoin.authenticator.GcmUtil.GcmUtilGlobal;
@@ -20,7 +23,7 @@ public class Main extends Activity {
 	public void onNewIntent(Intent intent){
 		gcmInit();
 		
-		// init preferences
+		// init preferencess
 		new BAPreferences(this);
 		
 		//SharedPreferences settings = getSharedPreferences("ConfigFile", 0);

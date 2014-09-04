@@ -43,12 +43,15 @@ public class PairingProtocol {
 	public void run(byte[] seed, SecretKey AESKey, String pairingID, byte[] regID, int num) throws CouldNotPairToWalletException {
     	try {
     		//Derive the key and chaincode from the seed.
+    		Log.i("asdf", "Pairing: Deriving Wallet Account");
         	HDKeyDerivation HDKey = null;
         	DeterministicKey masterkey = HDKey.createMasterPrivateKey(seed);
         	DeterministicKey childkey = HDKey.deriveChildKey(masterkey,num);
         	byte[] chaincode = childkey.getChainCode(); // 32 bytes
         	byte[] mpubkey = childkey.getPubKey(); // 32 bytes
+        	
         	//Format data into a JSON object
+        	Log.i("asdf", "Pairing: creating payload");
         	Map obj=new LinkedHashMap();
         	obj.put("version", 1);
     		obj.put("mpubkey", Utils.bytesToHex(mpubkey));
@@ -60,17 +63,21 @@ public class PairingProtocol {
     		catch (IOException e1) {e1.printStackTrace();}
     		String jsonText = jsonOut.toString();
     		byte[] jsonBytes = jsonText.getBytes();
+    		
         	//Calculate the HMAC
+    		Log.i("asdf", "Pairing: calculating checksum");
         	Mac mac = Mac.getInstance("HmacSHA256");
         	mac.init(AESKey);
         	byte[] macbytes = mac.doFinal(jsonBytes);
+        	
         	//Concatenate with the JSON object
         	ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
         	outputStream.write(jsonBytes);
         	outputStream.write(macbytes);
         	byte payload[] = outputStream.toByteArray();
-        	Log.v("ASDF","payload length byte[] - " + payload.length);
+        	
         	//Encrypt the payload
+        	Log.i("asdf", "Pairing: encrypting payload");
         	Cipher cipher = null;
         	try {cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");} 
         	catch (NoSuchAlgorithmException e) {e.printStackTrace();} 
@@ -81,6 +88,7 @@ public class PairingProtocol {
         	try {cipherBytes = cipher.doFinal(payload);} 
         	catch (IllegalBlockSizeException e) {e.printStackTrace();} 
         	catch (BadPaddingException e) {e.printStackTrace();}
+        	
         	//Send the payload over to the wallet
         	Connection.getInstance().writeAndClose(ips, cipherBytes);
     	}

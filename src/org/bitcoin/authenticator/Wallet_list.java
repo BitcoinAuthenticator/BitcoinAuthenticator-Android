@@ -89,7 +89,7 @@ public class Wallet_list extends Activity {
         //Create the list view
         try { setListView(true); } catch (InterruptedException e) { e.printStackTrace(); } catch (JSONException e) { e.printStackTrace(); }
         //Start the AsyncTask which waits for new transactions
-  		new ConnectToWallets().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR); 
+        connectToWallets(); 
   		
   		/**
   		 * Events
@@ -155,7 +155,7 @@ public class Wallet_list extends Activity {
            }
         });
         if(launchNewGCMListener)
-        	new ProcessGCMInBackground().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        	this.processGCMInBackground();
 	}
 	
 	public void updateListViewData(){
@@ -479,148 +479,145 @@ public class Wallet_list extends Activity {
      * This is a class that runs in the background and connects to the wallet and waits to receive a transaction.
      * When one is received, it loads the dialog box.
      */
-    public class ConnectToWallets extends AsyncTask<String,String,Connection> {
-    	TxData tx;
-    	ProcessGCMRequest.ProcessReturnObject ret;
-    	
-    	private Socket persistentSocketForTheProcess;
-    	
-        @Override
-        protected Connection doInBackground(String... message) {
-        	System.out.println("a1");
-    		//Load the GCM settings from shared preferences
-            //SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
-            Boolean GCM = BAPreferences.ConfigPreference().getGCM(true);//settings.getBoolean("GCM", true);
-            if(GCM){
-            	System.out.println("a2");
-            	// Handle a request that was pressed by the user
-            	String reqString = null;
-            	if(getIntent().getStringExtra("RequestID") != null){
-            		//SharedPreferences settings2 = getSharedPreferences("ConfigFile", 0);
-            		reqString = BAPreferences.ConfigPreference().getPendingRequestAsString(getIntent().getStringExtra("RequestID"));//settings2.getString(getIntent().getStringExtra("RequestID"), null);
-            		ProcessGCMRequest processor = new ProcessGCMRequest(getApplicationContext());
-            		ret = processor.ProcessRequest(reqString);
-            		
-            		// Connect
-            		BAPreferences.ConfigPreference().setRequest(false);
+    public void connectToWallets() {
+    	new Thread() {
+    		@Override
+    		public void run() {
+    			TxData tx = null;
+    	    	ProcessGCMRequest.ProcessReturnObject ret = null;
+    	    	Socket persistentSocketForTheProcess = null;
+    			
+    	    	/**
+    	    	 * 
+    	    	 */
+        		//Load the GCM settings from shared preferences
+                //SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
+                Boolean GCM = BAPreferences.ConfigPreference().getGCM(true);//settings.getBoolean("GCM", true);
+                if(GCM){
+                	// Handle a request that was pressed by the user
+                	String reqString = null;
+                	if(getIntent().getStringExtra("RequestID") != null){
+                		//SharedPreferences settings2 = getSharedPreferences("ConfigFile", 0);
+                		reqString = BAPreferences.ConfigPreference().getPendingRequestAsString(getIntent().getStringExtra("RequestID"));//settings2.getString(getIntent().getStringExtra("RequestID"), null);
+                		ProcessGCMRequest processor = new ProcessGCMRequest(getApplicationContext());
+                		ret = processor.ProcessRequest(reqString);
+                		
+                		// Connect
+                		BAPreferences.ConfigPreference().setRequest(false);
+                    	
+                		//Open a new connection
+                    	String[] ips = new String[] { ret.IPAddress, ret.LocalIP};
+                    	
+                    	SecretKey sharedsecret = Utils.getAESSecret(getApplicationContext(), ret.walletnum); 
+                    	
+                    	//Create a new message object for receiving the transaction.
+                    	Message msg = null;
+                    	
+        				//send request id
+                    	persistentSocketForTheProcess = null;
+        				try {
+        					msg = new Message(ips);
+    						persistentSocketForTheProcess = msg.sentRequestID(
+    								getIntent().getStringExtra("RequestID"),
+    								getIntent().getStringExtra("PairingID"));
+    					} catch (CouldNotSendRequestIDException e1) {
+    						e1.printStackTrace();
+    					}
+
+        				if(persistentSocketForTheProcess != null)
+    	        			try {tx = msg.receiveTX(sharedsecret, persistentSocketForTheProcess);} 
+    	        			catch (Exception e) {e.printStackTrace();}
+                	}            		
+                }
+                else { // TODO !
                 	
-            		//Open a new connection
-                	System.out.println("a4");
-                	String[] ips = new String[] { ret.IPAddress, ret.LocalIP};
-                	
-                	SecretKey sharedsecret = Utils.getAESSecret(getApplicationContext(), ret.walletnum); 
-                	
-                	//Create a new message object for receiving the transaction.
-            		System.out.println("a5");
-                	Message msg = null;
-                	
-    				//send request id
-                	persistentSocketForTheProcess = null;
-    				try {
-    					msg = new Message(ips);
-						persistentSocketForTheProcess = msg.sentRequestID(
-								getIntent().getStringExtra("RequestID"),
-								getIntent().getStringExtra("PairingID"));
-					} catch (CouldNotSendRequestIDException e1) {
-						e1.printStackTrace();
+                }
+                
+                /**
+                 * 
+                 */
+                if(tx != null)
+                	launchDialog(persistentSocketForTheProcess, tx, ret.walletnum);                
+    		}
+    		
+    		private void launchDialog(final Socket s, final TxData tx, final int walletNum) {
+    			runOnUiThread(new Runnable() {
+	    			public void run() {
+	    				try {
+	    					new ConfirmTxDialog(s, 
+	    		     				   tx, 
+	    		     				   Wallet_list.this, 
+	    		     				   walletNum, 
+	    		     				   new TxDialogResponse(){
+	    													@Override
+	    													public void onAuthorizedTx() {
+	    														proccessReq();
+	    													}
+	    								
+	    													@Override
+	    													public void onNotAuthorizedTx() {
+	    														proccessReq();
+	    													}
+	    								
+	    													@Override
+	    													public void onCancel() {
+	    														// TODO Auto-generated method stub
+	    														
+	    													}
+	    													
+	    													public void proccessReq(){
+	    														try {
+	    															JSONObject jo = BAPreferences.ConfigPreference().getPendingRequestAsJsonObject(getIntent().getStringExtra("RequestID"));
+	    															jo.put("seen", true);
+	    															BAPreferences.ConfigPreference().setPendingRequest(jo.getString("RequestID"), jo);
+	    											    		   // remove from pending requests
+	    											    		   removePendingRequestFromListAndThenUpdate(getIntent().getStringExtra("RequestID"));
+	    														} catch (JSONException e) { e.printStackTrace(); }
+	    													}
+
+	    													@Override
+	    													public void OnError() {
+	    														runOnUiThread(new Runnable() {
+	    								            				public void run() {
+	    								            					Toast.makeText(getApplicationContext(), "Failed !!", Toast.LENGTH_LONG).show();
+	    								            				}
+	    								            			});
+	    													}
+	    								        			   
+	    								        		   });
+	    				}
+	    				catch(Exception e) { }
 					}
-
-    				if(persistentSocketForTheProcess != null)
-	        			try {tx = msg.receiveTX(sharedsecret, persistentSocketForTheProcess);} 
-	        			catch (Exception e) {e.printStackTrace();}
-            	}            		
-            }
-            else { // TODO !
-            	
-            }
-        	
-			return null;
-        }
-
-        @Override
-        protected void onProgressUpdate(String... values) {
-            super.onProgressUpdate(values);
-        }
-        
-        /**On finish show the transaction in a dialog box*/
-        protected void onPostExecute(Connection result) {
-           super.onPostExecute(result);
-           if (tx != null) {
-        	   try 
-        	   {
-        		   new ConfirmTxDialog(persistentSocketForTheProcess, 
-        				   tx, 
-        				   Wallet_list.this, 
-        				   ret.walletnum, 
-        				   new TxDialogResponse(){
-											@Override
-											public void onAuthorizedTx() {
-												proccessReq();
-											}
-						
-											@Override
-											public void onNotAuthorizedTx() {
-												proccessReq();
-											}
-						
-											@Override
-											public void onCancel() {
-												// TODO Auto-generated method stub
-												
-											}
-											
-											public void proccessReq(){
-												try {
-													JSONObject jo = BAPreferences.ConfigPreference().getPendingRequestAsJsonObject(getIntent().getStringExtra("RequestID"));
-													jo.put("seen", true);
-													BAPreferences.ConfigPreference().setPendingRequest(jo.getString("RequestID"), jo);
-									    		   // remove from pending requests
-									    		   removePendingRequestFromListAndThenUpdate(getIntent().getStringExtra("RequestID"));
-												} catch (JSONException e) { e.printStackTrace(); }
-											}
-
-											@Override
-											public void OnError() {
-												runOnUiThread(new Runnable() {
-						            				public void run() {
-						            					Toast.makeText(getApplicationContext(), "Failed !!", Toast.LENGTH_LONG).show();
-						            				}
-						            			});
-											}
-						        			   
-						        		   });
-        		   
-        	   } 
-        	   catch (InterruptedException e) {e.printStackTrace();}
-           }
-        }
+				});    			
+    		}
+    	}.start();
     }
-    
+        
     /**
      * This is a class that runs in the background and connects to the wallet and waits to receive a transaction.
      * When one is received, it loads the dialog box.
      */
-    public class ProcessGCMInBackground extends AsyncTask<String,String,Connection> {
-
-		@Override
-		protected Connection doInBackground(String... params) {
-			while(true)
-			{
-				// blocking
-				try {
-					String reqID = GcmIntentService.takeRequest();
-					if(reqID != null)
-						runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								updateListViewData();
-							}
-						});
-						
-				} catch (InterruptedException e) { e.printStackTrace(); }
-			}
-		}
-    	
+    public void processGCMInBackground() {
+//    	new Thread() {
+//    		@Override
+//    		public void run() {
+//    			while(true)
+//    			{
+//    				// blocking
+//    				try {
+//    					String reqID = GcmIntentService.takeRequest();
+//    					if(reqID != null)
+//    						runOnUiThread(new Runnable() {
+//    							@Override
+//    							public void run() {
+//    								updateListViewData();
+//    							}
+//    						});
+//    						
+//    				} catch (InterruptedException e) { e.printStackTrace(); }
+//    			}
+//    		}
+//    	}.start();
     }
     
     /**

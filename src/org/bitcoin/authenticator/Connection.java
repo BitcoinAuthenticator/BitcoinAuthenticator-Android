@@ -46,7 +46,7 @@ public class Connection {
 	 * @return
 	 * @throws CannotConnectToWalletException
 	 */
-	public Socket generateSocket(String[] ips) throws CannotConnectToWalletException {
+	private Socket generateSocket(String[] ips) throws CannotConnectToWalletException {
 		Socket s = null;
 		for(String ip:ips)
 			try {
