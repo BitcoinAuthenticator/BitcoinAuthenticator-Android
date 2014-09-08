@@ -86,13 +86,14 @@ public class Re_pair_wallet extends Activity{
 				catch (IOException e) {e.printStackTrace();} 
 				//Start the pairing protocol
 				connectToWallet();
+				startActivity(new Intent(Re_pair_wallet.this, Wallet_list.class));
 			}
 			else if (resultCode == RESULT_CANCELED) {
 				QRInput = "Scan canceled.";
 				Log.i("asdf", "Cannot Read QR");
 				Toast.makeText(getApplicationContext(), "Cannot Read QR", Toast.LENGTH_LONG).show();
 			}
-			startActivity(new Intent(Re_pair_wallet.this, Wallet_list.class));
+			
 	}
 	
 	/**
