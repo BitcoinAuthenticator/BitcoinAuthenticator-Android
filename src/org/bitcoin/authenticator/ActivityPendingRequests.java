@@ -252,7 +252,7 @@ public class ActivityPendingRequests extends Activity {
 	    			} 
 	    			catch (CouldNotGetTransactionException e) {
 	    				e.printStackTrace(); 
-	    				riseError("Failed to get transaction");
+	    				riseError(e.getMessage());
 	    				try { persistentSocketForTheProcess.close();
 						} catch (IOException ex) { }
 	    			}

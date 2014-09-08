@@ -72,8 +72,9 @@ public class Message {
 			byte[] hash = Utils.hexStringToByteArray(payload.substring(payload.length()-64,payload.length()));
 			
 			// in case wallet couldn't process request
-			if(CannotProcessRequestPayload.isCannotBeProcessedPayload(testpayload))
-				throw new CouldNotGetTransactionException("Couldn't get transaction from wallet");
+			String response = CannotProcessRequestPayload.isCannotBeProcessedPayload(testpayload);
+			if(response != null)
+				throw new CouldNotGetTransactionException(response);
 			
 		    TxData data = new TxData(testpayload);
 		    //Verify the HMAC
@@ -91,7 +92,7 @@ public class Message {
 		}
 		catch (Exception e) {
 			e.printStackTrace();
-			throw new CouldNotGetTransactionException("Couldn't get transaction from wallet");
+			throw new CouldNotGetTransactionException(e.getMessage());
 		}
 		
 	}
