@@ -219,12 +219,10 @@ public class ActivityPendingRequests extends Activity {
 				}
 			});
 			
-			//SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
-            Boolean GCM = BAPreferences.ConfigPreference().getGCM(true);//settings.getBoolean("GCM", true);
+            Boolean GCM = BAPreferences.ConfigPreference().getGCM(true);
             data = (dataClass)lv1.getItemAtPosition(index);
             if(GCM){
-            	//SharedPreferences settings2 = getSharedPreferences("ConfigFile", 0);
-        		String reqString = BAPreferences.ConfigPreference().getPendingRequestAsString(data.getReqID());//settings2.getString(data.getReqID(), null);
+        		String reqString = BAPreferences.ConfigPreference().getPendingRequestAsString(data.getReqID());
         		ProcessGCMRequest processor = new ProcessGCMRequest(getApplicationContext());
         		ret = processor.ProcessRequest(reqString);
         		String[] ips = new String[] { ret.IPAddress, ret.LocalIP};

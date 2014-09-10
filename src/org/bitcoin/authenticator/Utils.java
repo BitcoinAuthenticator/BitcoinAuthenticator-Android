@@ -187,7 +187,7 @@ public class Utils {
     	return sb.toString();
     }
       
-    public static SecretKey getAESSecret(Context context, int walletnum){
+    public static SecretKey getAESSecret(Context context, long walletnum){
     	byte [] key = null;
 		String FILENAME = "AESKey" + walletnum;
 		File file = new File(context.getFilesDir(), FILENAME);

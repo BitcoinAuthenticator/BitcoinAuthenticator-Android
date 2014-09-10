@@ -15,6 +15,7 @@ import javax.crypto.spec.SecretKeySpec;
 import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
 import org.bitcoin.authenticator.Connection.CannotConnectToWalletException;
 import org.bitcoin.authenticator.PairingProtocol.CouldNotPairToWalletException;
+import org.bitcoin.authenticator.PairingProtocol.PairingQRData;
 import org.bitcoin.authenticator.GcmUtil.GcmUtilGlobal;
 
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -60,20 +61,14 @@ public class Re_pair_wallet extends Activity{
 		//if (requestCode == ZXING_QR_SCANNER_REQUEST) {
 			if (resultCode == RESULT_OK) {
 				QRInput = intent.getStringExtra("SCAN_RESULT");
-				//Checking to see what type of data was included in the QR code.
-				AESKey = QRInput.substring(QRInput.indexOf("AESKey=")+7, QRInput.indexOf("&PublicIP="));
-				IPAddress = QRInput.substring(QRInput.indexOf("&PublicIP=")+10, QRInput.indexOf("&LocalIP="));
-				LocalIP = QRInput.substring(QRInput.indexOf("&LocalIP=")+9, QRInput.indexOf("&WalletType="));
-				String walletType = QRInput.substring(QRInput.indexOf("&WalletType=")+12, QRInput.length());
-				//Calculate the fingerprint of the AES key to serve as the wallet identifier.
-				MessageDigest md = null;
-				try {md = MessageDigest.getInstance("SHA-1");} 
-				catch (NoSuchAlgorithmException e) {e.printStackTrace();}
-			    String fingerprint = Pair_wallet.getPairingIDDigest(walletNum, GcmUtilGlobal.gcmRegistrationToken);
+				PairingQRData qrData = PairingProtocol.parseQRString(QRInput);
+				
+				qrData.fingerprint = PairingProtocol.getPairingIDDigest(walletNum, GcmUtilGlobal.gcmRegistrationToken);
 				String walletData = Integer.toString(walletNum);
-				BAPreferences.WalletPreference().setFingerprint(walletData, fingerprint);
+				BAPreferences.WalletPreference().setFingerprint(walletData, qrData.fingerprint);
 				BAPreferences.WalletPreference().setExternalIP(walletData, IPAddress);
 				BAPreferences.WalletPreference().setLocalIP(walletData, LocalIP);
+				
 				//Save the AES key to internal storage.
 			    String FILENAME = "AESKey" + walletNum;
 			    byte[] keyBytes = Utils.hexStringToByteArray(AESKey);
@@ -131,7 +126,7 @@ public class Re_pair_wallet extends Activity{
 		        try {
 					pair2wallet.run(seed, 
 							secretkey, 
-							Pair_wallet.getPairingIDDigest(walletNum,GcmUtilGlobal.gcmRegistrationToken), 
+							PairingProtocol.getPairingIDDigest(walletNum,GcmUtilGlobal.gcmRegistrationToken), 
 							regID, walletNum);
 				} catch (CouldNotPairToWalletException e) {
 					e.printStackTrace();

@@ -55,6 +55,7 @@ import com.google.bitcoin.params.TestNet3Params;
 import com.google.bitcoin.script.Script;
 import com.google.bitcoin.script.ScriptBuilder;
 import com.google.common.collect.ImmutableList;
+import com.google.common.primitives.Ints;
 
 /**
  * Creates a dialog box to show to the user when the Authenticator receives a transaction from the wallet.
@@ -76,17 +77,17 @@ public class ConfirmTxDialog {
 	public ConfirmTxDialog(final Socket s, 
 			final TxData tx, 
 			Activity activity, 
-			final int walletnum,
+			final long walletnum,
 			final TxDialogResponse responseListener) throws InterruptedException{
 	
 		//Load walletID from Shared Preferences
 		//SharedPreferences data = activity.getSharedPreferences("WalletData"+ walletnum, 0);
-		String name = BAPreferences.WalletPreference().getID(Integer.toString(walletnum),"Null");//data.getString("ID", "null");
+		String name = BAPreferences.WalletPreference().getID(Long.toString(walletnum),"Null");//data.getString("ID", "null");
 		
 		//load wallet's ips
 		final String[] ips = new String[] 
-				{ BAPreferences.WalletPreference().getExternalIP(Integer.toString(walletnum),"Null"),
-				  BAPreferences.WalletPreference().getLocalIP(Integer.toString(walletnum),"Null")};
+				{ BAPreferences.WalletPreference().getExternalIP(Long.toString(walletnum),"Null"),
+				  BAPreferences.WalletPreference().getLocalIP(Long.toString(walletnum),"Null")};
 		
 		
 		//Load AES Key from internal storage
@@ -180,7 +181,7 @@ public class ConfirmTxDialog {
 							ArrayList<String> walpubkeys = tx.getPublicKeys();
 							HDKeyDerivation HDKey = null;
 							DeterministicKey masterKey = HDKey.createMasterPrivateKey(authseed);
-							DeterministicKey walletMasterKey = HDKey.deriveChildKey(masterKey, walletnum);
+							DeterministicKey walletMasterKey = HDKey.deriveChildKey(masterKey, Ints.checkedCast(walletnum));
 							DeterministicKey childKey = HDKey.deriveChildKey(walletMasterKey,index.get(j));
 							byte[] privKey = childKey.getPrivKeyBytes();
 							byte[] pubKey = childKey.getPubKey();

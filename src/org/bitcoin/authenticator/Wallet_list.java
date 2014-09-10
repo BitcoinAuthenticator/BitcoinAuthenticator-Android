@@ -3,6 +3,7 @@ package org.bitcoin.authenticator;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Set;
 
 import javax.crypto.SecretKey;
 
@@ -219,7 +220,7 @@ public class Wallet_list extends Activity {
 					if(input.length() > 3){
 						Object o = lv1.getItemAtPosition(index);
 		    			WalletItem Data = (WalletItem) o;		    			
-		    			String wdata = Integer.toString(Data.getWalletNum());
+		    			String wdata = Long.toString(Data.getWalletNum());
 		    			BAPreferences.WalletPreference().setID(wdata, input);
 		    			/*SharedPreferences data = getSharedPreferences(wdata, 0);
 		    			SharedPreferences.Editor editor = data.edit();	
@@ -244,9 +245,9 @@ public class Wallet_list extends Activity {
         	WalletItem wi = (WalletItem)lv1.getItemAtPosition(index);
         	i.putExtra("fingerprint", wi.getFingerprint());
         	i.putExtra("walletName", wi.getWalletLabel());
-        	i.putExtra("accountID", Integer.toString(wi.getWalletNum()));
-        	i.putExtra("externalIP", BAPreferences.WalletPreference().getExternalIP(Integer.toString(wi.getWalletNum()), ""));
-        	i.putExtra("internalIP", BAPreferences.WalletPreference().getLocalIP(Integer.toString(wi.getWalletNum()), ""));
+        	i.putExtra("accountID", Long.toString(wi.getWalletNum()));
+        	i.putExtra("externalIP", BAPreferences.WalletPreference().getExternalIP(Long.toString(wi.getWalletNum()), ""));
+        	i.putExtra("internalIP", BAPreferences.WalletPreference().getLocalIP(Long.toString(wi.getWalletNum()), ""));
         	i.putExtra("icon", wi.getIcon());
         	startActivity (i);
     	}
@@ -262,7 +263,7 @@ public class Wallet_list extends Activity {
 				public void onClick(BAAlertDialogBase alert) {
 					Object o = lv1.getItemAtPosition(index);
         			WalletItem Data = (WalletItem) o;
-        			String wdata = Integer.toString(Data.getWalletNum());
+        			String wdata = Long.toString(Data.getWalletNum());
         			BAPreferences.WalletPreference().setDeleted(wdata, true);
         	        try { setListView(false); } catch (InterruptedException e) { e.printStackTrace(); } catch (JSONException e) { e.printStackTrace(); }
 				}
@@ -317,13 +318,13 @@ public class Wallet_list extends Activity {
 	 * @throws JSONException */
     @SuppressWarnings("unchecked")
 	private ArrayList getListData() throws InterruptedException, JSONException {
-	    int num = BAPreferences.ConfigPreference().getWalletCount(0);
+	    Set<Long> walletIndexSet= BAPreferences.ConfigPreference().getWalletIndexList();
 	    boolean isTestnet = BAPreferences.ConfigPreference().getTestnet(false);
     	ArrayList results = new ArrayList();
     	
     	//Load the data for each wallet and add it to a WalletItem object
-    	for (int i=1; i <= num; i++){
-    		String wdata = Integer.toString(i);
+    	for (Long i:walletIndexSet) {
+    		String wdata = Long.toString(i);
     		WalletItem walletData = new WalletItem();
     		Boolean deleted = BAPreferences.WalletPreference().getDeleted(wdata, false);
     		int networkType = BAPreferences.WalletPreference().getNetworkType(wdata, 1);// default main net
@@ -357,13 +358,13 @@ public class Wallet_list extends Activity {
         private String fingerprint;
         private ArrayList<JSONObject> pendingGCMRequests;
         private int icon;
-        private int WalletNum;
+        private long WalletNum;
         
-        public int getWalletNum() {
+        public long getWalletNum() {
         	return WalletNum;
         }
         
-        public void setWalletNum(int num) {
+        public void setWalletNum(long num) {
         	this.WalletNum = num;
         }
      
@@ -540,7 +541,7 @@ public class Wallet_list extends Activity {
                 	launchDialog(persistentSocketForTheProcess, tx, ret.walletnum);                
     		}
     		
-    		private void launchDialog(final Socket s, final TxData tx, final int walletNum) {
+    		private void launchDialog(final Socket s, final TxData tx, final long walletNum) {
     			runOnUiThread(new Runnable() {
 	    			public void run() {
 	    				try {

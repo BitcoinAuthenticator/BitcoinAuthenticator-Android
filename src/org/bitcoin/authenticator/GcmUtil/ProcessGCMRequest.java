@@ -1,8 +1,10 @@
 package org.bitcoin.authenticator.GcmUtil;
 
 import java.io.IOException;
+import java.util.Set;
 
 import org.bitcoin.authenticator.Connection;
+import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -20,9 +22,9 @@ public class ProcessGCMRequest {
 		ProcessReturnObject ret = new ProcessReturnObject();
 		//Wait for pending requests via GCM\
     	
-		SharedPreferences settings = mContext.getSharedPreferences("ConfigFile", 0);
-		int numwallets = settings.getInt("numwallets", 0);
-		
+//		SharedPreferences settings = mContext.getSharedPreferences("ConfigFile", 0);
+//		int numwallets = settings.getInt("numwallets", 0);
+//		
        	if(msg != null)
     	try {
     		req = new JSONObject(msg);//GcmIntentService.getMessage();
@@ -31,11 +33,13 @@ public class ProcessGCMRequest {
     		ret.IPAddress =  reqPayload.getString("ExternalIP");
     		ret.LocalIP = reqPayload.getString("LocalIP");
     		String pairID = req.getString("PairingID");
-    		for (int y=1; y<=numwallets; y++){
-    			SharedPreferences data = mContext.getSharedPreferences("WalletData" + y, 0);
-    			String fingerprint = data.getString("Fingerprint", "null");
+    		
+    		// search wallet index
+    		Set<Long> wallets = BAPreferences.ConfigPreference().getWalletIndexList();
+    		for (Long l: wallets){
+    			String fingerprint = BAPreferences.WalletPreference().getFingerprint(Long.toString(l), "null");
     			if (fingerprint.equals(pairID)){
-    				ret.walletnum = y;
+    				ret.walletnum = l;
     			}
     		}
     		SharedPreferences prefs = mContext.getSharedPreferences("WalletData" + ret.walletnum, 0);
@@ -54,6 +58,6 @@ public class ProcessGCMRequest {
 		public  String PublicIP;
 		public  String LocalIP;
 		public  String IPAddress;
-		public int walletnum;
+		public long walletnum;
 	}
 }
