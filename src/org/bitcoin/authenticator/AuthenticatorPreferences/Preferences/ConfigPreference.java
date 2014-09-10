@@ -80,7 +80,10 @@ public class ConfigPreference  extends BAPreferenceBase{
 	}
 	
 	public JSONArray getPendingJsonList() throws JSONException{
-		return new JSONArray(getPendingListString());
+		String str = getPendingListString();
+		if (str != null && str.length() > 0)
+			return new JSONArray(str);
+		return new JSONArray();
 	}
 	
 	public ArrayList<String> getPendingList() {
