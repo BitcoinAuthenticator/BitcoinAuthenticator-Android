@@ -14,7 +14,11 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
+import org.bitcoin.authenticator.Connection.CannotConnectToWalletException;
+import org.bitcoin.authenticator.PairingProtocol.CouldNotPairToWalletException;
+import org.bitcoin.authenticator.PairingProtocol.PairingQRData;
 import org.bitcoin.authenticator.GcmUtil.GcmUtilGlobal;
+import org.bitcoin.authenticator.utils.EncodingUtils;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 
@@ -57,22 +61,7 @@ public class Pair_wallet extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_pair_wallet);
-		setupScanButton();
-		
-		/*chkForceAccountID = (CheckBox) findViewById(R.id.checkBox1);
-		chkForceAccountID.setOnCheckedChangeListener(new OnCheckedChangeListener(){
-			@Override
-			public void onCheckedChanged(CompoundButton buttonView,
-					boolean isChecked) {
-				accountID.setEnabled(isChecked);
-				accountID.setAlpha(isChecked? 1.0f:0.3f);
-			}
-		});
-		accountID = (EditText) findViewById(R.id.editText1);
-		if(!chkForceAccountID.isChecked()){
-			accountID.setEnabled(false);
-			accountID.setAlpha(0.3f);
-		}*/
+		setupScanButton();	
 	}
 	
 	/**Sets up the Scan button component*/
@@ -177,35 +166,25 @@ public class Pair_wallet extends Activity {
 				mProgressDialog = new ProgressDialog(this, R.style.CustomDialogSpinner);
 				mProgressDialog.setIndeterminate(false);
 	            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+	            mProgressDialog.setCancelable(false);
+	    		mProgressDialog.setCanceledOnTouchOutside(false);
 	            mProgressDialog.show();
             //
 			QRInput = intent.getStringExtra("SCAN_RESULT");
-			//Checking to see what type of data was included in the QR code.
-			String AESKey = QRInput.substring(QRInput.indexOf("AESKey=")+7, QRInput.indexOf("&PublicIP="));
-			String IPAddress = QRInput.substring(QRInput.indexOf("&PublicIP=")+10, QRInput.indexOf("&LocalIP="));
-			String LocalIP = QRInput.substring(QRInput.indexOf("&LocalIP=")+9, QRInput.indexOf("&WalletType="));
-			String walletType = QRInput.substring(QRInput.indexOf("&WalletType=")+12, QRInput.indexOf("&NetworkType="));
-			/**
-			 * 1 for main net, 0 for testnet
-			 */
-			int networkType = Integer.parseInt(QRInput.substring(QRInput.indexOf("&NetworkType=")+13, QRInput.length()));
-			//Increment the counter for the number of paired wallet in shared preferences
-		    int num ;
-		    /*if(!chkForceAccountID.isChecked())
-		    	num = (BAPreferences.ConfigPreference().getWalletCount(0)) + 1;
-		    else
-		    	num = Integer.parseInt(accountID.getText().toString());*/
-		    num = (BAPreferences.ConfigPreference().getWalletCount(0)) + 1;
-		    String fingerprint = getPairingIDDigest(num, GcmUtilGlobal.gcmRegistrationToken);
+			PairingQRData qrData = PairingProtocol.parseQRString(QRInput);
+
+			qrData.fingerprint = PairingProtocol.getPairingIDDigest(qrData.walletIndex, GcmUtilGlobal.gcmRegistrationToken);
 			//Start the pairing protocol
-			connectTask conx = new connectTask(AESKey, IPAddress, LocalIP, walletType, num, networkType,fingerprint);
+			connectTask conx = new connectTask(qrData);
 		    conx.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
 			} 
 			else if (resultCode == RESULT_CANCELED) {
 				QRInput = "Scan canceled.";
+			
 			}
 	}
 	
+
 	/**
 	 * This class runs in the background. It creates a connection object which connects
 	 * to the wallet and executes the core of the pairing protocol.
@@ -217,22 +196,17 @@ public class Pair_wallet extends Activity {
 		private String walletType;
 		private String LocalIP;
 		private String AESKey;
-		private  int num;
+		private long walletIndex;
 		private int networkType;
-		public connectTask(String AESKey, 
-				String IPAddress, 
-				String LocalIP, 
-				String walletType, 
-				int num, 
-				int networkType, 
-				String fingerprint){
-			this.IPAddress = IPAddress;
-			this.fingerprint = fingerprint;
-			this.walletType = walletType;
-			this.LocalIP = LocalIP;
-			this.AESKey = AESKey;
-			this.num = num;
-			this.networkType = networkType;
+		
+		public connectTask(PairingQRData qrData){
+			this.IPAddress = qrData.IPAddress;
+			this.fingerprint = qrData.fingerprint;
+			this.walletType = qrData.walletType;
+			this.LocalIP = qrData.LocalIP;
+			this.AESKey = qrData.AESKey;
+			this.walletIndex = qrData.walletIndex;
+			this.networkType = qrData.networkType;
 		}
 		
         @Override
@@ -253,29 +227,31 @@ public class Pair_wallet extends Activity {
     			try {inputStream.close();} 
     			catch (IOException e) {e.printStackTrace();}
     		}
-    		//Try to connect to wallet using either IP
-    		PairingProtocol pair2wallet = null;
-    		try {pair2wallet = new PairingProtocol(IPAddress);}
-        	catch (IOException e1) {
-        		try {pair2wallet = new PairingProtocol(LocalIP);} 
-            	catch (IOException e2) {
-            		runOnUiThread(new Runnable() {
-            			public void run() {
-    						  Toast.makeText(getApplicationContext(), "Unable to connect to wallet", Toast.LENGTH_LONG).show();
-    					}
-    				});
-            	}
-        	}
+    		
+    		String[] ips = new String[] { IPAddress, LocalIP};
+    		PairingProtocol pair2wallet = new PairingProtocol(ips);
+    		
+
     		//Run pairing protocol
             SecretKey secretkey = new SecretKeySpec(Utils.hexStringToByteArray(AESKey), "AES");
             byte[] regID = (GcmUtilGlobal.gcmRegistrationToken).getBytes();
 			try {
-				pair2wallet.run(seed, secretkey, getPairingIDDigest(num, GcmUtilGlobal.gcmRegistrationToken), regID, num);
-				completePairing(AESKey, IPAddress, LocalIP, walletType, num, networkType,fingerprint);
+				pair2wallet.run(seed, 
+						secretkey, 
+						PairingProtocol.getPairingIDDigest(walletIndex, GcmUtilGlobal.gcmRegistrationToken), 
+						regID, 
+						walletIndex);
+				completePairing(AESKey, IPAddress, LocalIP, walletType, walletIndex, networkType,fingerprint);
 			} 
-			catch (InvalidKeyException e) {e.printStackTrace();} 
-			catch (NoSuchAlgorithmException e) {e.printStackTrace();} 
-			catch (IOException e) {e.printStackTrace();}
+			catch (CouldNotPairToWalletException e) {
+				e.printStackTrace();
+				runOnUiThread(new Runnable() {
+        			public void run() {
+						  Toast.makeText(getApplicationContext(), "Unable to pair", Toast.LENGTH_LONG).show();
+					}
+				});
+			}
+
             return null;
         }
         @Override
@@ -296,10 +272,10 @@ public class Pair_wallet extends Activity {
     			String IPAddress, 
     			String LocalIP, 
     			String walletType, 
-    			int num, 
+    			long walletIndex, 
     			int networkType,
-    			String fingerprint) throws NoSuchAlgorithmException{	
-    	    String walletData = Integer.toString(num);
+    			String fingerprint){	
+    	    String walletData = Long.toString(walletIndex);
     	    BAPreferences.WalletPreference().setWallet(walletData,
     	    		txtID.getText().toString(), 
     	    		fingerprint, 
@@ -309,11 +285,11 @@ public class Pair_wallet extends Activity {
     	    		networkType,
     	    		false);
     	    //
-    	    BAPreferences.ConfigPreference().setWalletCount(num);
+    	    BAPreferences.ConfigPreference().addWalletIndex(walletIndex);
     	    BAPreferences.ConfigPreference().setPaired(true);
     	    
     	    //Save the AES key to internal storage.
-    	    String FILENAME = "AESKey" + num;
+    	    String FILENAME = "AESKey" + walletIndex;
     	    byte[] keyBytes = Utils.hexStringToByteArray(AESKey);
     	    FileOutputStream outputStream = null;
     		try {outputStream = openFileOutput(FILENAME, Context.MODE_PRIVATE);} 
@@ -325,28 +301,10 @@ public class Pair_wallet extends Activity {
     	}
     }
 	
-	public static String getPairingIDDigest(int num, String gcmRegID)
-	 {
-		MessageDigest md = null;
-		try {md = MessageDigest.getInstance("SHA-1");}
-		catch(NoSuchAlgorithmException e) {e.printStackTrace();} 
-	    byte[] digest = md.digest((gcmRegID + "_" + Integer.toString(num)).getBytes());
-	    String ret = new BigInteger(1, digest).toString(16);
-	    //Make sure it is 40 chars, if less pad with 0, if more substringit
-	    if(ret.length() > 40)
-	    {
-    	ret = ret.substring(0, 39);
-	    }
-	    else if(ret.length() < 40)
-	    {
-	    	int paddingNeeded = 40 - ret.length();
-	    	String padding = "";
-	    	for(int i=0;i<paddingNeeded;i++)
-	    		padding = padding + "0";
-	    	ret = padding + ret;
-	    }
-	    //Log.v("ASDF","Reg id: " + ret);
-	    return ret;
+	static public class CannotScanExceptionTemp extends Exception {
+		public CannotScanExceptionTemp(String str) {
+			super(str);
+		}
 	}
 }
 

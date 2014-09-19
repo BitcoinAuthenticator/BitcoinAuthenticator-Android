@@ -13,6 +13,9 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
+import org.bitcoin.authenticator.Connection.CannotConnectToWalletException;
+import org.bitcoin.authenticator.PairingProtocol.CouldNotPairToWalletException;
+import org.bitcoin.authenticator.PairingProtocol.PairingQRData;
 import org.bitcoin.authenticator.GcmUtil.GcmUtilGlobal;
 
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -24,6 +27,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 public class Re_pair_wallet extends Activity{
@@ -57,20 +61,14 @@ public class Re_pair_wallet extends Activity{
 		//if (requestCode == ZXING_QR_SCANNER_REQUEST) {
 			if (resultCode == RESULT_OK) {
 				QRInput = intent.getStringExtra("SCAN_RESULT");
-				//Checking to see what type of data was included in the QR code.
-				AESKey = QRInput.substring(QRInput.indexOf("AESKey=")+7, QRInput.indexOf("&PublicIP="));
-				IPAddress = QRInput.substring(QRInput.indexOf("&PublicIP=")+10, QRInput.indexOf("&LocalIP="));
-				LocalIP = QRInput.substring(QRInput.indexOf("&LocalIP=")+9, QRInput.indexOf("&WalletType="));
-				String walletType = QRInput.substring(QRInput.indexOf("&WalletType=")+12, QRInput.length());
-				//Calculate the fingerprint of the AES key to serve as the wallet identifier.
-				MessageDigest md = null;
-				try {md = MessageDigest.getInstance("SHA-1");} 
-				catch (NoSuchAlgorithmException e) {e.printStackTrace();}
-			    String fingerprint = Pair_wallet.getPairingIDDigest(walletNum, GcmUtilGlobal.gcmRegistrationToken);
+				PairingQRData qrData = PairingProtocol.parseQRString(QRInput);
+				
+				qrData.fingerprint = PairingProtocol.getPairingIDDigest(walletNum, GcmUtilGlobal.gcmRegistrationToken);
 				String walletData = Integer.toString(walletNum);
-				BAPreferences.WalletPreference().setFingerprint(walletData, fingerprint);
+				BAPreferences.WalletPreference().setFingerprint(walletData, qrData.fingerprint);
 				BAPreferences.WalletPreference().setExternalIP(walletData, IPAddress);
 				BAPreferences.WalletPreference().setLocalIP(walletData, LocalIP);
+				
 				//Save the AES key to internal storage.
 			    String FILENAME = "AESKey" + walletNum;
 			    byte[] keyBytes = Utils.hexStringToByteArray(AESKey);
@@ -82,66 +80,64 @@ public class Re_pair_wallet extends Activity{
 				try {outputStream.close();} 
 				catch (IOException e) {e.printStackTrace();} 
 				//Start the pairing protocol
-				connectTask conx = new connectTask();
-				conx.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+				connectToWallet();
 				startActivity(new Intent(Re_pair_wallet.this, Wallet_list.class));
 			}
 			else if (resultCode == RESULT_CANCELED) {
 				QRInput = "Scan canceled.";
-				startActivity(new Intent(Re_pair_wallet.this, Wallet_list.class));
+				Log.i("asdf", "Cannot Read QR");
+				Toast.makeText(getApplicationContext(), "Cannot Read QR", Toast.LENGTH_LONG).show();
 			}
+			
 	}
 	
 	/**
 	 * This class runs in the background. It creates a connection object which connects
 	 * to the wallet and executes the core of the pairing protocol.
 	 */
-	public class connectTask extends AsyncTask<String,String,PairingProtocol> {
-        @Override
-        protected PairingProtocol doInBackground(String... message) {
-            //Load the seed from file
-        	byte [] seed = null;
-    		String FILENAME = "seed";
-    		File file = new File(getFilesDir(), FILENAME);
-    		int size = (int)file.length();
-    		if (size != 0)
-    		{
-    			FileInputStream inputStream = null;
-    			try {inputStream = openFileInput(FILENAME);} 
-    			catch (FileNotFoundException e1) {e1.printStackTrace();}
-    			seed = new byte[size];
-    			try {inputStream.read(seed, 0, size);} 
-    			catch (IOException e) {e.printStackTrace();}
-    			try {inputStream.close();} 
-    			catch (IOException e) {e.printStackTrace();}
-    		}
-    		//Try to connect to wallet using either IP
-    		PairingProtocol pair2wallet = null;
-    		try {pair2wallet = new PairingProtocol(IPAddress);}
-        	catch (IOException e1) {
-        		try {pair2wallet = new PairingProtocol(LocalIP);} 
-            	catch (IOException e2) {
-            		runOnUiThread(new Runnable() {
-            			public void run() {
-    						  Toast.makeText(getApplicationContext(), "Unable to connect to wallet", Toast.LENGTH_LONG).show();
-    					}
-    				});
-            	}
-        	}
-            SecretKey secretkey = new SecretKeySpec(Utils.hexStringToByteArray(AESKey), "AES");
-            byte[] regID = (GcmUtilGlobal.gcmRegistrationToken).getBytes();
-			try {pair2wallet.run(seed, secretkey, Pair_wallet.getPairingIDDigest(walletNum, GcmUtilGlobal.gcmRegistrationToken), regID, walletNum);} 
-			catch (InvalidKeyException e) {e.printStackTrace();} 
-			catch (NoSuchAlgorithmException e) {e.printStackTrace();} 
-			catch (IOException e) {e.printStackTrace();}
-            return null;
-        }
-        @Override
-        protected void onProgressUpdate(String... values) {
-            super.onProgressUpdate(values);
-        }
-        protected void onPostExecute(PairingProtocol result) {
-            super.onPostExecute(result);
-        }
-    }
+	private void connectToWallet() {
+		new Thread() {
+			@Override
+			public void run() {
+				//Load the seed from file
+				Log.i("asdf", "Reading seed");
+		    	byte [] seed = null;
+				String FILENAME = "seed";
+				File file = new File(getFilesDir(), FILENAME);
+				int size = (int)file.length();
+				if (size != 0)
+				{
+					FileInputStream inputStream = null;
+					try {inputStream = openFileInput(FILENAME);} 
+					catch (FileNotFoundException e1) {e1.printStackTrace();}
+					seed = new byte[size];
+					try {inputStream.read(seed, 0, size);} 
+					catch (IOException e) {e.printStackTrace();}
+					try {inputStream.close();} 
+					catch (IOException e) {e.printStackTrace();}
+				}
+
+				PairingProtocol pair2wallet = new PairingProtocol(new String[]{ IPAddress, LocalIP  } );
+
+		        SecretKey secretkey = new SecretKeySpec(Utils.hexStringToByteArray(AESKey), "AES");
+		        
+		        byte[] regID = (GcmUtilGlobal.gcmRegistrationToken).getBytes();
+		        
+		        try {
+					pair2wallet.run(seed, 
+							secretkey, 
+							PairingProtocol.getPairingIDDigest(walletNum,GcmUtilGlobal.gcmRegistrationToken), 
+							regID, walletNum);
+				} catch (CouldNotPairToWalletException e) {
+					e.printStackTrace();
+					runOnUiThread(new Runnable() {
+		    			public void run() {
+							  Toast.makeText(getApplicationContext(), "Unable to pair", Toast.LENGTH_LONG).show();
+						}
+					});
+				}
+			}
+		}.start();
+	}
+	
 }

@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.net.Socket;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
@@ -15,6 +16,7 @@ import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
+import org.bitcoin.authenticator.net.CannotProcessRequestPayload;
 import org.json.simple.JSONObject;
 
 /**
@@ -22,22 +24,33 @@ import org.json.simple.JSONObject;
  */
 public class Message {
 	
-	static DataInputStream in;
-	static DataOutputStream out ;
+	private String[] ips;
 	
 	/**Constructor takes in active Connection object to the wallet*/
-	public Message(Connection conn) throws IOException{
-		in = conn.getInputStream();
-		out = conn.getOutputStream();
+	public Message(String[] ips){
+		if (ips == null || ips.length == 0)
+			throw new IllegalArgumentException("No ips were provided");
+		this.ips = ips;
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void sentRequestID(String requestID) throws IOException{
-		JSONObject jo = new JSONObject();
-		jo.put("requestID", requestID);
-		byte[] payload = jo.toString().getBytes();
-		out.writeInt(payload.length);
-		out.write(payload);
+	public Socket sentRequestID(String requestID, String pairingID) throws CouldNotSendRequestIDException{
+		try {
+			JSONObject jo = new JSONObject();
+			jo.put("requestID", requestID);
+			jo.put("pairingID", pairingID);
+			byte[] payload = jo.toString().getBytes();
+			return Connection.getInstance().writeContinuous(ips, payload);
+		}
+		catch(Exception e) {
+			throw new CouldNotSendRequestIDException("Couldn't send request ID to wallet");
+		}
+	}
+	
+	static public class CouldNotSendRequestIDException extends Exception {
+		public CouldNotSendRequestIDException(String str) {
+			super(str);
+		}
 	}
 	
 	/**
@@ -45,62 +58,95 @@ public class Message {
 	 * Returns a TxData object containing the number of inputs, child key indexes, public keys from the wallet, and 
 	 * raw unsigned transaction.
 	 */
-	public TxData receiveTX(SecretKey sharedsecret) throws Exception {
-		//Receive the encrypted payload
-	  	byte[] cipherBytes;
-	  	int size = in.readInt();
-		cipherBytes = new byte[size];
-		in.read(cipherBytes);
-		//Decrypt the payload
-	  	Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
-	    cipher.init(Cipher.DECRYPT_MODE, sharedsecret);
-	    //Split the payload into it's parts.
-	    String payload = Utils.bytesToHex(cipher.doFinal(cipherBytes));
-		byte[] testpayload = Utils.hexStringToByteArray(payload.substring(0,payload.length()-64));
-		byte[] hash = Utils.hexStringToByteArray(payload.substring(payload.length()-64,payload.length()));
-	    TxData data = new TxData(testpayload);
-	    //Verify the HMAC
-	    Mac mac = Mac.getInstance("HmacSHA256");
-		mac.init(sharedsecret);
-		byte[] macbytes = mac.doFinal(testpayload);
-		if (Arrays.equals(macbytes, hash)){
-			//Return the payload
-			return data;
+	public TxData receiveTX(SecretKey sharedsecret, Socket s) throws CouldNotGetTransactionException {
+		try {
+			//Receive the encrypted payload
+		  	byte[] cipherBytes;
+			cipherBytes = Connection.getInstance().readContinuous(s);
+			//Decrypt the payload
+		  	Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
+		    cipher.init(Cipher.DECRYPT_MODE, sharedsecret);
+		    //Split the payload into it's parts.
+		    String payload = Utils.bytesToHex(cipher.doFinal(cipherBytes));
+			byte[] testpayload = Utils.hexStringToByteArray(payload.substring(0,payload.length()-64));
+			byte[] hash = Utils.hexStringToByteArray(payload.substring(payload.length()-64,payload.length()));
+			
+			// in case wallet couldn't process request
+			String response = CannotProcessRequestPayload.isCannotBeProcessedPayload(testpayload);
+			if(response != null)
+				throw new CouldNotGetTransactionException(response);
+			
+		    TxData data = new TxData(testpayload);
+		    //Verify the HMAC
+		    Mac mac = Mac.getInstance("HmacSHA256");
+			mac.init(sharedsecret);
+			byte[] macbytes = mac.doFinal(testpayload);
+			if (Arrays.equals(macbytes, hash)){
+				//Return the payload
+				return data;
+			}
+			else {
+				System.out.println("Message authentication code is invalid");
+				throw new CouldNotGetTransactionException("Couldn't get transaction from wallet");
+			}
 		}
-		else {
-			System.out.println("Message authentication code is invalid");
-			return null;
+		catch (Exception e) {
+			e.printStackTrace();
+			throw new CouldNotGetTransactionException(e.getMessage());
+		}
+		
+	}
+	
+	static public class CouldNotGetTransactionException extends Exception {
+		public CouldNotGetTransactionException(String str) {
+			super(str);
 		}
 	}
 
 	/**
 	 * Method to send the transaction signature back to the wallet.
-	 * It calculates the HMAC of the signature, concatentates it, and encypts it with AES.
+	 * It calculates the HMAC of the signature, concatenates it, and encrypts it with AES.
+	 * 
+	 * @param sig
+	 * @param sharedsecret
+	 * @param ip
+	 * @throws CouldNotSendEncryptedException
 	 */
-	public void sendEncrypted (byte[] sig, SecretKey sharedsecret) throws IOException, InvalidKeyException, NoSuchAlgorithmException{
-		//Calculate the HMAC
-    	Mac mac = Mac.getInstance("HmacSHA256");
-		mac.init(sharedsecret);
-		byte[] macbytes = mac.doFinal(sig);
-		//Concatenate it with the signature
-		ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
-		outputStream.write(sig);
-		outputStream.write(macbytes);
-		byte payload[] = outputStream.toByteArray();
-  		//Encrypt the payload
-  	    Cipher cipher = null;
-		try {cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");} 
-		catch (NoSuchAlgorithmException e) {e.printStackTrace();} 
-		catch (NoSuchPaddingException e) {e.printStackTrace();}
-        try {cipher.init(Cipher.ENCRYPT_MODE, sharedsecret);} 
-        catch (InvalidKeyException e) {e.printStackTrace();}
-        byte[] cipherBytes = null;
-		try {cipherBytes = cipher.doFinal(payload);} 
-		catch (IllegalBlockSizeException e) {e.printStackTrace();} 
-		catch (BadPaddingException e) {e.printStackTrace();}
-		//Send the payload over to the wallet
-	  	out.writeInt(cipherBytes.length);
-		out.write(cipherBytes);
+	public void sendEncrypted (byte[] sig, SecretKey sharedsecret, Socket s) throws CouldNotSendEncryptedException{
+		try {
+			//Calculate the HMAC
+	    	Mac mac = Mac.getInstance("HmacSHA256");
+			mac.init(sharedsecret);
+			byte[] macbytes = mac.doFinal(sig);
+			//Concatenate it with the signature
+			ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
+			outputStream.write(sig);
+			outputStream.write(macbytes);
+			byte payload[] = outputStream.toByteArray();
+	  		//Encrypt the payload
+	  	    Cipher cipher = null;
+			try {cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");} 
+			catch (NoSuchAlgorithmException e) {e.printStackTrace();} 
+			catch (NoSuchPaddingException e) {e.printStackTrace();}
+	        try {cipher.init(Cipher.ENCRYPT_MODE, sharedsecret);} 
+	        catch (InvalidKeyException e) {e.printStackTrace();}
+	        byte[] cipherBytes = null;
+			try {cipherBytes = cipher.doFinal(payload);} 
+			catch (IllegalBlockSizeException e) {e.printStackTrace();} 
+			catch (BadPaddingException e) {e.printStackTrace();}
+			//Send the payload over to the wallet
+			Connection.getInstance().writeAndClose(s, cipherBytes);
+		}
+		catch(Exception e) {
+			throw new CouldNotSendEncryptedException("Couldn't send encrypted payload");
+		}
+		
     }
+	
+	static public class CouldNotSendEncryptedException extends Exception {
+		public CouldNotSendEncryptedException(String str) {
+			super(str);
+		}
+	}
 	
 }

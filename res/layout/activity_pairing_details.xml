@@ -107,6 +107,62 @@
 	    
 	</LinearLayout>
 	
+    <!-- Spacer -->
+    <View android:layout_width="fill_parent"
+	        android:layout_height="30dp"
+	        android:background="@color/transparent"/>
+	
+    <!-- Last known external IP  -->
+    <LinearLayout  android:layout_width="fill_parent"
+				    android:layout_height="wrap_content"
+				    android:orientation="horizontal"
+				    android:background="@color/transparent">
+				    
+        <TextView
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:textColor="@color/ui_text_color"
+	        android:textSize="14dip"
+	        android:text="Last know External IP: " />
+        
+	    <TextView
+	        android:id="@+id/pairing_details_ext_ip"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:textSize="14dip"
+	        android:textColor="@color/ui_text_color"
+	        android:text="XXX" />
+	    
+	</LinearLayout>
+	
+    <!-- Spacer -->
+    <View android:layout_width="fill_parent"
+	        android:layout_height="10dp"
+	        android:background="@color/transparent"/>
+	
+    <!-- Last known internal IP  -->
+    <LinearLayout  android:layout_width="fill_parent"
+				    android:layout_height="wrap_content"
+				    android:orientation="horizontal"
+				    android:background="@color/transparent">
+				    
+        <TextView
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:textColor="@color/ui_text_color"
+	        android:textSize="14dip"
+	        android:text="Last know Internal IP: " />
+        
+	    <TextView
+	        android:id="@+id/pairing_details_int_ip"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:textSize="14dip"
+	        android:textColor="@color/ui_text_color"
+	        android:text="XXX" />
+	    
+	</LinearLayout>
+	
    
 
 </LinearLayout>

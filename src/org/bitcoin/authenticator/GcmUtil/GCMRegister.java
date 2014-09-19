@@ -84,7 +84,7 @@ public class GCMRegister {
 	    return registrationId;
 	}
 	
-	private SharedPreferences getGCMPreferences(Context context) {
+	public static SharedPreferences getGCMPreferences(Context context) {
 	    // This sample app persists the registration ID in shared preferences, but
 	    // how you store the regID in your app is up to you.
 	    return context.getSharedPreferences(Main.class.getSimpleName(),
@@ -149,7 +149,7 @@ public class GCMRegister {
 	    Log.v(GcmUtilGlobal.TAG,"GCM Registration ID - " + regId);
 	}
 	
-	private void storeRegistrationId(Context context, String regId) {
+	public static void storeRegistrationId(Context context, String regId) {
 	    final SharedPreferences prefs = getGCMPreferences(context);
 	    int appVersion = getAppVersion(context);
 	    Log.i(GcmUtilGlobal.TAG, "Saving regId on app version " + appVersion);

@@ -2,12 +2,14 @@ package org.bitcoin.authenticator.GcmUtil;
 
 import java.io.InputStream;
 import java.util.Date;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.bitcoin.authenticator.Main;
 import org.bitcoin.authenticator.R;
+import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -83,18 +85,23 @@ public class GcmIntentService extends IntentService {
     	obj = new JSONObject(msg);
     	JSONObject payload = new JSONObject(obj.getString("ReqPayload"));
     	// search notification
-    	SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
-		SharedPreferences.Editor editor = settings.edit();	
+//    	SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
+//		SharedPreferences.Editor editor = settings.edit();	
 		/**
 		 * Update all pending requests IPs from the received pairingID
 		 */
 		JSONArray o;
 		boolean didFind = false;
-		if(settings.getString("pendingList", null) !=null){
-			o = new JSONArray(settings.getString("pendingList", ""));
-			for(int i = 0 ; i < o.length(); i++){
-				String pendingID = o.get(i).toString();
-				JSONObject pendingObj = new JSONObject(settings.getString(pendingID, null));
+		List<String> pendingReqs = BAPreferences.ConfigPreference().getPendingList();
+		if(pendingReqs !=null){
+			//o = new JSONArray(settings.getString("pendingList", ""));
+			//for(int i = 0 ; i < o.length(); i++){
+			for(String pendingID: pendingReqs) {
+				//String pendingID = o.get(i).toString();
+				//JSONObject pendingObj = new JSONObject(settings.getString(pendingID, null));
+				
+				JSONObject pendingObj = BAPreferences.ConfigPreference().getPendingRequestAsJsonObject(pendingID);
+				
 				if(pendingObj.getString("PairingID").equals(obj.getString("PairingID")) && pendingObj.getBoolean("seen") == false){
 					didFind = true;
 					// update
@@ -102,8 +109,13 @@ public class GcmIntentService extends IntentService {
 					pendingPayload.put("ExternalIP", payload.getString("ExternalIP"));
 					pendingPayload.put("LocalIP", payload.getString("LocalIP"));
 					pendingObj.put("ReqPayload",pendingPayload );
-					editor.putString(pendingObj.getString("RequestID"), pendingObj.toString());
-					editor.commit();
+					
+					BAPreferences.ConfigPreference().setPendingRequest(pendingID, pendingObj);
+					
+					Log.v(GcmUtilGlobal.TAG, "Updated pending request: " + pendingID);
+//					
+//					editor.putString(pendingObj.getString("RequestID"), pendingObj.toString());
+//					editor.commit();
 				}
 			}
 		}
@@ -159,6 +171,7 @@ public class GcmIntentService extends IntentService {
 		 */
 		// 1) 
 		intent.putExtra("RequestID", obj.getString("RequestID"));
+		intent.putExtra("PairingID", obj.getString("PairingID"));
 		intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		// 2) 
 		addRequestToQueue(obj.getString("RequestID"));
@@ -189,19 +202,25 @@ public class GcmIntentService extends IntentService {
         mNotificationManager.notify((int)uniqueId, notif);
 
         // update preference
-		SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
-		SharedPreferences.Editor editor = settings.edit();	
-    	editor.putBoolean("request", true);
-		editor.putString(obj.getString("RequestID"), obj.toString());
-		// update RequestID list
-		JSONArray o;
-		if(settings.getString("pendingList", null) !=null)
-			o = new JSONArray(settings.getString("pendingList", ""));
-		else
-			o = new JSONArray();
-		o.put(obj.getString("RequestID"));
-		editor.putString("pendingList", o.toString());
-		editor.commit();
+        BAPreferences.ConfigPreference().setRequest(true);
+        BAPreferences.ConfigPreference().setPendingRequest(obj.getString("RequestID"), obj);
+        BAPreferences.ConfigPreference().addPendingRequestToList(obj.getString("RequestID"));
+        
+        Log.v(GcmUtilGlobal.TAG, "Added pending request: " + obj.getString("RequestID"));
+        
+//		SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
+//		SharedPreferences.Editor editor = settings.edit();	
+//    	editor.putBoolean("request", true);
+//		editor.putString(obj.getString("RequestID"), obj.toString());
+//		// update RequestID list
+//		JSONArray o;
+//		if(settings.getString("pendingList", null) !=null)
+//			o = new JSONArray(settings.getString("pendingList", ""));
+//		else
+//			o = new JSONArray();
+//		o.put(obj.getString("RequestID"));
+//		editor.putString("pendingList", o.toString());
+//		editor.commit();
     	
     }
         

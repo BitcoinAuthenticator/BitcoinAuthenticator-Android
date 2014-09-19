@@ -1,6 +1,9 @@
 package org.bitcoin.authenticator.AuthenticatorPreferences.Preferences;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferenceBase;
 import org.json.JSONArray;
@@ -20,14 +23,35 @@ public class ConfigPreference  extends BAPreferenceBase{
 	 * Wallet Count
 	 */
 	
-	public int getWalletCount(int defValue){
+	public Set<Long> getWalletIndexList(){
 		SharedPreferences settings2 = getSharedPreferences(getPrefix(), 0);
-		return settings2.getInt(BAPreferenceType.WALLET_COUNT.toString(), defValue);
+		Set<String> str = settings2.getStringSet(BAPreferenceType.WALLET_INDEX_LIST.toString(), null);
+		if(str == null)
+			str = new HashSet<String>();
+		
+		Set<Long> ret = new HashSet<Long>();
+		for(String s: str) {
+			Long v = Long.parseLong(s);
+			ret.add(v);
+		}
+		
+		return ret;
 	}
 	
-	public void setWalletCount(int value){
+	public void addWalletIndex(Long value){
 		SharedPreferences.Editor editor = getEditor(getPrefix());
-		editor.putInt(BAPreferenceType.WALLET_COUNT.toString(), value);
+		Set<Long> all = getWalletIndexList();
+		if(all == null)
+			all = new HashSet<Long>();
+		all.add(value);
+		
+		Set<String> toStore = new HashSet<String>();
+		for(Long l:all) {
+			String v = Long.toString(l);
+			toStore.add(v);
+		}
+		
+		editor.putStringSet(BAPreferenceType.WALLET_INDEX_LIST.toString(), toStore);
 		editor.commit();
 	}
 	
@@ -56,7 +80,10 @@ public class ConfigPreference  extends BAPreferenceBase{
 	}
 	
 	public JSONArray getPendingJsonList() throws JSONException{
-		return new JSONArray(getPendingListString());
+		String str = getPendingListString();
+		if (str != null && str.length() > 0)
+			return new JSONArray(str);
+		return new JSONArray();
 	}
 	
 	public ArrayList<String> getPendingList() {
@@ -92,6 +119,12 @@ public class ConfigPreference  extends BAPreferenceBase{
 			   }
 			}
 		   setPendingList(newPja);
+	}
+	
+	public void addPendingRequestToList(String requestID) throws JSONException {
+		JSONArray pja = getPendingJsonList();
+		pja.put(requestID);
+		setPendingList(pja);
 	}
 	
 	/**
@@ -183,13 +216,13 @@ public class ConfigPreference  extends BAPreferenceBase{
 	 *
 	 */
 	private enum BAPreferenceType {
-		PENDING_LIST			("pendingList"	),
-		WALLET_COUNT			("numwallets"	),
-		TESTNET					("testnet"		),
-		REQUEST					("request"		),
-		PAIRED					("paired"		),
-		GCM						("GCM"			),
-		INITIALIZED				("initialized"	);
+		PENDING_LIST			("pendingList"		),
+		WALLET_INDEX_LIST		("walletIndexList"	),
+		TESTNET					("testnet"			),
+		REQUEST					("request"			),
+		PAIRED					("paired"			),
+		GCM						("GCM"				),
+		INITIALIZED				("initialized"		);
 		
 		private String name;       
 
