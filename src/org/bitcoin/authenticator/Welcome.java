@@ -32,6 +32,12 @@ import android.widget.Toast;
  */
 public class Welcome extends Activity {
 
+	private ProgressDialog mProgressDialog;
+	
+	private Button howitworksButton;
+	private Button NewWalletButton;
+	private Button restoreButton;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -43,7 +49,7 @@ public class Welcome extends Activity {
 	
 	/**These methods set up the activity components*/
 	private void setupHowItWorksBtn(){
-		Button howitworksButton = (Button) findViewById(R.id.btnHowItWorks);
+		howitworksButton = (Button) findViewById(R.id.btnHowItWorks);
 		howitworksButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -53,7 +59,7 @@ public class Welcome extends Activity {
 	}
 	
 	private void setupNewWalletBtn(){
-		Button NewWalletButton = (Button) findViewById(R.id.btnNewWallet);
+		NewWalletButton = (Button) findViewById(R.id.btnNewWallet);
 		NewWalletButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -63,7 +69,7 @@ public class Welcome extends Activity {
 	}
 	
 	private void setupRestoreBtn(){
-		Button restoreButton = (Button) findViewById(R.id.btnRestoreWallet);
+		restoreButton = (Button) findViewById(R.id.btnRestoreWallet);
 		restoreButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -113,14 +119,56 @@ public class Welcome extends Activity {
 		if (resultCode == RESULT_OK) {
             //
 			input = intent.getStringExtra("SCAN_RESULT");
+			new RestoreSeedTask(input) {
+				@Override
+		        protected void onPostExecute(String result) {
+					mProgressDialog.hide();
+					startActivity (new Intent(Welcome.this, Show_seed.class));
+				}
+				
+			}.execute("");
+		} 
+		else
+			Toast.makeText(getApplicationContext(), "Could Not ReadQR", Toast.LENGTH_LONG).show();
+	}
+	
+	private class RestoreSeedTask extends AsyncTask<String, Void, String> {
+		private SeedQRData seedData;
+		private String inputQRString;
+		
+		public RestoreSeedTask(String inputQRString) {
+			this.inputQRString = inputQRString;
+		}
+		
+		@Override
+        protected void onPreExecute() { 
+			//Display a spinner while the device is pairing.
+			mProgressDialog = new ProgressDialog(Welcome.this, R.style.CustomDialogSpinner);
+			mProgressDialog.setIndeterminate(false);
+            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            mProgressDialog.setCancelable(false);
+    		mProgressDialog.setCanceledOnTouchOutside(false);
+            mProgressDialog.show();
+            
+            howitworksButton.setVisibility(View.INVISIBLE);
+        	NewWalletButton.setVisibility(View.INVISIBLE);
+        	restoreButton.setVisibility(View.INVISIBLE);
+        	
+		}
+		
+		@Override
+		protected String doInBackground(String... params) {
+			
 			PaperWalletQR qr = new PaperWalletQR(Welcome.this);
-			SeedQRData data = qr.parseSeedQR(input);
+			SeedQRData data = qr.parseSeedQR(inputQRString);
 			
 			WalletCore wc = new WalletCore();
 			wc.saveSeedBytes(Welcome.this, data.getSeedFromMnemonics());
 			wc.saveMnemonic(Welcome.this, data.toMnemonicArray());
-			
-			startActivity (new Intent(Welcome.this, Show_seed.class));
-		} 
+			BAPreferences.ConfigPreference().setInitialized(true);
+
+			return null;
+		}
+		
 	}
 }

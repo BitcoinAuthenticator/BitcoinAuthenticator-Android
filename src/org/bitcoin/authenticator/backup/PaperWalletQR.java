@@ -48,13 +48,6 @@ public class PaperWalletQR{
 	@SuppressWarnings("restriction")
 	public Bitmap createQRSeedImage(DeterministicSeed seed, long creationTime){
 		byte[] imageBytes = null;
-//		imageBytes = QRCode
-//				        .from(generateQRSeedDataString(seed, creationTime))
-//				        .withSize(170, 170)
-//				        .to(ImageType.PNG)
-//				        .stream()
-//				        .toByteArray();
-//        return BitmapFactory.decodeByteArray(imageBytes , 0, imageBytes .length);
 		return this.generateQR(generateQRSeedDataString(seed, creationTime), 170, 170);
 	}
 	
@@ -72,13 +65,6 @@ public class PaperWalletQR{
  		} catch (Exception e) {
  			e.printStackTrace();
  		}
-
-		
-		try {
-			
-		} catch (Exception e1) {
-			e1.printStackTrace();
-		}
 		
 		return qrCodeData;
 	}
@@ -124,13 +110,6 @@ public class PaperWalletQR{
 		byte[] imageBytes = null;
 		DeterministicKey mprivkey = HDKeyDerivation.createMasterPrivateKey(seed.getSecretBytes());
         DeterministicKey mpubkey = mprivkey.getPubOnly();
-//        imageBytes = QRCode
-//			        .from(mpubkey.toString())
-//			        .withSize(160, 160)
-//			        .to(ImageType.PNG)
-//			        .stream()
-//			        .toByteArray();
-//        return BitmapFactory.decodeByteArray(imageBytes , 0, imageBytes .length);
         return this.generateQR(mpubkey.toString(), 160, 160);
 	}
 	
