@@ -19,9 +19,11 @@ import com.google.bitcoin.crypto.MnemonicException.MnemonicLengthException;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -31,6 +33,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.Toast;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageButton;
 import android.widget.TextView;
@@ -41,6 +44,8 @@ import android.widget.TextView;
  */
 public class Show_seed extends Activity {
 		
+	private ProgressDialog mProgressDialog;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -50,12 +55,7 @@ public class Show_seed extends Activity {
 		
 	    Boolean initialized = BAPreferences.ConfigPreference().getInitialized(false);//settings.getBoolean("initialized", false);
 	    if (initialized == false){
-	    	try {
-				generateSeed();
-			} catch (NoSeedOrMnemonicsFound e) {
-				e.printStackTrace();
-			}
-	    	BAPreferences.ConfigPreference().setInitialized(true);
+	    	generateSeed();
 	    }
 	    else {
 	    	try {
@@ -112,13 +112,59 @@ public class Show_seed extends Activity {
 	 * @throws NoSeedOrMnemonicsFound 
 	 */
 	@SuppressLint("TrulyRandom")
-	private void generateSeed() throws NoSeedOrMnemonicsFound{
-		
-		WalletCore wc = new WalletCore();
-		wc.generateSeed(getApplicationContext(), true);		
-		displaySeed();
+	private void generateSeed(){
+		new GenerateSeedTask() {
+			@Override
+	        protected void onPostExecute(String result) {
+				try {
+					//
+					CheckBox chk = (CheckBox)findViewById(R.id.show_seed_chk_Confirmation);
+		            chk.setEnabled(true);
+		            Button btn = (Button)findViewById(R.id.show_seed_btn_Continue);
+		            btn.setEnabled(true);
+					
+					displaySeed();
+					BAPreferences.ConfigPreference().setInitialized(true);
+				} catch (NoSeedOrMnemonicsFound e) {
+					e.printStackTrace();
+					
+					// show error
+					Toast.makeText(getApplicationContext(), "Error while creating seed", Toast.LENGTH_LONG).show();
+				}
+				finally {
+					mProgressDialog.hide();
+				}
+	        }
+		}.execute("");
 	}
 	
+	private class GenerateSeedTask extends AsyncTask<String, Void, String> {
+
+		@Override
+        protected void onPreExecute() { 
+			//Display a spinner while the device is pairing.
+			mProgressDialog = new ProgressDialog(Show_seed.this, R.style.CustomDialogSpinner);
+			mProgressDialog.setIndeterminate(false);
+            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            mProgressDialog.setCancelable(false);
+    		mProgressDialog.setCanceledOnTouchOutside(false);
+            mProgressDialog.show();
+            
+            CheckBox chk = (CheckBox)findViewById(R.id.show_seed_chk_Confirmation);
+            chk.setEnabled(false);
+            Button btn = (Button)findViewById(R.id.show_seed_btn_Continue);
+            btn.setEnabled(false);
+		}
+		
+		@Override
+		protected String doInBackground(String... params) {
+		
+			WalletCore wc = new WalletCore();
+			wc.generateSeed(getApplicationContext(), true);
+			return null;
+		}
+		
+	}
 	
 	/**These last two methods setup the activity components*/
 	private void setupConfirmationCheckbox(){
