@@ -55,7 +55,7 @@ public class WalletCore {
 			e.printStackTrace();
 		}
 		
-		DeterministicSeed HDSeed = new DeterministicSeed(mnemonic, "", Utils.currentTimeSeconds());
+		DeterministicSeed HDSeed = new DeterministicSeed(mnemonic, null, "", Utils.currentTimeSeconds());
 		
 		if(shouldSave){
 			saveSeedBytes(c, MnemonicCode.toSeed(mnemonic, ""));

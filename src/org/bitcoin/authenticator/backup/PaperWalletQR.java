@@ -90,7 +90,7 @@ public class PaperWalletQR{
 	 			ms = new MnemonicCode();
 	 			entropy = HEX.decode(entropyHex);
 	 			mnemonic = ms.toMnemonic(entropy);
-	 			seed = new DeterministicSeed(mnemonic, "", creationTime);
+	 			seed = new DeterministicSeed(mnemonic, null, "", creationTime);
 	 			String mnemonicStr = Joiner.on(" ").join(seed.getMnemonicCode());
 	 		} catch (Exception e) {
 	 			e.printStackTrace();
