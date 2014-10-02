@@ -19,8 +19,8 @@ import org.json.simple.JSONValue;
 
 import android.util.Log;
 
-import com.google.bitcoin.crypto.DeterministicKey;
-import com.google.bitcoin.crypto.HDKeyDerivation;
+import org.bitcoinj.crypto.DeterministicKey;
+import org.bitcoinj.crypto.HDKeyDerivation;
 import com.google.common.primitives.Ints;
  
 /**
