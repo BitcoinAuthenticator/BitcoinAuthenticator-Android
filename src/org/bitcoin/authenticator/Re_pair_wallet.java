@@ -62,6 +62,15 @@ public class Re_pair_wallet extends Activity{
 			if (resultCode == RESULT_OK) {
 				QRInput = intent.getStringExtra("SCAN_RESULT");
 				PairingQRData qrData = PairingProtocol.parseQRString(QRInput);
+				if(qrData == null) {
+					runOnUiThread(new Runnable() {
+	        			public void run() {
+							  Toast.makeText(getApplicationContext(), "Unrecognized QR", Toast.LENGTH_LONG).show();
+						}
+					});
+					
+					return;
+				}
 				
 				qrData.fingerprint = PairingProtocol.getPairingIDDigest(walletNum, GcmUtilGlobal.gcmRegistrationToken);
 				String walletData = Integer.toString(walletNum);

@@ -152,6 +152,19 @@ public class Pair_wallet extends Activity {
             //
 			QRInput = intent.getStringExtra("SCAN_RESULT");
 			PairingQRData qrData = PairingProtocol.parseQRString(QRInput);
+			if(qrData == null) {
+				runOnUiThread(new Runnable() {
+        			public void run() {
+						  Toast.makeText(getApplicationContext(), "Unrecognized QR", Toast.LENGTH_LONG).show();
+					}
+				});
+				
+				mProgressDialog.hide();
+				mProgressDialog = null;
+				txtID.setText("");
+				
+				return;
+			}
 
 			qrData.fingerprint = PairingProtocol.getPairingIDDigest(qrData.walletIndex, GcmUtilGlobal.gcmRegistrationToken);
 			//Start the pairing protocol
