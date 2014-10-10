@@ -31,14 +31,14 @@ import android.util.Log;
 import android.widget.Toast;
 
 public class Re_pair_wallet extends Activity{
-	int walletNum;
+	long walletNum;
 	String AESKey;
 	String IPAddress;
 	String LocalIP;
 	
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		walletNum = getIntent().getIntExtra("walletNum", -1);
+		walletNum = getIntent().getLongExtra("walletNum", -1);
 		if (walletNum == -1) throw new AssertionError("Wrong wallet number !");
 		try {launchScanActivity();} 
 		catch (Exception e) {e.printStackTrace();}
@@ -73,7 +73,7 @@ public class Re_pair_wallet extends Activity{
 				}
 				
 				qrData.fingerprint = PairingProtocol.getPairingIDDigest(walletNum, GcmUtilGlobal.gcmRegistrationToken);
-				String walletData = Integer.toString(walletNum);
+				String walletData = Long.toString(walletNum);
 				BAPreferences.WalletPreference().setFingerprint(walletData, qrData.fingerprint);
 				BAPreferences.WalletPreference().setExternalIP(walletData, IPAddress);
 				BAPreferences.WalletPreference().setLocalIP(walletData, LocalIP);
