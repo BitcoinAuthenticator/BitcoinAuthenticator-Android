@@ -5,7 +5,7 @@ import org.bitcoin.authenticator.R;
 import org.bitcoin.authenticator.core.WalletCore;
 import org.bitcoin.authenticator.core.exceptions.NoSeedOrMnemonicsFound;
 
-import com.google.bitcoin.wallet.DeterministicSeed;
+import org.bitcoinj.wallet.DeterministicSeed;
 
 import android.app.Activity;
 import android.content.Context;

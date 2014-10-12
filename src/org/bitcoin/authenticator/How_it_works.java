@@ -57,7 +57,7 @@ public class How_it_works extends Activity {
 			    	startActivity (new Intent(How_it_works.this, Wallet_list.class));
 			    }
 			    else {
-			    	startActivity (new Intent(How_it_works.this, Welcome.class));
+					startActivity (new Intent(How_it_works.this, Show_seed.class));
 			    }		
 				
 			}

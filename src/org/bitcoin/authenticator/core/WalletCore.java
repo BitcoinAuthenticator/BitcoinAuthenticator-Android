@@ -15,12 +15,12 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.Log;
 
-import com.google.bitcoin.core.Utils;
-import com.google.bitcoin.crypto.MnemonicCode;
-import com.google.bitcoin.crypto.MnemonicException.MnemonicChecksumException;
-import com.google.bitcoin.crypto.MnemonicException.MnemonicLengthException;
-import com.google.bitcoin.crypto.MnemonicException.MnemonicWordException;
-import com.google.bitcoin.wallet.DeterministicSeed;
+import org.bitcoinj.core.Utils;
+import org.bitcoinj.crypto.MnemonicCode;
+import org.bitcoinj.crypto.MnemonicException.MnemonicChecksumException;
+import org.bitcoinj.crypto.MnemonicException.MnemonicLengthException;
+import org.bitcoinj.crypto.MnemonicException.MnemonicWordException;
+import org.bitcoinj.wallet.DeterministicSeed;
 
 public class WalletCore {
 	
@@ -55,7 +55,7 @@ public class WalletCore {
 			e.printStackTrace();
 		}
 		
-		DeterministicSeed HDSeed = new DeterministicSeed(mnemonic, "", Utils.currentTimeSeconds());
+		DeterministicSeed HDSeed = new DeterministicSeed(mnemonic, null, "", Utils.currentTimeSeconds());
 		
 		if(shouldSave){
 			saveSeedBytes(c, MnemonicCode.toSeed(mnemonic, ""));

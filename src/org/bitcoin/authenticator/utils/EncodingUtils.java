@@ -13,8 +13,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.spongycastle.util.encoders.Hex;
 
-import com.google.bitcoin.core.Transaction;
-import com.google.bitcoin.crypto.DeterministicKey;
+import org.bitcoinj.core.Transaction;
+import org.bitcoinj.crypto.DeterministicKey;
 
 public class EncodingUtils {
 	

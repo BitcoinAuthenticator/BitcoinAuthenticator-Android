@@ -18,19 +18,19 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 
-import com.google.bitcoin.crypto.DeterministicKey;
-import com.google.bitcoin.crypto.HDKeyDerivation;
-import com.google.bitcoin.crypto.MnemonicCode;
-import com.google.bitcoin.crypto.MnemonicException.MnemonicChecksumException;
-import com.google.bitcoin.crypto.MnemonicException.MnemonicLengthException;
-import com.google.bitcoin.crypto.MnemonicException.MnemonicWordException;
-import com.google.bitcoin.wallet.DeterministicSeed;
+import org.bitcoinj.crypto.DeterministicKey;
+import org.bitcoinj.crypto.HDKeyDerivation;
+import org.bitcoinj.crypto.MnemonicCode;
+import org.bitcoinj.crypto.MnemonicException.MnemonicChecksumException;
+import org.bitcoinj.crypto.MnemonicException.MnemonicLengthException;
+import org.bitcoinj.crypto.MnemonicException.MnemonicWordException;
+import org.bitcoinj.wallet.DeterministicSeed;
 import com.google.common.base.Joiner;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
-import static com.google.bitcoin.core.Utils.HEX;
+import static org.bitcoinj.core.Utils.HEX;
 
 public class PaperWalletQR{
 	private Context context;
@@ -48,13 +48,6 @@ public class PaperWalletQR{
 	@SuppressWarnings("restriction")
 	public Bitmap createQRSeedImage(DeterministicSeed seed, long creationTime){
 		byte[] imageBytes = null;
-//		imageBytes = QRCode
-//				        .from(generateQRSeedDataString(seed, creationTime))
-//				        .withSize(170, 170)
-//				        .to(ImageType.PNG)
-//				        .stream()
-//				        .toByteArray();
-//        return BitmapFactory.decodeByteArray(imageBytes , 0, imageBytes .length);
 		return this.generateQR(generateQRSeedDataString(seed, creationTime), 170, 170);
 	}
 	
@@ -72,13 +65,6 @@ public class PaperWalletQR{
  		} catch (Exception e) {
  			e.printStackTrace();
  		}
-
-		
-		try {
-			
-		} catch (Exception e1) {
-			e1.printStackTrace();
-		}
 		
 		return qrCodeData;
 	}
@@ -104,7 +90,7 @@ public class PaperWalletQR{
 	 			ms = new MnemonicCode();
 	 			entropy = HEX.decode(entropyHex);
 	 			mnemonic = ms.toMnemonic(entropy);
-	 			seed = new DeterministicSeed(mnemonic, "", creationTime);
+	 			seed = new DeterministicSeed(mnemonic, null, "", creationTime);
 	 			String mnemonicStr = Joiner.on(" ").join(seed.getMnemonicCode());
 	 		} catch (Exception e) {
 	 			e.printStackTrace();
@@ -124,13 +110,6 @@ public class PaperWalletQR{
 		byte[] imageBytes = null;
 		DeterministicKey mprivkey = HDKeyDerivation.createMasterPrivateKey(seed.getSecretBytes());
         DeterministicKey mpubkey = mprivkey.getPubOnly();
-//        imageBytes = QRCode
-//			        .from(mpubkey.toString())
-//			        .withSize(160, 160)
-//			        .to(ImageType.PNG)
-//			        .stream()
-//			        .toByteArray();
-//        return BitmapFactory.decodeByteArray(imageBytes , 0, imageBytes .length);
         return this.generateQR(mpubkey.toString(), 160, 160);
 	}
 	

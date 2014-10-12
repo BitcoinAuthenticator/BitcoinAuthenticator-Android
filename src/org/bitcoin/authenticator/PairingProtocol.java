@@ -19,8 +19,8 @@ import org.json.simple.JSONValue;
 
 import android.util.Log;
 
-import com.google.bitcoin.crypto.DeterministicKey;
-import com.google.bitcoin.crypto.HDKeyDerivation;
+import org.bitcoinj.crypto.DeterministicKey;
+import org.bitcoinj.crypto.HDKeyDerivation;
 import com.google.common.primitives.Ints;
  
 /**
@@ -136,6 +136,9 @@ public class PairingProtocol {
     }
     
     public static PairingQRData parseQRString(String QRInput) {
+    	if(!checkQRDataValidity(QRInput))	
+    			return null;
+    	
     	PairingQRData ret = new PairingQRData();
     	
     	ret.AESKey = QRInput.substring(QRInput.indexOf("AESKey=")+7, QRInput.indexOf("&PublicIP="));
@@ -156,10 +159,38 @@ public class PairingProtocol {
     	return ret;
     }
     
+    /**
+     * Checks to see all necessary data elements are present
+     * 
+     * @param data
+     * @return
+     */
+    public static boolean checkQRDataValidity(String data) {
+    	if(!data.contains("AESKey"))
+    		return false;
+    	
+    	if(!data.contains("PublicIP"))
+    		return false;
+    	
+    	if(!data.contains("LocalIP"))
+    		return false;
+    	
+    	if(!data.contains("WalletType"))
+    		return false;
+    	
+    	if(!data.contains("NetworkType"))
+    		return false;
+    	
+    	if(!data.contains("index"))
+    		return false;
+    	
+    	return true;
+    }
+    
     static public class CouldNotPairToWalletException extends Exception {
 		public CouldNotPairToWalletException(String str) {
 			super(str);
 		}
 	}
-	
+   
 }
