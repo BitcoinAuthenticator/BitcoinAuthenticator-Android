@@ -34,7 +34,7 @@ public class Welcome extends Activity {
 
 	private ProgressDialog mProgressDialog;
 	
-//	private Button howitworksButton;
+	private Button howitworksButton;
 	private Button NewWalletButton;
 	private Button restoreButton;
 	
@@ -42,28 +42,28 @@ public class Welcome extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_welcome);
-//		setupHowItWorksBtn();
+		setupHowItWorksBtn();
 		setupNewWalletBtn();
 		setupRestoreBtn();
 	}
 	
-//	/**These methods set up the activity components*/
-//	private void setupHowItWorksBtn(){
-//		howitworksButton = (Button) findViewById(R.id.btnHowItWorks);
-//		howitworksButton.setOnClickListener(new View.OnClickListener() {
-//			@Override
-//			public void onClick(View v) {
-//				startActivity (new Intent(Welcome.this, How_it_works.class));
-//			}
-//		});
-//	}
+	/**These methods set up the activity components*/
+	private void setupHowItWorksBtn(){
+		howitworksButton = (Button) findViewById(R.id.btnHowItWorks);
+		howitworksButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startActivity (new Intent(Welcome.this, How_it_works.class));
+			}
+		});
+	}
 	
 	private void setupNewWalletBtn(){
 		NewWalletButton = (Button) findViewById(R.id.btnNewWallet);
 		NewWalletButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				startActivity (new Intent(Welcome.this, How_it_works.class));
+				startActivity (new Intent(Welcome.this, Show_seed.class));
 			}
 		});
 	}

@@ -339,13 +339,13 @@ public class Wallet_list extends Activity {
     		//Decide which icon to display
     		String typ = BAPreferences.WalletPreference().getType(wdata, "Null");
     		if (	 typ.equals("blockchain"	))	{walletData.setIcon(R.drawable.ic_blockchain_logo);}
-    		else if (typ.equals("electrum"		))	{walletData.setIcon(R.drawable.ic_electrum_logo);}
-    		else if (typ.equals("hive"			))	{walletData.setIcon(R.drawable.hive_logo);}
+    		else if (typ.equals("electrum"		))	{walletData.setIcon(R.drawable.ic_electrum_logo);} 
+    		else if (typ.equals("hive"			))	{walletData.setIcon(R.drawable.ic_hive_logo);}
     		else if (typ.equals("multibit"		))	{walletData.setIcon(R.drawable.multibit_logo);}
     		else if (typ.equals("bitcoincore"	))	{walletData.setIcon(R.drawable.ic_bitcoin_logo);}
     		else if (typ.equals("armory"		))	{walletData.setIcon(R.drawable.armory_logo);}
         	else if (typ.equals("darkwallet"	))	{walletData.setIcon(R.drawable.darkwallet_logo);}
-        	else 									{walletData.setIcon(R.drawable.ic_auth_logo);}
+        	else 									{walletData.setIcon(R.drawable.ic_authenticator_logo);}
     		results.add(walletData);
     	}
         return getGCMPendingRequests(results);

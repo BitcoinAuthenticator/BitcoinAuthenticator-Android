@@ -29,22 +29,20 @@
          android:textColor="#FFFFFF"
          android:textSize="16sp" />
 
-     <!--  <Button
-         android:id="@+id/btnHowItWorks"
-         android:layout_width="fill_parent"
-         android:layout_height="wrap_content"
-         android:layout_alignLeft="@+id/tvWelcome"
-         android:layout_below="@+id/tvAbout"
-         android:layout_marginTop="22dp"
-         android:text="@string/button_see_how_it_works"
-         android:textColor="#FFFFFF" />-->
-
      <Button
          android:id="@+id/btnNewWallet"
          android:layout_width="fill_parent"
          android:layout_height="wrap_content"
          android:layout_marginTop="30dp"
          android:text="@string/button_new_wallet"
+         android:textColor="#FFFFFF" />
+     
+     <Button
+         android:id="@+id/btnHowItWorks"
+         android:layout_width="fill_parent"
+         android:layout_height="wrap_content"
+         android:layout_marginTop="5dp"
+         android:text="@string/button_see_how_it_works"
          android:textColor="#FFFFFF" />
 
      <Button
