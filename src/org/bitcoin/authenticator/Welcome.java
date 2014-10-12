@@ -49,7 +49,7 @@ public class Welcome extends Activity {
 	
 	/**These methods set up the activity components*/
 	private void setupHowItWorksBtn(){
-		howitworksButton = (Button) findViewById(R.id.btnHowItWorks);
+		Button howitworksButton = (Button) findViewById(R.id.btnHowItWorks);
 		howitworksButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -59,7 +59,7 @@ public class Welcome extends Activity {
 	}
 	
 	private void setupNewWalletBtn(){
-		NewWalletButton = (Button) findViewById(R.id.btnNewWallet);
+		Button NewWalletButton = (Button) findViewById(R.id.btnNewWallet);
 		NewWalletButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -69,7 +69,7 @@ public class Welcome extends Activity {
 	}
 	
 	private void setupRestoreBtn(){
-		restoreButton = (Button) findViewById(R.id.btnRestoreWallet);
+		Button restoreButton = (Button) findViewById(R.id.btnRestoreWallet);
 		restoreButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
