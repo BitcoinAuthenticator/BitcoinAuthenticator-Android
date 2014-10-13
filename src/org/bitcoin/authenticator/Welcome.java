@@ -43,7 +43,6 @@ public class Welcome extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_welcome);
 		setupHowItWorksBtn();
-		setupNewWalletBtn();
 		setupRestoreBtn();
 	}
 	
@@ -54,16 +53,6 @@ public class Welcome extends Activity {
 			@Override
 			public void onClick(View v) {
 				startActivity (new Intent(Welcome.this, How_it_works.class));
-			}
-		});
-	}
-	
-	private void setupNewWalletBtn(){
-		Button NewWalletButton = (Button) findViewById(R.id.btnNewWallet);
-		NewWalletButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				startActivity (new Intent(Welcome.this, Show_seed.class));
 			}
 		});
 	}

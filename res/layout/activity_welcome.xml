@@ -28,21 +28,13 @@
          android:text="@string/about"
          android:textColor="#FFFFFF"
          android:textSize="16sp" />
-
-     <Button
-         android:id="@+id/btnNewWallet"
-         android:layout_width="fill_parent"
-         android:layout_height="wrap_content"
-         android:layout_marginTop="30dp"
-         android:text="@string/button_new_wallet"
-         android:textColor="#FFFFFF" />
      
      <Button
          android:id="@+id/btnHowItWorks"
          android:layout_width="fill_parent"
          android:layout_height="wrap_content"
-         android:layout_marginTop="5dp"
-         android:text="@string/button_see_how_it_works"
+         android:layout_marginTop="30dp"
+         android:text="@string/button_new_wallet"
          android:textColor="#FFFFFF" />
 
      <Button

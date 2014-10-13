@@ -8,10 +8,14 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.OnPageChangeListener;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ScrollView;
 
 /**
  * Creates an activity that explains to the user how the Bitcoin Authenticator works. 
@@ -29,39 +33,24 @@ public class How_it_works extends Activity {
 		// Set the ViewPager adapter
 		ExplanationPagerAdapter adapter = new ExplanationPagerAdapter();
 	    ViewPager pager = (ViewPager) findViewById(R.id.how_it_works_pager);
+	    paired = BAPreferences.ConfigPreference().getPaired(false);
 	    pager.setOffscreenPageLimit(3);
 	    pager.setAdapter(adapter);
-		
-		
-		//The user can access this activity from two places ― the welcome activity and the menu in the 
-		//wallet_list activity. If she's accessing it from the welcome activity (ie. the device isn't paired)
-		//the button text should say "Begin Setup". If she's accessing it from the menu it should just say "Continue" 
-	    paired = BAPreferences.ConfigPreference().getPaired(false);
-	    ImageButton btn = (ImageButton) findViewById(R.id.btnBeginSetup);
-	    /*if (paired==true){
-	    	btn.setText("Continue");
-	    }*/
-		setupBeginSetupBtn();
-	}
-	
-	/** 
-	 * Like before, if the user is accessing this activity from the welcome activity, this button should take her
-	 * to the Show_seed activity. Otherwise, it should just take her back to the main wallet_list activity.
-	 */
-	private void setupBeginSetupBtn(){
-		ImageButton BeginSetupButton = (ImageButton) findViewById(R.id.btnBeginSetup);
-		BeginSetupButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if (paired==true){
-			    	startActivity (new Intent(How_it_works.this, Wallet_list.class));
-			    }
-			    else {
-					startActivity (new Intent(How_it_works.this, Show_seed.class));
-			    }		
-				
-			}
-		});
+	    pager.setOnPageChangeListener(new OnPageChangeListener() {
+	        public void onPageScrollStateChanged(int state) {}
+	        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
+
+	        public void onPageSelected(int position) {
+	            if (position==3){
+	            	if (paired==true){
+				    	startActivity (new Intent(How_it_works.this, Wallet_list.class));
+				    }
+				    else {
+						startActivity (new Intent(How_it_works.this, Show_seed.class));
+				    }	
+	            }
+	        }
+	    });
 	}
 	
 	class ExplanationPagerAdapter extends PagerAdapter {
@@ -69,7 +58,7 @@ public class How_it_works extends Activity {
     
         @Override
         public int getCount() {
-            return 3;
+            return 4;
         }
 
         @Override
@@ -90,6 +79,9 @@ public class How_it_works extends Activity {
             case 2:
                 resId = R.id.how_it_works_page_three;
                 break;
+            case 3:
+                resId = R.id.how_it_works_page_four;
+                break;
             }
         	
             View v = findViewById(resId);
@@ -99,7 +91,7 @@ public class How_it_works extends Activity {
         
         @Override
         public void destroyItem(View container, int position, Object object) {
-             //((ViewPager) container).removeView((View) object);
+             ((ViewPager) container).removeView((View) object);
         }
     }
 }
