@@ -52,6 +52,10 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".Restore"
+            android:label="@string/app_name" >
+        </activity>
+        <activity
             android:name=".How_it_works"
             android:label="@string/app_name" >
         </activity>

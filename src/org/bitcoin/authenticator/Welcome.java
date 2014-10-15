@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.Window;
 import android.widget.Button;
@@ -46,6 +47,16 @@ public class Welcome extends Activity {
 		setupRestoreBtn();
 	}
 	
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+	    if(keyCode == KeyEvent.KEYCODE_BACK)
+	    {
+	            moveTaskToBack(true);
+	            return true;
+	    }
+		return false;
+	}
+	
 	/**These methods set up the activity components*/
 	private void setupHowItWorksBtn(){
 		Button howitworksButton = (Button) findViewById(R.id.btnHowItWorks);
@@ -62,7 +73,7 @@ public class Welcome extends Activity {
 		restoreButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				askIfReadyToScanQR();
+				startActivity (new Intent(Welcome.this, Restore.class));
 			}
 		});
 	}

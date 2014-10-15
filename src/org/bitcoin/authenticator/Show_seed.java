@@ -67,14 +67,14 @@ public class Show_seed extends Activity {
 	}
 	
 	/**Inflates the menu and adds it to the action bar*/
-	@Override
+	/*@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.show_seed_menu, menu);
 		return true;
-	}
+	}*/
 
 	/**This method handles the clicks in the option menu*/
-	@Override
+	/*@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int id = item.getItemId();
 		if (id == R.id.action_copy){
@@ -90,7 +90,7 @@ public class Show_seed extends Activity {
 			
 		}
 		return super.onOptionsItemSelected(item);
-	}
+	}*/
 	
 	/** Prevents the back button from being pressed. Forces users to confirm they have saved their mnemonic seed.*/
 	@Override
@@ -142,13 +142,12 @@ public class Show_seed extends Activity {
 
 		@Override
         protected void onPreExecute() { 
-			//Display a spinner while the device is pairing.
 			mProgressDialog = new ProgressDialog(Show_seed.this, R.style.CustomDialogSpinner);
 			mProgressDialog.setIndeterminate(false);
-            mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            mProgressDialog.setCancelable(false);
-    		mProgressDialog.setCanceledOnTouchOutside(false);
-            mProgressDialog.show();
+			mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+			mProgressDialog.setCancelable(false);
+			mProgressDialog.setCanceledOnTouchOutside(false);
+			mProgressDialog.show();
             
             CheckBox chk = (CheckBox)findViewById(R.id.show_seed_chk_Confirmation);
             chk.setEnabled(false);

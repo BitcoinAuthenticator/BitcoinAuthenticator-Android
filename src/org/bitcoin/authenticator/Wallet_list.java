@@ -39,6 +39,7 @@ import android.support.v4.widget.SwipeRefreshLayout.OnRefreshListener;
 import android.text.Html;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -281,8 +282,14 @@ public class Wallet_list extends Activity {
 	 * Disable the back button because the device is now paired and any activity the user needs can be 
 	 * accessed from the menu. 
 	 */
-	@Override
-	public void onBackPressed() {
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+
+	    if(keyCode == KeyEvent.KEYCODE_BACK)
+	    {
+	            moveTaskToBack(true);
+	            return true;
+	    }
+		return false;
 	}
 
 	@SuppressWarnings("unchecked")
