@@ -96,7 +96,7 @@ public class PairingProtocol {
         	Connection.getInstance().writeAndClose(ips, cipherBytes);
     	}
     	catch (Exception e) {
-    		throw new CouldNotPairToWalletException("Could not pair to wallet");
+    		throw new CouldNotPairToWalletException("Could not pair to wallet: " + e.getMessage());
     	}
     	
 	  }
