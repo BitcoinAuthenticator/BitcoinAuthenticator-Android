@@ -73,7 +73,7 @@ public class Welcome extends Activity {
 		restoreButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				startActivity (new Intent(Welcome.this, Restore.class));
+				startActivity (new Intent(Welcome.this, Restore_Menu.class));
 			}
 		});
 	}

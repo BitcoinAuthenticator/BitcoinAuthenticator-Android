@@ -17,11 +17,11 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-public class Restore extends Activity {
+public class Restore_Mnemonic extends Activity {
 	
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_restore);
+		setContentView(R.layout.activity_restore_mnemonic);
 		setupRestoreBtn();
 	}
 	
@@ -39,10 +39,10 @@ public class Restore extends Activity {
 					List<String> words = new ArrayList<String>();		
 					for (String s: inputstring){words.add(s);}
 					WalletCore wc = new WalletCore();
-					wc.saveSeedBytes(Restore.this, mc.toSeed(words, ""));
-					wc.saveMnemonic(Restore.this, inputstring);
+					wc.saveSeedBytes(Restore_Mnemonic.this, mc.toSeed(words, ""));
+					wc.saveMnemonic(Restore_Mnemonic.this, inputstring);
 					BAPreferences.ConfigPreference().setInitialized(true);
-					startActivity (new Intent(Restore.this, Pair_wallet.class));
+					startActivity (new Intent(Restore_Mnemonic.this, Pair_wallet.class));
 				}
 			}
 		});

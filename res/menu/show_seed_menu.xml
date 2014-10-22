@@ -7,16 +7,12 @@
         android:showAsAction="never"
         android:title="Copy mnemonic seed"/>
     <item
-        android:id="@+id/action_save"
-        android:showAsAction="never"
-        android:title="Save to disk"/>
-    <item
         android:id="@+id/action_qr"
         android:showAsAction="never"
         android:title="QR code backup"/>
-     <item
+     <!--  <item
         android:id="@+id/action_sss"
         android:showAsAction="never"
-        android:title="Shamir's Secret Sharing"/>
+        android:title="Shamir's Secret Sharing"/>-->
  
 </menu>

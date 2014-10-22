@@ -56,21 +56,6 @@ public class PaperWallet extends Activity {
 					Toast.makeText(getApplicationContext(), "Failed, try again !", Toast.LENGTH_LONG).show();
 			}
 		});
-		
-		Button email = (Button) findViewById(R.id.paper_wallet_btn_send_email);	
-		email.setOnClickListener(new OnClickListener(){
-			@Override
-			public void onClick(View v) {
-				if(fullQR != null){
-//					MediaStore.Images.Media.insertImage(getContentResolver(), fullQR, "paper wallet" , "");
-					String path = MediaSaver.insertImage(getContentResolver(), fullQR, "paper wallet" , "");
-					if(!sendBitmapToEmail(path))
-						Toast.makeText(getApplicationContext(), "Failed, try again !", Toast.LENGTH_LONG).show();
-				}
-				else
-					Toast.makeText(getApplicationContext(), "Failed, try again !", Toast.LENGTH_LONG).show();
-			}
-		});
 	}
 
 	@Override
@@ -90,19 +75,6 @@ public class PaperWallet extends Activity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
-	}
-	
-	private boolean sendBitmapToEmail(String path){
-		try {
-			    Uri screenshotUri = Uri.parse(path);
-			    final Intent emailIntent1 = new Intent(     android.content.Intent.ACTION_SEND);
-			    emailIntent1.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-			    emailIntent1.putExtra(Intent.EXTRA_STREAM, screenshotUri);
-			    emailIntent1.setType("image/png");
-			    startActivity(Intent.createChooser(emailIntent1, "Send email using"));
-			    return true;
-			}
-			catch(Exception e) { return true; }
 	}
 	
 	Bitmap fullQR = null;

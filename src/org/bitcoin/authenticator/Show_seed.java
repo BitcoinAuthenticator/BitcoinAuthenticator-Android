@@ -13,13 +13,14 @@ import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
 import org.bitcoin.authenticator.backup.PaperWallet;
 import org.bitcoin.authenticator.core.WalletCore;
 import org.bitcoin.authenticator.core.exceptions.NoSeedOrMnemonicsFound;
-
 import org.bitcoinj.crypto.MnemonicCode;
 import org.bitcoinj.crypto.MnemonicException.MnemonicLengthException;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -67,30 +68,38 @@ public class Show_seed extends Activity {
 	}
 	
 	/**Inflates the menu and adds it to the action bar*/
-	/*@Override
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.show_seed_menu, menu);
 		return true;
-	}*/
+	}
 
 	/**This method handles the clicks in the option menu*/
-	/*@Override
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int id = item.getItemId();
 		if (id == R.id.action_copy){
-			
-		}
-		if (id == R.id.action_save){
-			
+			WalletCore wc = new WalletCore();
+			try {
+				String mnemonic = wc.getMnemonicString(getApplicationContext());
+				
+				ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE); 
+				ClipData clip = ClipData.newPlainText("Wallet's mnemonic", mnemonic);
+				clipboard.setPrimaryClip(clip);
+				Toast.makeText(getApplicationContext(), "Copied successfully", Toast.LENGTH_LONG).show();
+			} catch (NoSeedOrMnemonicsFound e) {
+				e.printStackTrace();
+				Toast.makeText(getApplicationContext(), "Could not copy the mnemonic string", Toast.LENGTH_LONG).show();
+			}
 		}
 		if (id == R.id.action_qr){
 			startActivity (new Intent(Show_seed.this, PaperWallet.class));
 		}
-		if (id == R.id.action_sss){
-			
-		}
+//		if (id == R.id.action_sss){
+//			
+//		}
 		return super.onOptionsItemSelected(item);
-	}*/
+	}
 	
 	/** Prevents the back button from being pressed. Forces users to confirm they have saved their mnemonic seed.*/
 	@Override

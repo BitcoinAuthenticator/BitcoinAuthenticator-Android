@@ -22,7 +22,7 @@
   	           android:id="@+id/show_seed_AboutSeed"
   	           android:layout_width="wrap_content"
   	           android:layout_height="wrap_content"
-  	           android:text="This is your Authenticator Seed. If your mobile device is lost or damaged, you can use it to recover your keys. Please write it down and keep it in a safe place."
+  	           android:text="This is your Authenticator Seed. If your mobile device is lost or damaged, you can use it to recover your keys. Please write it down or press the menu button for more backup options and keep it in a safe place."
   	           android:textColor="#e3e3e3"
   	           android:textSize="16sp" />
 

@@ -18,4 +18,6 @@
     <color name="Explanation_Text_Color">#dddddd</color>
     <!-- Pull Refresh -->
     <color name="Pull_Refresh_Color">#b2aeae</color>
+    <!-- Restore buttons background -->
+    <color name="Restore_Button_Background">#dddddd</color>
 </resources>

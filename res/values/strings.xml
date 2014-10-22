@@ -7,6 +7,7 @@
     <string name="action_pair_wallet">Pair wallet</string>
     <string name="action_how_it_works">How it works</string>
     <string name="action_show_seed">Show seed</string>
+    <string name="action_backup">Backup Wallet</string>
     <string name="action_settings">Settings</string>
     <string name="action_donate_tip">Donate/Tip</string>
     <string name="action_about">About</string>
@@ -20,5 +21,7 @@
     <string name="title_activity_activity_pending_requests">Pending Requests</string>
     <string name="title_activity_pairing_details">Pairing Details</string>
     <string name="title_activity_paper_wallet">Paper Wallet</string>
+    <string name="title_activity_restore_menu">Restore Wallet</string>
+    <string name="title_activity_backup_menu">Backup Wallet</string>
 
 </resources>
