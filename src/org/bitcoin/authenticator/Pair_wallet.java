@@ -53,7 +53,6 @@ import android.widget.Toast;
 public class Pair_wallet extends Activity {
 	
 	ProgressDialog mProgressDialog;
-	private EditText txtID;
 	private CheckBox chkForceAccountID;
 	private EditText accountID;
 
@@ -67,7 +66,6 @@ public class Pair_wallet extends Activity {
 	/**Sets up the Scan button component*/
 	private void setupScanButton(){
 		ImageButton scanBtn = (ImageButton) findViewById(R.id.btnScan);
-		txtID = (EditText) findViewById(R.id.txtLabel);
 		
 		//Check and make sure the user entered a name, if not display a warning dialog.
 		scanBtn.setOnClickListener(new OnClickListener() {
@@ -90,38 +88,23 @@ public class Pair_wallet extends Activity {
 					// Showing Alert Message
 					alertDialog.show();
 			}
-			
-			private boolean validateForm(){
-				/**
-				 * check name
-				 */
-				String check = txtID.getText().toString();
-				if (check.matches("")){
-					showError("Please enter a label for this wallet");
-					return false;
-				}
-				
-				return true;
-			}
-			
+						
 			@SuppressLint("ShowToast")
 			@SuppressWarnings("deprecation")
 			@Override
 			public void onClick(View v) {			
-				if(validateForm()) {
-					try {
-						launchScanActivity();
-					} catch (Exception e) {
-						e.printStackTrace();
-						Toast.makeText(getApplicationContext(), "ERROR:" + e, 1).show();
-					}
-					catch (Error e)
-					{
-						/* Download zxing */
-						Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
-						Intent marketIntent = new Intent(Intent.ACTION_VIEW,marketUri);
-						startActivity(marketIntent);
-					}
+				try {
+					launchScanActivity();
+				} catch (Exception e) {
+					e.printStackTrace();
+					Toast.makeText(getApplicationContext(), "ERROR:" + e, 1).show();
+				}
+				catch (Error e)
+				{
+					/* Download zxing */
+					Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
+					Intent marketIntent = new Intent(Intent.ACTION_VIEW,marketUri);
+					startActivity(marketIntent);
 				}
 			}
 		});
@@ -161,7 +144,6 @@ public class Pair_wallet extends Activity {
 				
 				mProgressDialog.hide();
 				mProgressDialog = null;
-				txtID.setText("");
 				
 				return;
 			}
@@ -189,17 +171,19 @@ public class Pair_wallet extends Activity {
 		private String walletType;
 		private String LocalIP;
 		private String AESKey;
+		private String pairingName;
 		private long walletIndex;
 		private int networkType;
 		
 		public connectTask(PairingQRData qrData){
-			this.IPAddress = qrData.IPAddress;
-			this.fingerprint = qrData.fingerprint;
-			this.walletType = qrData.walletType;
-			this.LocalIP = qrData.LocalIP;
-			this.AESKey = qrData.AESKey;
-			this.walletIndex = qrData.walletIndex;
-			this.networkType = qrData.networkType;
+			this.IPAddress 		= qrData.IPAddress;
+			this.fingerprint 	= qrData.fingerprint;
+			this.walletType		= qrData.walletType;
+			this.LocalIP 		= qrData.LocalIP;
+			this.AESKey 		= qrData.AESKey;
+			this.pairingName 	= qrData.pairingName;
+			this.walletIndex 	= qrData.walletIndex;
+			this.networkType 	= qrData.networkType;
 		}
 		
         @Override
@@ -234,7 +218,14 @@ public class Pair_wallet extends Activity {
 						PairingProtocol.getPairingIDDigest(walletIndex, GcmUtilGlobal.gcmRegistrationToken), 
 						regID, 
 						walletIndex);
-				completePairing(AESKey, IPAddress, LocalIP, walletType, walletIndex, networkType,fingerprint);
+				completePairing(AESKey, 
+						IPAddress, 
+						LocalIP, 
+						walletType, 
+						pairingName, 
+						walletIndex, 
+						networkType, 
+						fingerprint);
 			} 
 			catch (CouldNotPairToWalletException e) {
 				e.printStackTrace();
@@ -265,12 +256,13 @@ public class Pair_wallet extends Activity {
     			String IPAddress, 
     			String LocalIP, 
     			String walletType, 
+    			String pairingName,
     			long walletIndex, 
     			int networkType,
     			String fingerprint){	
     	    String walletData = Long.toString(walletIndex);
     	    BAPreferences.WalletPreference().setWallet(walletData,
-    	    		txtID.getText().toString(), 
+    	    		pairingName, 
     	    		fingerprint, 
     	    		walletType, 
     	    		IPAddress, 
