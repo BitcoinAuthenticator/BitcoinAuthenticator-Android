@@ -140,7 +140,6 @@ public class Wallet_list extends Activity {
            {
         	   final int index = position;
         	   ArrayList<BAPopupMenu.PopupButton> buttons = new ArrayList<BAPopupMenu.PopupButton>();
-        	   buttons.add(new BAPopupMenu.PopupButton("Re-pair",true));
         	   buttons.add(new BAPopupMenu.PopupButton("Rename",true));
         	   buttons.add(new BAPopupMenu.PopupButton("Details",true));
         	   buttons.add(new BAPopupMenu.PopupButton("Delete",true));
@@ -205,13 +204,6 @@ public class Wallet_list extends Activity {
         	i.putExtra("walletName", wi.getWalletLabel());
         	startActivity (i);
         }
-        else if(title=="Re-pair"){
-       		Object o = lv1.getItemAtPosition(index);
-			WalletItem Data = (WalletItem) o;
-			Intent in = new Intent(Wallet_list.this, Re_pair_wallet.class);
-			in.putExtra("walletNum", Data.getWalletNum());
-			startActivity (in);
-       	}
        	//Displays a dialog allowing the user to rename the wallet in the listview
     	else if(title=="Rename"){
     		BASingleInputDialog alert = new BASingleInputDialog(this);
