@@ -217,7 +217,7 @@ public class Wallet_list extends Activity {
 						Object o = lv1.getItemAtPosition(index);
 		    			WalletItem Data = (WalletItem) o;		    			
 		    			String wdata = Long.toString(Data.getWalletNum());
-		    			BAPreferences.WalletPreference().setID(wdata, input);
+		    			BAPreferences.WalletPreference().setName(wdata, input);
 		    			/*SharedPreferences data = getSharedPreferences(wdata, 0);
 		    			SharedPreferences.Editor editor = data.edit();	
 		    			editor.putString("ID", input);
@@ -335,7 +335,7 @@ public class Wallet_list extends Activity {
     			continue;
     		
     		walletData.setWalletNum(i);
-    		walletData.setWalletLabel(BAPreferences.WalletPreference().getID(wdata, "Null"));
+    		walletData.setWalletLabel(BAPreferences.WalletPreference().getName(wdata, "Null"));
     		String fingerprint = BAPreferences.WalletPreference().getFingerprint(wdata, "Null");
     		if (!fingerprint.equals("null")) walletData.setFingerprint(fingerprint.substring(32,40).toUpperCase());
     		//Decide which icon to display

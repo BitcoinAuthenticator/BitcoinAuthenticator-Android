@@ -21,14 +21,14 @@ public class WalletPreference extends BAPreferenceBase{
 	
 	public void setWallet(String 
 			walletID, 
-			String id,
+			String name,
 			String fingerprint, 
 			String type, 
 			String extIP, 
 			String locIP, 
 			int networkType,
 			boolean deleted){
-		setID(walletID, id);
+		setName(walletID, name);
 		setFingerprint(walletID, fingerprint);
 		setType(walletID, type);
 		setExternalIP(walletID, extIP);
@@ -43,20 +43,20 @@ public class WalletPreference extends BAPreferenceBase{
 	 * @return
 	 */
 	public boolean checkIFWalletNumAvailable(String walletID){
-		return getID(walletID, null) == null? true:false;
+		return getName(walletID, null) == null? true:false;
 	}
 	
 	/**
 	 * ID
 	 */
 	
-	public void setID(String walletID,String value){
+	public void setName(String walletID,String value){
 		SharedPreferences.Editor editor = getEditor(getPrefix() + walletID);	
 		editor.putString(BAPreferenceType.ID.toString(), value);
 		editor.commit();
 	}
 	
-	public String getID(String walletID, String defValue){
+	public String getName(String walletID, String defValue){
 		SharedPreferences data = getActivity().getSharedPreferences(getPrefix() + walletID, 0);
 		return data.getString(BAPreferenceType.ID.toString(), defValue);
 	}

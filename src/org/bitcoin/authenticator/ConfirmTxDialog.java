@@ -82,7 +82,7 @@ public class ConfirmTxDialog {
 	
 		//Load walletID from Shared Preferences
 		//SharedPreferences data = activity.getSharedPreferences("WalletData"+ walletnum, 0);
-		String name = BAPreferences.WalletPreference().getID(Long.toString(walletnum),"Null");//data.getString("ID", "null");
+		String name = BAPreferences.WalletPreference().getName(Long.toString(walletnum),"Null");//data.getString("ID", "null");
 		
 		//load wallet's ips
 		final String[] ips = new String[] 

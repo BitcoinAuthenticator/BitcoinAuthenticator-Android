@@ -9,6 +9,7 @@ import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Set;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -260,6 +261,18 @@ public class Pair_wallet extends Activity {
     			long walletIndex, 
     			int networkType,
     			String fingerprint){	
+			/*
+			 * check the pairing name does not exist, if it does add a (2) ending to the name
+			 */
+			Set<Long> walletIndexSet= BAPreferences.ConfigPreference().getWalletIndexList();
+			for (Long i:walletIndexSet) {
+				String name = BAPreferences.WalletPreference().getName(Long.toString(i), null);
+				if(name.equals(pairingName)) {
+					pairingName = pairingName + " (2)";
+					break;
+				}
+			}
+			
     	    String walletData = Long.toString(walletIndex);
     	    BAPreferences.WalletPreference().setWallet(walletData,
     	    		pairingName, 
