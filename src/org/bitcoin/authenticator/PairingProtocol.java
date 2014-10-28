@@ -150,8 +150,8 @@ public class PairingProtocol {
     	
     	ret.AESKey = QRInput.substring(QRInput.indexOf("AESKey=")+7, QRInput.indexOf("&PublicIP="));
     	ret.IPAddress = QRInput.substring(QRInput.indexOf("&PublicIP=")+10, QRInput.indexOf("&LocalIP="));
-    	ret.LocalIP = QRInput.substring(QRInput.indexOf("&LocalIP=")+9, QRInput.indexOf("&WalletType="));
-    	ret.pairingName = QRInput.substring(QRInput.indexOf("&pairingName=")+13, QRInput.indexOf("&NetworkType="));
+    	ret.LocalIP = QRInput.substring(QRInput.indexOf("&LocalIP=")+9, QRInput.indexOf("&pairingName="));
+    	ret.pairingName = QRInput.substring(QRInput.indexOf("&pairingName=")+13, QRInput.indexOf("&WalletType="));
     	ret.walletType = QRInput.substring(QRInput.indexOf("&WalletType=")+12, QRInput.indexOf("&NetworkType="));
 		/**
 		 * 1 for main net, 0 for testnet

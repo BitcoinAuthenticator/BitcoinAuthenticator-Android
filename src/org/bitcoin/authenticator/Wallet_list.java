@@ -161,7 +161,7 @@ public class Wallet_list extends Activity {
 	
 	public void updateListViewData(){
 		try {
-			listAdapter.updateData(getGCMPendingRequests(listAdapter.listData));
+			listAdapter.updateData(addGCMPendingRequestsToWallets(getListData()));
 		} catch (InterruptedException e) { e.printStackTrace(); } catch (JSONException e) { e.printStackTrace(); }
 	}
 
@@ -213,17 +213,19 @@ public class Wallet_list extends Activity {
     		alert.setOkButtonListener(new SingleInputOnClickListener(){
 				@Override
 				public void onClick(BAAlertDialogBase alert, String input) {
-					if(input.length() > 3){
+					if(input.length() > 2){
 						Object o = lv1.getItemAtPosition(index);
 		    			WalletItem Data = (WalletItem) o;		    			
 		    			String wdata = Long.toString(Data.getWalletNum());
 		    			BAPreferences.WalletPreference().setName(wdata, input);
-		    			/*SharedPreferences data = getSharedPreferences(wdata, 0);
-		    			SharedPreferences.Editor editor = data.edit();	
-		    			editor.putString("ID", input);
-		    			editor.commit();*/
-		    	        try { setListView(false); } 
-		    	        catch (InterruptedException e) { e.printStackTrace(); } catch (JSONException e) { e.printStackTrace(); }
+		    			updateListViewData();
+					}
+					else {
+						runOnUiThread(new Runnable() {
+            				public void run() {
+            					Toast.makeText(getApplicationContext(), "Name must be at least 2 characters", Toast.LENGTH_LONG).show();
+            				}
+            			});
 					}
 				}
     		});
@@ -293,12 +295,12 @@ public class Wallet_list extends Activity {
 	
 		// update adapter
 		try {
-			listAdapter.updateData(getGCMPendingRequests(listAdapter.listData));
+			listAdapter.updateData(addGCMPendingRequestsToWallets(listAdapter.listData));
 		} catch (InterruptedException e) { e.printStackTrace(); } catch (JSONException e) { e.printStackTrace(); }
 	}
 	
 	@SuppressWarnings("unchecked")
-	private ArrayList getGCMPendingRequests(ArrayList wallets) throws InterruptedException, JSONException{
+	private ArrayList addGCMPendingRequestsToWallets(ArrayList wallets) throws InterruptedException, JSONException{
 		
 		ArrayList<String> pending = BAPreferences.ConfigPreference().getPendingList();
 		for(WalletItem walletData:(ArrayList<WalletItem>)wallets){
@@ -350,7 +352,7 @@ public class Wallet_list extends Activity {
         	else 									{walletData.setIcon(R.drawable.ic_authenticator_logo);}
     		results.add(walletData);
     	}
-        return getGCMPendingRequests(results);
+        return addGCMPendingRequestsToWallets(results);
     }
     
     /**Creates an object that holds the metadata for each wallet to include in the listview*/
