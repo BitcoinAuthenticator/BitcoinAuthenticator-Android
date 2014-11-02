@@ -185,9 +185,6 @@ public class Wallet_list extends Activity {
 		if (id == R.id.action_show_seed){
 			startActivity (new Intent(Wallet_list.this, Show_seed.class));
 		}
-		if (id == R.id.action_backup){
-			startActivity (new Intent(Wallet_list.this, Backup_Menu.class));
-		}
 		if (id == R.id.action_settings){
 			startActivity (new Intent(Wallet_list.this, Settings.class));
 		}

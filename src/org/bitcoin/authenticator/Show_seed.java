@@ -1,16 +1,28 @@
 package org.bitcoin.authenticator;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
+
 import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
-import org.bitcoin.authenticator.backup.PaperWallet;
 import org.bitcoin.authenticator.core.WalletCore;
 import org.bitcoin.authenticator.core.exceptions.NoSeedOrMnemonicsFound;
 import org.bitcoinj.crypto.MnemonicCode;
@@ -18,14 +30,19 @@ import org.bitcoinj.crypto.MnemonicException.MnemonicLengthException;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
+import android.text.Editable;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,6 +51,8 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageButton;
@@ -92,12 +111,83 @@ public class Show_seed extends Activity {
 				Toast.makeText(getApplicationContext(), "Could not copy the mnemonic string", Toast.LENGTH_LONG).show();
 			}
 		}
-		if (id == R.id.action_qr){
-			startActivity (new Intent(Show_seed.this, PaperWallet.class));
+		if (id == R.id.action_save){
+			LinearLayout layout = new LinearLayout(this);
+			layout.setOrientation(LinearLayout.VERTICAL);
+			final EditText input = new EditText(this);
+			input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+			input.setHint("Password");
+			layout.addView(input);
+
+			final CheckBox showpw = new CheckBox(this);
+			showpw.setText("Show Password?");
+			showpw.setChecked(false);
+			layout.addView(showpw);
+			showpw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+			       @Override
+			       public void onCheckedChanged(CompoundButton buttonView,boolean isChecked) {
+			    	   if (showpw.isChecked()){input.setInputType(InputType.TYPE_CLASS_TEXT);}
+			    	   else {input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);}
+			       }
+			   }
+			);     
+			new AlertDialog.Builder(Show_seed.this)
+		    .setTitle("Save seed to file")
+		    .setMessage("Enter a password to encrypt your seed")
+		    .setView(layout)
+		    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+		        public void onClick(DialogInterface dialog, int whichButton) {
+		            Editable value = input.getText(); 
+		            WalletCore wc = new WalletCore();
+					String m;
+		            try {
+						m = wc.getMnemonicString(getApplicationContext());
+						String FILENAME = "Bitcoin_Authenticator_Seed_Backup";
+						File storage = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+						File dir = new File (storage.getAbsolutePath() + "/backups/");
+						dir.mkdirs();
+						File file = new File(dir, FILENAME);
+						char[] password = new char[input.getText().length()];
+						for (int i=0; i<input.getText().length(); i++){
+							password[i]=input.getText().charAt(i);
+						}
+						byte[] salt = new byte[]{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
+						SecretKeyFactory kf = null;
+						try {kf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");} 
+						catch (NoSuchAlgorithmException e1) {e1.printStackTrace();	}
+						PBEKeySpec spec = new PBEKeySpec(password, salt, 8192, 256);
+						SecretKey tmp = null;
+						try {tmp = kf.generateSecret(spec);} 
+						catch (InvalidKeySpecException e1) {e1.printStackTrace();}
+						SecretKey AESKey = new SecretKeySpec(tmp.getEncoded(), "AES");
+						Cipher cipher = null;
+			        	try {cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");} 
+			        	catch (NoSuchAlgorithmException e) {e.printStackTrace();} 
+			        	catch (NoSuchPaddingException e) {e.printStackTrace();}
+			        	try {cipher.init(Cipher.ENCRYPT_MODE, AESKey);} 
+			        	catch (InvalidKeyException e) {e.printStackTrace();}
+			        	byte[] cipherBytes = null;
+			        	try {cipherBytes = cipher.doFinal(m.getBytes());} 
+			        	catch (IllegalBlockSizeException e) {e.printStackTrace();} 
+			        	catch (BadPaddingException e) {e.printStackTrace();}
+						FileOutputStream f = new FileOutputStream(file);
+						f.write(cipherBytes);
+						f.close();
+						Toast.makeText(getApplicationContext(), "Saved seed to " + storage.getAbsolutePath() + "/backups/", Toast.LENGTH_LONG).show();
+					} catch (NoSeedOrMnemonicsFound e) {
+						Toast.makeText(getApplicationContext(), "Unable to save seed", Toast.LENGTH_LONG).show();
+					} catch (IOException e) {
+						Toast.makeText(getApplicationContext(), "Unable to save seed", Toast.LENGTH_LONG).show();
+					}
+		        }
+		    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+		        public void onClick(DialogInterface dialog, int whichButton) {
+		            // Do nothing.
+		        }
+		    }).show();
+			
 		}
-//		if (id == R.id.action_sss){
-//			
-//		}
 		return super.onOptionsItemSelected(item);
 	}
 	
