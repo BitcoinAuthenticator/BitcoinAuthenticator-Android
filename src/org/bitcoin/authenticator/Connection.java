@@ -18,7 +18,7 @@ import android.util.Log;
  */
 public class Connection {
 	
-	public static final int PORT = 1234;
+	public static final int PORT = 8222;
 	
 	private static Connection instance;
 	public static Connection getInstance() {
