@@ -267,7 +267,8 @@ public class Pair_wallet extends Activity {
 			Set<Long> walletIndexSet= BAPreferences.ConfigPreference().getWalletIndexList();
 			for (Long i:walletIndexSet) {
 				String name = BAPreferences.WalletPreference().getName(Long.toString(i), null);
-				if(name.equals(pairingName)) {
+				boolean isDeleted = BAPreferences.WalletPreference().getDeleted(Long.toString(i), true);
+				if(name.equals(pairingName) && isDeleted == false) {
 					pairingName = pairingName + " (2)";
 					break;
 				}
