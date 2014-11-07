@@ -3,6 +3,7 @@ package org.bitcoin.authenticator.GcmUtil;
 import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -60,6 +61,12 @@ public class GcmIntentService extends IntentService {
 		        	processUpdateIpAddresses(extras.getString("data"));
 		        	Log.v(GcmUtilGlobal.TAG, "Received: " + extras.getString("data"));
 		        }
+		        else if(messageType == RequestType.CoinsReceived){
+		        	processCoinsReceived(extras.getString("data"));
+		        	Log.v(GcmUtilGlobal.TAG, "Received: " + extras.getString("data"));
+		        }
+		        else
+		        	Log.v(GcmUtilGlobal.TAG, "Received Uknown: " + extras.getString("data"));
 		    }
         } catch (JSONException e) { e.printStackTrace(); }
         
@@ -77,16 +84,52 @@ public class GcmIntentService extends IntentService {
     		return RequestType.signTx;
     	case 4:
     		return RequestType.updateIpAddressesForPreviousMessage;
+    	case 6:
+    		return RequestType.CoinsReceived;
     	}
     	return null;
+    }
+    
+    private void processCoinsReceived(String msg) throws JSONException {
+    	obj = new JSONObject(msg);
+    	
+    	InputStream is = this.getResources().openRawResource(R.drawable.authenticator_logo);
+        Bitmap logo = BitmapFactory.decodeStream(is);  
+		mNotificationManager = (NotificationManager)
+                this.getSystemService(Context.NOTIFICATION_SERVICE);
+		//
+		String customMsg = obj.getString("CustomMsg");
+		String accountName = "XXX";
+		Set<Long> ids = BAPreferences.ConfigPreference().getWalletIndexList();
+		for(Long id:ids) {
+			String pairingID = BAPreferences.WalletPreference().getFingerprint(Long.toString(id), null);
+			if(pairingID.equals(obj.getString("PairingID"))) {
+				accountName = BAPreferences.WalletPreference().getName(Long.toString(id), "XXX");
+				break;
+			}
+		}
+		customMsg = accountName + ": " + customMsg;
+		
+		NotificationCompat.Builder mBuilder =
+                new NotificationCompat.Builder(this)
+        .setSmallIcon(R.drawable.ic_icon_action_bar)
+        .setLargeIcon(logo)
+        .setContentTitle("Coins Received")
+        .setStyle(new NotificationCompat.BigTextStyle()
+        .bigText(customMsg))
+        .setContentText(customMsg)
+        .setDefaults(Notification.DEFAULT_SOUND)
+        .setDefaults(Notification.DEFAULT_VIBRATE)
+        .setTicker(customMsg).setWhen(System.currentTimeMillis());
+
+        Notification notif = mBuilder.build();
+        notif.flags |= Notification.FLAG_AUTO_CANCEL;
+        mNotificationManager.notify((int)uniqueId, notif);
     }
 
     private void processUpdateIpAddresses(String msg) throws JSONException {
     	obj = new JSONObject(msg);
     	JSONObject payload = new JSONObject(obj.getString("ReqPayload"));
-    	// search notification
-//    	SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
-//		SharedPreferences.Editor editor = settings.edit();	
 		/**
 		 * Update all pending requests IPs from the received pairingID
 		 */
@@ -113,9 +156,8 @@ public class GcmIntentService extends IntentService {
 					BAPreferences.ConfigPreference().setPendingRequest(pendingID, pendingObj);
 					
 					Log.v(GcmUtilGlobal.TAG, "Updated pending request: " + pendingID);
-//					
-//					editor.putString(pendingObj.getString("RequestID"), pendingObj.toString());
-//					editor.commit();
+
+
 				}
 			}
 		}
@@ -207,21 +249,7 @@ public class GcmIntentService extends IntentService {
         BAPreferences.ConfigPreference().addPendingRequestToList(obj.getString("RequestID"));
         
         Log.v(GcmUtilGlobal.TAG, "Added pending request: " + obj.getString("RequestID"));
-        
-//		SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
-//		SharedPreferences.Editor editor = settings.edit();	
-//    	editor.putBoolean("request", true);
-//		editor.putString(obj.getString("RequestID"), obj.toString());
-//		// update RequestID list
-//		JSONArray o;
-//		if(settings.getString("pendingList", null) !=null)
-//			o = new JSONArray(settings.getString("pendingList", ""));
-//		else
-//			o = new JSONArray();
-//		o.put(obj.getString("RequestID"));
-//		editor.putString("pendingList", o.toString());
-//		editor.commit();
-    	
+
     }
         
     //########################
