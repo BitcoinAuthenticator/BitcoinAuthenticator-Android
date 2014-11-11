@@ -5,13 +5,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 
 public class WalletPreference extends BAPreferenceBase{
 	
 	
-	public WalletPreference(Activity activity){
-		setActivity(activity);
+	public WalletPreference(Context context){
+		setContext(context);
 		setPrefix("WalletData");
 	}
 	
@@ -57,7 +58,7 @@ public class WalletPreference extends BAPreferenceBase{
 	}
 	
 	public String getName(String walletID, String defValue){
-		SharedPreferences data = getActivity().getSharedPreferences(getPrefix() + walletID, 0);
+		SharedPreferences data = getContext().getSharedPreferences(getPrefix() + walletID, 0);
 		return data.getString(BAPreferenceType.ID.toString(), defValue);
 	}
 	
@@ -72,7 +73,7 @@ public class WalletPreference extends BAPreferenceBase{
 	}
 
 	public boolean getDeleted(String walletID, boolean defValue){
-		SharedPreferences data = getActivity().getSharedPreferences(getPrefix() + walletID, 0);
+		SharedPreferences data = getContext().getSharedPreferences(getPrefix() + walletID, 0);
 		return data.getBoolean(BAPreferenceType.DELETED.toString(), defValue);
 	}
 	
@@ -87,7 +88,7 @@ public class WalletPreference extends BAPreferenceBase{
 	}
 
 	public int getNetworkType(String walletID, int defValue){
-		SharedPreferences data = getActivity().getSharedPreferences(getPrefix() + walletID, 0);
+		SharedPreferences data = getContext().getSharedPreferences(getPrefix() + walletID, 0);
 		return data.getInt(BAPreferenceType.NETWORK.toString(), defValue);
 	}
 	
@@ -102,7 +103,7 @@ public class WalletPreference extends BAPreferenceBase{
 	}
 
 	public String getFingerprint(String walletID, String defValue){
-		SharedPreferences data = getActivity().getSharedPreferences(getPrefix() + walletID, 0);
+		SharedPreferences data = getContext().getSharedPreferences(getPrefix() + walletID, 0);
 		return data.getString(BAPreferenceType.FINGERPRINT.toString(), defValue);
 	}
 	
@@ -117,7 +118,7 @@ public class WalletPreference extends BAPreferenceBase{
 	}
 
 	public String getType(String walletID, String defValue){
-		SharedPreferences data = getActivity().getSharedPreferences(getPrefix() + walletID, 0);
+		SharedPreferences data = getContext().getSharedPreferences(getPrefix() + walletID, 0);
 		return data.getString(BAPreferenceType.TYPE.toString(), defValue);
 	}
 	
@@ -132,7 +133,7 @@ public class WalletPreference extends BAPreferenceBase{
 	}
 
 	public String getExternalIP(String walletID, String defValue){
-		SharedPreferences data = getActivity().getSharedPreferences(getPrefix() + walletID, 0);
+		SharedPreferences data = getContext().getSharedPreferences(getPrefix() + walletID, 0);
 		return data.getString(BAPreferenceType.EXTERNAL_IP.toString(), defValue);
 	}
 	
@@ -147,7 +148,7 @@ public class WalletPreference extends BAPreferenceBase{
 	}
 
 	public String getLocalIP(String walletID, String defValue){
-		SharedPreferences data = getActivity().getSharedPreferences(getPrefix() + walletID, 0);
+		SharedPreferences data = getContext().getSharedPreferences(getPrefix() + walletID, 0);
 		return data.getString(BAPreferenceType.LOCAL_IP.toString(), defValue);
 	}
 	

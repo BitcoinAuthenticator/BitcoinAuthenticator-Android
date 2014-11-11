@@ -24,7 +24,7 @@ public class Main extends Activity {
 		gcmInit();
 		
 		// init preferencess
-		new BAPreferences(this);
+		new BAPreferences(this.getApplicationContext());
 		
 		//SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
 	    Boolean paired = BAPreferences.ConfigPreference().getPaired(false);//settings.getBoolean("paired", false);
