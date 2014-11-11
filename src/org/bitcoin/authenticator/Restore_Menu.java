@@ -1,5 +1,7 @@
 package org.bitcoin.authenticator;
 
+import java.util.ArrayList;
+
 import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
 import org.bitcoin.authenticator.core.WalletCore;
 import org.bitcoin.authenticator.dialogs.BAAlertDialogBase;
@@ -47,7 +49,8 @@ public class Restore_Menu extends Activity {
 		restoreButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				//startActivity (new Intent(Restore_Menu.this, Restore_Mnemonic.class));
+				
+				
 			}
 		});
 	}
