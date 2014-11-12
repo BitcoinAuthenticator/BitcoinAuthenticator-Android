@@ -47,12 +47,16 @@ public class GcmIntentService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         Bundle extras = intent.getExtras();
         GoogleCloudMessaging gcm = GoogleCloudMessaging.getInstance(this);
+        
+        // init preferencess
+     	new BAPreferences(this.getApplicationContext());
+        
         // The getMessageType() intent parameter must be the intent you received
         // in your BroadcastReceiver.
         try {
 		    if (!extras.isEmpty()) { 
 		    	RequestType messageType = getRequestType(extras.getString("data"));
-				
+
 		        if (messageType == RequestType.signTx) {
 		        	processNewSigningNotification(extras.getString("data"));
 		            Log.v(GcmUtilGlobal.TAG, "Received: " + extras.getString("data"));
@@ -199,7 +203,7 @@ public class GcmIntentService extends IntentService {
     	mNotificationManager = (NotificationManager)
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
 
-    	Intent intent = new Intent(this, Main.class);
+    	Intent mainIntent = new Intent(this, Main.class);
     	String customMsg = "";
 	
 		obj = new JSONObject(msg);
@@ -212,16 +216,16 @@ public class GcmIntentService extends IntentService {
 		 * 	  activity will pull it in the while loop 
 		 */
 		// 1) 
-		intent.putExtra("RequestID", obj.getString("RequestID"));
-		intent.putExtra("PairingID", obj.getString("PairingID"));
-		intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		mainIntent.putExtra("RequestID", obj.getString("RequestID"));
+		mainIntent.putExtra("PairingID", obj.getString("PairingID"));
+		mainIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		// 2) 
 		addRequestToQueue(obj.getString("RequestID"));
 		
 		customMsg = obj.getString("CustomMsg");
   
         PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-                intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        		mainIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         
         InputStream is = this.getResources().openRawResource(R.drawable.authenticator_logo);
         Bitmap logo = BitmapFactory.decodeStream(is);  

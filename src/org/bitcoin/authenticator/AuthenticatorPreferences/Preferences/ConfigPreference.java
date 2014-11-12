@@ -11,11 +11,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 
 public class ConfigPreference  extends BAPreferenceBase{
-	public ConfigPreference(Activity activity){
-		setActivity(activity);
+	public ConfigPreference(Context context){
+		setContext(context);
 		setPrefix("ConfigFile");
 	}
 	
@@ -161,7 +162,7 @@ public class ConfigPreference  extends BAPreferenceBase{
 	}
 
 	public boolean getRequest(boolean defValue){
-		SharedPreferences data = getActivity().getSharedPreferences(getPrefix(), 0);
+		SharedPreferences data = getContext().getSharedPreferences(getPrefix(), 0);
 		return data.getBoolean(BAPreferenceType.REQUEST.toString(), defValue);
 	}
 	
@@ -176,7 +177,7 @@ public class ConfigPreference  extends BAPreferenceBase{
 	}
 
 	public boolean getPaired(boolean defValue){
-		SharedPreferences data = getActivity().getSharedPreferences(getPrefix(), 0);
+		SharedPreferences data = getContext().getSharedPreferences(getPrefix(), 0);
 		return data.getBoolean(BAPreferenceType.PAIRED.toString(), defValue);
 	}
 	
@@ -191,7 +192,7 @@ public class ConfigPreference  extends BAPreferenceBase{
 	}
 
 	public boolean getGCM(boolean defValue){
-		SharedPreferences data = getActivity().getSharedPreferences(getPrefix(), 0);
+		SharedPreferences data = getContext().getSharedPreferences(getPrefix(), 0);
 		return data.getBoolean(BAPreferenceType.GCM.toString(), defValue);
 	}
 	
@@ -206,7 +207,7 @@ public class ConfigPreference  extends BAPreferenceBase{
 	}
 
 	public boolean getInitialized(boolean defValue){
-		SharedPreferences data = getActivity().getSharedPreferences(getPrefix(), 0);
+		SharedPreferences data = getContext().getSharedPreferences(getPrefix(), 0);
 		return data.getBoolean(BAPreferenceType.INITIALIZED.toString(), defValue);
 	}
 	
