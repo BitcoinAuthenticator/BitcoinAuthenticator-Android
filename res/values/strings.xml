@@ -23,5 +23,6 @@
     <string name="title_activity_paper_wallet">Paper Wallet</string>
     <string name="title_activity_restore_menu">Restore Wallet</string>
     <string name="title_activity_backup_menu">Backup Wallet</string>
+    <string name="chooser_title">Select backup file</string>
 
 </resources>
