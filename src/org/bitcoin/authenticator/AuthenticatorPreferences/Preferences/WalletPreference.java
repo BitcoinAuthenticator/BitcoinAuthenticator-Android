@@ -23,14 +23,12 @@ public class WalletPreference extends BAPreferenceBase{
 	public void setWallet(String 
 			walletID, 
 			String name,
-			String fingerprint, 
 			String type, 
 			String extIP, 
 			String locIP, 
 			int networkType,
 			boolean deleted){
 		setName(walletID, name);
-		setFingerprint(walletID, fingerprint);
 		setType(walletID, type);
 		setExternalIP(walletID, extIP);
 		setLocalIP(walletID, locIP);
@@ -93,21 +91,6 @@ public class WalletPreference extends BAPreferenceBase{
 	}
 	
 	/**
-	 * Fingerprint
-	 */
-	
-	public void setFingerprint(String walletID,String value){
-		SharedPreferences.Editor editor = getEditor(getPrefix() + walletID);
-		editor.putString(BAPreferenceType.FINGERPRINT.toString(), value);
-		editor.commit();
-	}
-
-	public String getFingerprint(String walletID, String defValue){
-		SharedPreferences data = getContext().getSharedPreferences(getPrefix() + walletID, 0);
-		return data.getString(BAPreferenceType.FINGERPRINT.toString(), defValue);
-	}
-	
-	/**
 	 * Type
 	 */
 	
@@ -161,7 +144,6 @@ public class WalletPreference extends BAPreferenceBase{
 		ID					("ID"			),
 		DELETED				("Deleted"		),
 		NETWORK				("NetworkType"	),
-		FINGERPRINT			("Fingerprint"	),
 		TYPE				("Type"			),
 		EXTERNAL_IP			("ExternalIP"	),
 		LOCAL_IP			("LocalIP"		);

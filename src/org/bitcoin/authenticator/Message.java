@@ -34,11 +34,11 @@ public class Message {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public Socket sentRequestID(String requestID, String pairingID) throws CouldNotSendRequestIDException{
+	public Socket sentRequestID(String requestID, String walletID) throws CouldNotSendRequestIDException{
 		try {
 			JSONObject jo = new JSONObject();
 			jo.put("requestID", requestID);
-			jo.put("pairingID", pairingID);
+			jo.put("pairingID", walletID); // the walletID in the authenticator is the pairing id in the wallet
 			byte[] payload = jo.toString().getBytes();
 			return Connection.getInstance().writeContinuous(ips, payload);
 		}

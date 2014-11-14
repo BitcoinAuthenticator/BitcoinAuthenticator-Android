@@ -81,34 +81,6 @@
 	
     <!-- Spacer -->
     <View android:layout_width="fill_parent"
-	        android:layout_height="15dp"
-	        android:background="@color/transparent"/>
-	
-    <!-- Pairing ID  -->
-    <LinearLayout  android:layout_width="fill_parent"
-				    android:layout_height="wrap_content"
-				    android:orientation="horizontal"
-				    android:background="@color/transparent">
-				    
-        <TextView
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:textColor="@color/ui_text_color"
-	        android:textSize="20dip"
-	        android:text="Pairing ID: " />
-        
-	    <TextView
-	        android:id="@+id/pairing_details_pairing_id"
-	        android:layout_width="wrap_content"
-	        android:layout_height="wrap_content"
-	        android:textSize="20dip"
-	        android:textColor="@color/ui_text_color"
-	        android:text="XXX" />
-	    
-	</LinearLayout>
-	
-    <!-- Spacer -->
-    <View android:layout_width="fill_parent"
 	        android:layout_height="30dp"
 	        android:background="@color/transparent"/>
 	

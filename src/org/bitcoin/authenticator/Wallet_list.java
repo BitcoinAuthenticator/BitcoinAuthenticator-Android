@@ -126,7 +126,7 @@ public class Wallet_list extends Activity {
         	   if (showPending){
         		   Intent i = new Intent(Wallet_list.this, ActivityPendingRequests.class);
         		   WalletItem wi = (WalletItem)lv1.getItemAtPosition(index);
-        		   i.putExtra("fingerprint", wi.getFingerprint());
+        		   i.putExtra("walletID", wi.getWalletIDString());
         		   i.putExtra("walletName", wi.getWalletLabel());
         		   startActivity (i);
         	   }
@@ -155,8 +155,6 @@ public class Wallet_list extends Activity {
 				return true;
            }
         });
-        if(launchNewGCMListener)
-        	this.processGCMInBackground();
 	}
 	
 	public void updateListViewData(){
@@ -197,7 +195,7 @@ public class Wallet_list extends Activity {
         if(title == "Show Pending Requests"){
         	Intent i = new Intent(Wallet_list.this, ActivityPendingRequests.class);
         	WalletItem wi = (WalletItem)lv1.getItemAtPosition(index);
-        	i.putExtra("fingerprint", wi.getFingerprint());
+        	i.putExtra("walletID", wi.getWalletIDString());
         	i.putExtra("walletName", wi.getWalletLabel());
         	startActivity (i);
         }
@@ -213,7 +211,7 @@ public class Wallet_list extends Activity {
 					if(input.length() > 2){
 						Object o = lv1.getItemAtPosition(index);
 		    			WalletItem Data = (WalletItem) o;		    			
-		    			String wdata = Long.toString(Data.getWalletNum());
+		    			String wdata = Data.getWalletIDString();
 		    			BAPreferences.WalletPreference().setName(wdata, input);
 		    			updateListViewData();
 					}
@@ -238,11 +236,10 @@ public class Wallet_list extends Activity {
     	else if(title=="Details"){
     		Intent i = new Intent(Wallet_list.this, PairingDetails.class);
         	WalletItem wi = (WalletItem)lv1.getItemAtPosition(index);
-        	i.putExtra("fingerprint", wi.getFingerprint());
         	i.putExtra("walletName", wi.getWalletLabel());
-        	i.putExtra("accountID", Long.toString(wi.getWalletNum()));
-        	i.putExtra("externalIP", BAPreferences.WalletPreference().getExternalIP(Long.toString(wi.getWalletNum()), ""));
-        	i.putExtra("internalIP", BAPreferences.WalletPreference().getLocalIP(Long.toString(wi.getWalletNum()), ""));
+        	i.putExtra("accountID", wi.getWalletIDString());
+        	i.putExtra("externalIP", BAPreferences.WalletPreference().getExternalIP(wi.getWalletIDString(), ""));
+        	i.putExtra("internalIP", BAPreferences.WalletPreference().getLocalIP(wi.getWalletIDString(), ""));
         	i.putExtra("icon", wi.getIcon());
         	startActivity (i);
     	}
@@ -258,7 +255,7 @@ public class Wallet_list extends Activity {
 				public void onClick(BAAlertDialogBase alert) {
 					Object o = lv1.getItemAtPosition(index);
         			WalletItem Data = (WalletItem) o;
-        			String wdata = Long.toString(Data.getWalletNum());
+        			String wdata = Data.getWalletIDString();
         			BAPreferences.WalletPreference().setDeleted(wdata, true);
         	        try { setListView(false); } catch (InterruptedException e) { e.printStackTrace(); } catch (JSONException e) { e.printStackTrace(); }
 				}
@@ -305,8 +302,8 @@ public class Wallet_list extends Activity {
 			// Load pending request
 			for(String req:pending){
 				JSONObject o = BAPreferences.ConfigPreference().getPendingRequestAsJsonObject(req);//new JSONObject(settings.getString(req, null));
-				String fingerPrintFromPairingID = o.getString("PairingID").substring(32,40).toUpperCase();
-				if(fingerPrintFromPairingID.equals(walletData.getFingerprint()))
+				String walletID = o.getString("WalletID");
+				if(walletID.equals(walletData.getWalletIDString()))
 				if(o.getBoolean("seen") == false)
 					walletData.addPendingGCMRequest(o);
 			}
@@ -333,10 +330,8 @@ public class Wallet_list extends Activity {
     		if((isTestnet && networkType == 1) || (isTestnet == false && networkType == 0)) // get only current network type wallets
     			continue;
     		
-    		walletData.setWalletNum(i);
+    		walletData.setWalletID(i);
     		walletData.setWalletLabel(BAPreferences.WalletPreference().getName(wdata, "Null"));
-    		String fingerprint = BAPreferences.WalletPreference().getFingerprint(wdata, "Null");
-    		if (!fingerprint.equals("null")) walletData.setFingerprint(fingerprint.substring(32,40).toUpperCase());
     		//Decide which icon to display
     		String typ = BAPreferences.WalletPreference().getType(wdata, "Null");
     		if (	 typ.equals("blockchain"	))	{walletData.setIcon(R.drawable.ic_blockchain_logo);}
@@ -356,17 +351,20 @@ public class Wallet_list extends Activity {
     public class WalletItem {
     	 
         private String walletLabel;
-        private String fingerprint;
         private ArrayList<JSONObject> pendingGCMRequests;
         private int icon;
-        private long WalletNum;
+        private long WalletID;
         
-        public long getWalletNum() {
-        	return WalletNum;
+        public long getWalletID() {
+        	return WalletID;
         }
         
-        public void setWalletNum(long num) {
-        	this.WalletNum = num;
+        public String getWalletIDString() {
+        	return Long.toString(WalletID);
+        }
+        
+        public void setWalletID(long num) {
+        	this.WalletID = num;
         }
      
         public String getWalletLabel() {
@@ -388,14 +386,6 @@ public class Wallet_list extends Activity {
         	getPendingGCMRequests().add(req);
         }
      
-        public String getFingerprint() {
-            return fingerprint;
-        }
-     
-        public void setFingerprint(String fp) {
-            this.fingerprint = fp;
-        }
-     
         public int getIcon() {
             return icon;
         }
@@ -406,8 +396,8 @@ public class Wallet_list extends Activity {
      
         @Override
         public String toString() {
-            return "[ Wallet Label=" + walletLabel + ", Fingerprint=" + 
-                    fingerprint + " , Icon=" + icon + "]";
+            return "[ Wallet Label=" + walletLabel + ", WalletID=" + 
+            		WalletID + " , Icon=" + icon + "]";
         }
     }
 
@@ -450,7 +440,7 @@ public class Wallet_list extends Activity {
     			holder.walletIcon = (ImageView) convertView.findViewById(R.id.wallet_icon);
     			holder.walletPendingRequestCntView = (TextView) convertView.findViewById(R.id.wallet_new_requests);
     			holder.walletLabelView = (TextView) convertView.findViewById(R.id.wallet_label);
-    			holder.walletFingerprintView = (TextView) convertView.findViewById(R.id.wallet_fingerprint);
+    			holder.walletIDView = (TextView) convertView.findViewById(R.id.wallet_id);
     			
     			convertView.setTag(holder);
     		} else {
@@ -461,7 +451,7 @@ public class Wallet_list extends Activity {
     		if (cnt > 0) {holder.walletPendingRequestCntView.setText("  " + Integer.toString(cnt) + "  ");}
     		else {holder.walletPendingRequestCntView.setText("");}
     		holder.walletLabelView.setText(((WalletItem) listData.get(position)).getWalletLabel());
-    		holder.walletFingerprintView.setText(((WalletItem) listData.get(position)).getFingerprint());
+    		holder.walletIDView.setText(((WalletItem) listData.get(position)).getWalletIDString());
     		
     		
  
@@ -471,7 +461,7 @@ public class Wallet_list extends Activity {
     	class ViewHolder {
     		ImageView walletIcon;
     		TextView walletLabelView;
-    		TextView walletFingerprintView;
+    		TextView walletIDView;
     		TextView walletPendingRequestCntView;
     		
     	}
@@ -521,7 +511,7 @@ public class Wallet_list extends Activity {
         					msg = new Message(ips);
     						persistentSocketForTheProcess = msg.sentRequestID(
     								getIntent().getStringExtra("RequestID"),
-    								getIntent().getStringExtra("PairingID"));
+    								getIntent().getStringExtra("WalletID"));
     					} catch (CouldNotSendRequestIDException e1) {
     						e1.printStackTrace();
     					}
@@ -594,34 +584,7 @@ public class Wallet_list extends Activity {
     		}
     	}.start();
     }
-        
-    /**
-     * This is a class that runs in the background and connects to the wallet and waits to receive a transaction.
-     * When one is received, it loads the dialog box.
-     */
-    public void processGCMInBackground() {
-//    	new Thread() {
-//    		@Override
-//    		public void run() {
-//    			while(true)
-//    			{
-//    				// blocking
-//    				try {
-//    					String reqID = GcmIntentService.takeRequest();
-//    					if(reqID != null)
-//    						runOnUiThread(new Runnable() {
-//    							@Override
-//    							public void run() {
-//    								updateListViewData();
-//    							}
-//    						});
-//    						
-//    				} catch (InterruptedException e) { e.printStackTrace(); }
-//    			}
-//    		}
-//    	}.start();
-    }
-    
+            
     /**
      * Events
      */

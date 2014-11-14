@@ -11,7 +11,6 @@ public class PairingDetails extends Activity {
 
 	private ImageView iv;
 	private TextView txvName;
-	private TextView txvPairingID;
 	private TextView txvAccountID;
 	private TextView txvExtIP;
 	private TextView txvInternalIP;
@@ -22,20 +21,17 @@ public class PairingDetails extends Activity {
 		setContentView(R.layout.activity_pairing_details);
 		
 		txvName = (TextView) findViewById(R.id.pairing_details_name);
-		txvPairingID = (TextView) findViewById(R.id.pairing_details_pairing_id);
 		txvAccountID = (TextView) findViewById(R.id.pairing_details_account_id);
 		txvExtIP = (TextView) findViewById(R.id.pairing_details_ext_ip);
 		txvInternalIP = (TextView) findViewById(R.id.pairing_details_int_ip);
 		
 		String name = getIntent().getStringExtra("walletName");
-		String pairID = getIntent().getStringExtra("fingerprint");
 		String accID = getIntent().getStringExtra("accountID");
 		String extIP = getIntent().getStringExtra("externalIP");
 		String internalIP = getIntent().getStringExtra("internalIP");
 		int icon = getIntent().getIntExtra("icon", 0);
 		
 		txvName.setText(name);
-		txvPairingID.setText(pairID);
 		txvAccountID.setText(accID);
 		txvExtIP.setText(extIP);
 		txvInternalIP.setText(internalIP);

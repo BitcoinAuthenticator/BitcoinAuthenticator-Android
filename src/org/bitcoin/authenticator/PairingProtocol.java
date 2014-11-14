@@ -43,7 +43,7 @@ public class PairingProtocol {
      * @throws CouldNotPairToWalletException 
      */
     @SuppressWarnings({ "unchecked", "rawtypes", "static-access" })
-	public void run(byte[] seed, SecretKey AESKey, String pairingID, byte[] regID, long walletIndex) throws CouldNotPairToWalletException {
+	public void run(byte[] seed, SecretKey AESKey, byte[] regID, long walletIndex) throws CouldNotPairToWalletException {
     	try {
     		//Derive the key and chaincode from the seed.
     		Log.i("asdf", "Pairing: Deriving Wallet Account");
@@ -59,7 +59,6 @@ public class PairingProtocol {
         	obj.put("version", 1);
     		obj.put("mpubkey", Utils.bytesToHex(mpubkey));
     		obj.put("chaincode", Utils.bytesToHex(chaincode));
-    		obj.put("pairID", pairingID);
     		obj.put("gcmID", new String (regID));
     		StringWriter jsonOut = new StringWriter();
     		try {JSONValue.writeJSONString(obj, jsonOut);} 
@@ -101,36 +100,11 @@ public class PairingProtocol {
     	
 	  }
     
-    public static String getPairingIDDigest(long num, String gcmRegID)
-	 {
-		MessageDigest md = null;
-		try {md = MessageDigest.getInstance("SHA-1");}
-		catch(NoSuchAlgorithmException e) {e.printStackTrace();} 
-	    byte[] digest = md.digest((gcmRegID + "_" + Long.toString(num)).getBytes());
-	    String ret = new BigInteger(1, digest).toString(16);
-	    //Make sure it is 40 chars, if less pad with 0, if more substringit
-	    if(ret.length() > 40)
-	    {
-	    	ret = ret.substring(0, 39);
-	    }
-	    else if(ret.length() < 40)
-	    {
-	    	int paddingNeeded = 40 - ret.length();
-	    	String padding = "";
-	    	for(int i=0;i<paddingNeeded;i++)
-	    		padding = padding + "0";
-	    	ret = padding + ret;
-	    }
-	    //Log.v("ASDF","Reg id: " + ret);
-	    return ret;
-	}
-    
     public static class PairingQRData {
     	public String AESKey;
     	public String IPAddress;
     	public String LocalIP;
     	public String walletType;
-    	public String fingerprint;
     	public String pairingName;
     	public int networkType;
     	public long walletIndex;
@@ -162,9 +136,13 @@ public class PairingProtocol {
 		 * get index
 		 */
 		String walletIndexHex = QRInput.substring(QRInput.indexOf("&index=")+7, QRInput.length());
-		ret.walletIndex = new BigInteger(EncodingUtils.hexStringToByteArray(walletIndexHex)).longValue();
+		ret.walletIndex = getWalletIndexFromString(walletIndexHex);
     	
     	return ret;
+    }
+    
+    public static long getWalletIndexFromString(String hex) {
+    	return new BigInteger(EncodingUtils.hexStringToByteArray(hex)).longValue();
     }
     
     /**

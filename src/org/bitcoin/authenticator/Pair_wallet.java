@@ -149,7 +149,6 @@ public class Pair_wallet extends Activity {
 				return;
 			}
 
-			qrData.fingerprint = PairingProtocol.getPairingIDDigest(qrData.walletIndex, GcmUtilGlobal.gcmRegistrationToken);
 			//Start the pairing protocol
 			connectTask conx = new connectTask(qrData);
 		    conx.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -168,7 +167,6 @@ public class Pair_wallet extends Activity {
 	public class connectTask extends AsyncTask<String,String,PairingProtocol> {
 		
 		private String IPAddress;
-		private String fingerprint;
 		private String walletType;
 		private String LocalIP;
 		private String AESKey;
@@ -178,7 +176,6 @@ public class Pair_wallet extends Activity {
 		
 		public connectTask(PairingQRData qrData){
 			this.IPAddress 		= qrData.IPAddress;
-			this.fingerprint 	= qrData.fingerprint;
 			this.walletType		= qrData.walletType;
 			this.LocalIP 		= qrData.LocalIP;
 			this.AESKey 		= qrData.AESKey;
@@ -216,7 +213,6 @@ public class Pair_wallet extends Activity {
 			try {
 				pair2wallet.run(seed, 
 						secretkey, 
-						PairingProtocol.getPairingIDDigest(walletIndex, GcmUtilGlobal.gcmRegistrationToken), 
 						regID, 
 						walletIndex);
 				completePairing(AESKey, 
@@ -225,8 +221,7 @@ public class Pair_wallet extends Activity {
 						walletType, 
 						pairingName, 
 						walletIndex, 
-						networkType, 
-						fingerprint);
+						networkType);
 			} 
 			catch (CouldNotPairToWalletException e) {
 				e.printStackTrace();
@@ -259,8 +254,7 @@ public class Pair_wallet extends Activity {
     			String walletType, 
     			String pairingName,
     			long walletIndex, 
-    			int networkType,
-    			String fingerprint){	
+    			int networkType) {	
 			/*
 			 * check the pairing name does not exist, if it does add a (2) ending to the name
 			 */
@@ -277,7 +271,6 @@ public class Pair_wallet extends Activity {
     	    String walletData = Long.toString(walletIndex);
     	    BAPreferences.WalletPreference().setWallet(walletData,
     	    		pairingName, 
-    	    		fingerprint, 
     	    		walletType, 
     	    		IPAddress, 
     	    		LocalIP,

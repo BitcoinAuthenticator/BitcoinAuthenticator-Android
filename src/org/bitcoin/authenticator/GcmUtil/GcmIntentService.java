@@ -9,6 +9,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import org.bitcoin.authenticator.Main;
+import org.bitcoin.authenticator.PairingProtocol;
 import org.bitcoin.authenticator.R;
 import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
 import org.json.JSONArray;
@@ -103,15 +104,8 @@ public class GcmIntentService extends IntentService {
                 this.getSystemService(Context.NOTIFICATION_SERVICE);
 		//
 		String customMsg = obj.getString("CustomMsg");
-		String accountName = "XXX";
-		Set<Long> ids = BAPreferences.ConfigPreference().getWalletIndexList();
-		for(Long id:ids) {
-			String pairingID = BAPreferences.WalletPreference().getFingerprint(Long.toString(id), null);
-			if(pairingID.equals(obj.getString("PairingID"))) {
-				accountName = BAPreferences.WalletPreference().getName(Long.toString(id), "XXX");
-				break;
-			}
-		}
+		long walletID = PairingProtocol.getWalletIndexFromString(obj.getString("WalletID"));
+		String accountName = BAPreferences.WalletPreference().getName(Long.toString(walletID), "XXX");
 		customMsg = accountName + ": " + customMsg;
 		
 		NotificationCompat.Builder mBuilder =
@@ -135,7 +129,7 @@ public class GcmIntentService extends IntentService {
     	obj = new JSONObject(msg);
     	JSONObject payload = new JSONObject(obj.getString("ReqPayload"));
 		/**
-		 * Update all pending requests IPs from the received pairingID
+		 * Update all pending requests IPs from the received WalletID
 		 */
 		JSONArray o;
 		boolean didFind = false;
@@ -149,7 +143,7 @@ public class GcmIntentService extends IntentService {
 				
 				JSONObject pendingObj = BAPreferences.ConfigPreference().getPendingRequestAsJsonObject(pendingID);
 				
-				if(pendingObj.getString("PairingID").equals(obj.getString("PairingID")) && pendingObj.getBoolean("seen") == false){
+				if(pendingObj.getString("WalletID").equals(obj.getString("WalletID")) && pendingObj.getBoolean("seen") == false){
 					didFind = true;
 					// update
 					JSONObject pendingPayload = new JSONObject(pendingObj.getString("ReqPayload"));
@@ -216,8 +210,8 @@ public class GcmIntentService extends IntentService {
 		 * 	  activity will pull it in the while loop 
 		 */
 		// 1) 
-		mainIntent.putExtra("RequestID", obj.getString("RequestID"));
-		mainIntent.putExtra("PairingID", obj.getString("PairingID"));
+		mainIntent.putExtra("WalletID", obj.getString("WalletID"));
+		mainIntent.putExtra("WalletID", obj.getString("WalletID"));
 		mainIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		// 2) 
 		addRequestToQueue(obj.getString("RequestID"));
