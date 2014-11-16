@@ -301,9 +301,10 @@ public class Wallet_list extends Activity {
 			walletData.pendingGCMRequests = new ArrayList<JSONObject>();
 			// Load pending request
 			for(String req:pending){
-				JSONObject o = BAPreferences.ConfigPreference().getPendingRequestAsJsonObject(req);//new JSONObject(settings.getString(req, null));
-				String walletID = o.getString("WalletID");
-				if(walletID.equals(walletData.getWalletIDString()))
+				JSONObject o = BAPreferences.ConfigPreference().getPendingRequestAsJsonObject(req);
+				String pendingReqWalletID = Long.toString(PairingProtocol.getWalletIndexFromString(o.getString("WalletID")));
+				String walletID = walletData.getWalletIDString();
+				if(pendingReqWalletID.equals(walletID))
 				if(o.getBoolean("seen") == false)
 					walletData.addPendingGCMRequest(o);
 			}

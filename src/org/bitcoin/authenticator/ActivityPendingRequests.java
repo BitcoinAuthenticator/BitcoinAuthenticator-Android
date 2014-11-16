@@ -126,18 +126,11 @@ public class ActivityPendingRequests extends Activity {
 		ArrayList<JSONObject> pending = new ArrayList<JSONObject>();
 		ArrayList<String> allPending = new ArrayList<String>();
     	//load from preference
-		SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
-		JSONArray arr;
-		if(settings.getString("pendingList", null) != null){
-			arr = new JSONArray(settings.getString("pendingList", null));
-			for (int i = 0; i < arr.length(); i++)
-				allPending.add(arr.getString(i));
-		}
-		
-		// Load pending request
+		allPending = BAPreferences.ConfigPreference().getPendingList();
 		for(String req:allPending){
-			JSONObject o = new JSONObject(settings.getString(req, null));
-			if(o.getString("WalletID").equals(walletID))
+			JSONObject o = BAPreferences.ConfigPreference().getPendingRequestAsJsonObject(req);
+			String pendingReqWalletID = Long.toString(PairingProtocol.getWalletIndexFromString(o.getString("WalletID")));
+			if(pendingReqWalletID.equals(walletID))
 			if(o.getBoolean("seen") == false)
 				pending.add(o);
 		}
