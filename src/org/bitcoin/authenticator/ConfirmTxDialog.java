@@ -26,6 +26,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONValue;
+import org.spongycastle.util.encoders.Hex;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -37,6 +38,7 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.text.Html;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.WindowManager.LayoutParams;
@@ -107,7 +109,8 @@ public class ConfirmTxDialog {
 			catch (IOException e) {e.printStackTrace();}
 		}
 		final byte[] AESKey = key;
-		final SecretKey sharedsecret = new SecretKeySpec(AESKey, "AES");
+		final SecretKey sharedsecret = new SecretKeySpec(AESKey, "AES");		
+		
 		//Load the seed from internal storage
 		byte [] seed = null;
 		String FILENAME2 = "seed";
@@ -126,8 +129,7 @@ public class ConfirmTxDialog {
 		}
 		final byte[] authseed = seed;
 		//Load network parameters from shared preferences
-		//SharedPreferences settings = activity.getSharedPreferences("ConfigFile", 0);
-        Boolean testnet = BAPreferences.ConfigPreference().getTestnet(false);//settings.getBoolean("testnet", false);
+        Boolean testnet = BAPreferences.ConfigPreference().getTestnet(false);
         NetworkParameters params = null;
         if (testnet==false){
         	params = MainNetParams.get();
@@ -208,6 +210,9 @@ public class ConfirmTxDialog {
 						byte[] jsonBytes = jsonText.getBytes();
 						//Create a new message object
 						Message msg = new Message(ips);
+						
+						byte[] dd= sharedsecret.getEncoded();
+						Log.i("asdf", "key used: " + Hex.toHexString(dd));
 						
 			        	//Send the signature
 						msg.sendEncrypted(jsonBytes, sharedsecret, s);
