@@ -1,7 +1,11 @@
 package org.bitcoin.authenticator.Backup;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
@@ -15,7 +19,9 @@ import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import org.apache.commons.io.IOUtils;
 import org.bitcoin.authenticator.Backup.Exceptions.CannotBackupToFileException;
+import org.bitcoin.authenticator.Backup.Exceptions.CannotRestoreBackupFileException;
 import org.bitcoin.authenticator.utils.CryptoUtils;
 
 import android.os.Environment;
@@ -41,6 +47,21 @@ public class FileBackup {
     	return cipherBytes;
 	}
 	
+	public static String getAndDecryptBackupFileContent(String path, String passwordStr) throws CannotRestoreBackupFileException {
+		try {
+			File file = new File(path);
+	        InputStream in = new BufferedInputStream(new FileInputStream(file));
+	     	final byte[] cipherbytes = IOUtils.toByteArray(in);
+	     	
+	     	SecretKey sk = CryptoUtils.deriveSecretKeyFromPasswordString(passwordStr);
+	     	return new String(CryptoUtils.decryptPayload(sk, cipherbytes));
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+			throw new CannotRestoreBackupFileException("Failed to restore backup file");
+		}
+		    
+	}
 	/**
 	 * also makes the dir if not existing
 	 * @return

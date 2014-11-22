@@ -86,6 +86,49 @@ public class CryptoUtilsTest extends TestCase {
 		    e = ex;
 		}
 		assertTrue(e instanceof IllegalArgumentException);
+	}
+	
+	@Test
+	public void testDecryptPayload() {
+		String expected = "I am the payload";
+		String pw = "password";
 		
+		byte[] payload = expected.getBytes();
+		SecretKey sk = CryptoUtils.deriveSecretKeyFromPasswordString(pw);
+		byte[] encryptedPayload = CryptoUtils.encryptPayload(sk, payload);
+		byte[] decryptedPayload = CryptoUtils.decryptPayload(sk, encryptedPayload);
+		
+		assertTrue(expected.equals(new String(decryptedPayload)));
+		
+		/* Wrong password */
+		sk = CryptoUtils.deriveSecretKeyFromPasswordString("passwor");
+		decryptedPayload = CryptoUtils.decryptPayload(sk, encryptedPayload);
+		assertTrue(decryptedPayload == null);
+		
+		/* illegal arguments */
+		Exception e = null;
+		try {
+			CryptoUtils.decryptPayload(sk, new byte[0]);
+		} catch (Exception ex) {
+		    e = ex;
+		}
+		assertTrue(e instanceof IllegalArgumentException);
+		
+		e = null;
+		try {
+			CryptoUtils.decryptPayload(sk, null);
+		} catch (Exception ex) {
+		    e = ex;
+		}
+		assertTrue(e instanceof IllegalArgumentException);
+		
+		e = null;
+		try {
+			sk = null;
+			CryptoUtils.decryptPayload(sk, payload);
+		} catch (Exception ex) {
+		    e = ex;
+		}
+		assertTrue(e instanceof IllegalArgumentException);
 	}
 }

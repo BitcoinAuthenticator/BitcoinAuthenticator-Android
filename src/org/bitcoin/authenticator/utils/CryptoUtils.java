@@ -50,6 +50,9 @@ public class CryptoUtils {
 	}
 	
 	public static byte[] encryptPayload(Cipher cipher, byte[] payload) {
+		if(cipher == null || payload == null || payload.length == 0)
+			throw new IllegalArgumentException("Illegal encryption parameters");
+		
 		byte[] cipherBytes = null;
 		try {
 			cipherBytes = cipher.doFinal(payload);
@@ -57,6 +60,32 @@ public class CryptoUtils {
 		} 
     	catch (IllegalBlockSizeException e) {e.printStackTrace();} 
     	catch (BadPaddingException e) {e.printStackTrace();}
+		return null;
+	}
+	
+	public static byte[] decryptPayload(SecretKey secretKey, byte[] payload) {
+		if(secretKey == null || payload == null || payload.length == 0)
+			throw new IllegalArgumentException("Illegal encryption parameters");
+		
+		SecretKey AESKey = new SecretKeySpec(secretKey.getEncoded(), "AES");
+		Cipher cipher = null;
+		try {cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");} 
+		catch (NoSuchAlgorithmException e) {e.printStackTrace();} 
+		catch (NoSuchPaddingException e) {e.printStackTrace();}
+	    try {cipher.init(Cipher.DECRYPT_MODE, AESKey);} 
+	    catch (InvalidKeyException e) {e.printStackTrace();}
+	    
+	    return decryptPayload(cipher, payload);
+	}
+	
+	public static byte[] decryptPayload(Cipher cipher, byte[] payload) {
+		if(cipher == null || payload == null || payload.length == 0)
+			throw new IllegalArgumentException("Illegal encryption parameters");
+		
+		try {
+			return new String(cipher.doFinal(payload)).getBytes();
+		} catch (IllegalBlockSizeException e) { e.printStackTrace(); }
+		catch (BadPaddingException e) { e.printStackTrace(); }
 		return null;
 	}
 }

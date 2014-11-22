@@ -1,9 +1,14 @@
 package org.bitcoin.authenticator.test.backup;
 
 import static org.junit.Assert.*;
+
+import java.io.File;
+
 import junit.framework.TestCase;
 
 import org.bitcoin.authenticator.Backup.FileBackup;
+import org.bitcoin.authenticator.Backup.Exceptions.CannotBackupToFileException;
+import org.bitcoin.authenticator.Backup.Exceptions.CannotRestoreBackupFileException;
 import org.junit.Test;
 import org.spongycastle.util.encoders.Hex;
 
@@ -20,5 +25,43 @@ public class FileBackupTest extends TestCase{
 		result = Hex.toHexString(bytes);
 		assertTrue(expected.equals(result));
 	}
-
+	
+	@Test
+	public void testBackupAndRestoreContent() {
+		String mnemonic = "one two three four five six seven";
+		String pw = "password";
+		
+		/* backup */
+		try {
+			FileBackup.backupToFile(mnemonic, pw);
+		} catch (CannotBackupToFileException e) {
+			e.printStackTrace();
+			assertTrue(false);
+		}
+		
+		/* restore */
+		String result = null;
+		try {
+			result = FileBackup.getAndDecryptBackupFileContent(FileBackup.getBackupFileAbsolutePath(), pw);
+		} catch (CannotRestoreBackupFileException e) {
+			e.printStackTrace();
+		}
+		assertTrue(result.equals(mnemonic));
+		
+		/* wrong password */
+		Exception ex = null;
+		try {
+			result = FileBackup.getAndDecryptBackupFileContent(FileBackup.getBackupFileAbsolutePath(), "passwor");
+		} catch (CannotRestoreBackupFileException e) {
+			e.printStackTrace();
+			ex = e;
+		}
+		assertTrue(ex instanceof CannotRestoreBackupFileException);
+		
+		/* dispose of backup file */
+		File f = new File(FileBackup.getBackupFileAbsolutePath());
+		if(f.exists()) {
+			f.delete();
+		}
+	}
 }
