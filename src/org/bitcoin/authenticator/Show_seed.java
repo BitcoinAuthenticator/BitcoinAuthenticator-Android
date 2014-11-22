@@ -23,6 +23,8 @@ import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
+import org.bitcoin.authenticator.Backup.FileBackup;
+import org.bitcoin.authenticator.Backup.Exceptions.CannotBackupToFileException;
 import org.bitcoin.authenticator.core.WalletCore;
 import org.bitcoin.authenticator.core.exceptions.NoSeedOrMnemonicsFound;
 import org.bitcoinj.crypto.MnemonicCode;
@@ -138,46 +140,18 @@ public class Show_seed extends Activity {
 		    .setView(layout)
 		    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 		        public void onClick(DialogInterface dialog, int whichButton) {
-		            Editable value = input.getText(); 
 		            WalletCore wc = new WalletCore();
 					String m;
 		            try {
 						m = wc.getMnemonicString(getApplicationContext());
-						String FILENAME = "Bitcoin_Authenticator_Seed_Backup";
-						File storage = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-						File dir = new File (storage.getAbsolutePath() + "/backups/");
-						dir.mkdirs();
-						File file = new File(dir, FILENAME);
-						char[] password = new char[input.getText().length()];
-						for (int i=0; i<input.getText().length(); i++){
-							password[i]=input.getText().charAt(i);
-						}
-						byte[] salt = new byte[]{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-						SecretKeyFactory kf = null;
-						try {kf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");} 
-						catch (NoSuchAlgorithmException e1) {e1.printStackTrace();	}
-						PBEKeySpec spec = new PBEKeySpec(password, salt, 8192, 256);
-						SecretKey tmp = null;
-						try {tmp = kf.generateSecret(spec);} 
-						catch (InvalidKeySpecException e1) {e1.printStackTrace();}
-						SecretKey AESKey = new SecretKeySpec(tmp.getEncoded(), "AES");
-						Cipher cipher = null;
-			        	try {cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");} 
-			        	catch (NoSuchAlgorithmException e) {e.printStackTrace();} 
-			        	catch (NoSuchPaddingException e) {e.printStackTrace();}
-			        	try {cipher.init(Cipher.ENCRYPT_MODE, AESKey);} 
-			        	catch (InvalidKeyException e) {e.printStackTrace();}
-			        	byte[] cipherBytes = null;
-			        	try {cipherBytes = cipher.doFinal(m.getBytes());} 
-			        	catch (IllegalBlockSizeException e) {e.printStackTrace();} 
-			        	catch (BadPaddingException e) {e.printStackTrace();}
-						FileOutputStream f = new FileOutputStream(file);
-						f.write(cipherBytes);
-						f.close();
-						Toast.makeText(getApplicationContext(), "Saved seed to " + storage.getAbsolutePath() + "/backups/", Toast.LENGTH_LONG).show();
+						FileBackup.backupToFile(m, input.getText().toString());						
+						Toast.makeText(getApplicationContext(), "Saved seed to " + FileBackup.getBackupFileAbsolutePath() + "/backups/", Toast.LENGTH_LONG).show();
 					} catch (NoSeedOrMnemonicsFound e) {
+						e.printStackTrace();
 						Toast.makeText(getApplicationContext(), "Unable to save seed", Toast.LENGTH_LONG).show();
-					} catch (IOException e) {
+					}
+					catch (CannotBackupToFileException e) {
+						e.printStackTrace();
 						Toast.makeText(getApplicationContext(), "Unable to save seed", Toast.LENGTH_LONG).show();
 					}
 		        }

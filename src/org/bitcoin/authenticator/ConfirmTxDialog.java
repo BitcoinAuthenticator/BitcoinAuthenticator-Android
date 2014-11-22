@@ -211,9 +211,6 @@ public class ConfirmTxDialog {
 						//Create a new message object
 						Message msg = new Message(ips);
 						
-						byte[] dd= sharedsecret.getEncoded();
-						Log.i("asdf", "key used: " + Hex.toHexString(dd));
-						
 			        	//Send the signature
 						msg.sendEncrypted(jsonBytes, sharedsecret, s);
 						responseListener.onAuthorizedTx();
