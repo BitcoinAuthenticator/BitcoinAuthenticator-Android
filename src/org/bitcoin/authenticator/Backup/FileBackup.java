@@ -52,6 +52,7 @@ public class FileBackup {
 			File file = new File(path);
 	        InputStream in = new BufferedInputStream(new FileInputStream(file));
 	     	final byte[] cipherbytes = IOUtils.toByteArray(in);
+	     	in.close();
 	     	
 	     	SecretKey sk = CryptoUtils.deriveSecretKeyFromPasswordString(passwordStr);
 	     	return new String(CryptoUtils.decryptPayload(sk, cipherbytes));

@@ -25,6 +25,8 @@ import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.io.IOUtils;
 import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
+import org.bitcoin.authenticator.Backup.FileBackup;
+import org.bitcoin.authenticator.Backup.Exceptions.CannotRestoreBackupFileException;
 import org.bitcoin.authenticator.core.WalletCore;
 import org.bitcoin.authenticator.core.exceptions.NoSeedOrMnemonicsFound;
 import org.bitcoin.authenticator.dialogs.BAAlertDialogBase;
@@ -101,106 +103,76 @@ public class Restore_Menu extends Activity {
 	    switch (requestCode) {
 	        case REQUEST_CHOOSER:   
 	            if (resultCode == RESULT_OK) {
-
 	                final Uri uri = data.getData();
+	                final String path = FileUtils.getPath(this, uri);
 
-	                // Get the File path from the Uri
-	                String path = FileUtils.getPath(this, uri);
-
-	                // Alternatively, use FileUtils.getFile(Context, Uri)
 	                if (path != null && FileUtils.isLocal(path)) {
-	                    File file = new File(path);
-	                    InputStream in = null;
-	                    try {
-	                    	try {in = new BufferedInputStream(new FileInputStream(file));} 
-	                    	catch (FileNotFoundException e) {e.printStackTrace();}
-	                    	final byte[] cipherbytes = IOUtils.toByteArray(in);          		    
-	            		    
-	            		    LinearLayout layout = new LinearLayout(this);
-	            			layout.setOrientation(LinearLayout.VERTICAL);
-	            			final EditText input = new EditText(this);
-	            			input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
-	            			input.setHint("Password");
-	            			layout.addView(input);
-
-	            			final CheckBox showpw = new CheckBox(this);
-	            			showpw.setText("Show Password?");
-	            			showpw.setChecked(false);
-	            			layout.addView(showpw);
-	            			showpw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-
-	            			       @Override
-	            			       public void onCheckedChanged(CompoundButton buttonView,boolean isChecked) {
-	            			    	   if (showpw.isChecked()){input.setInputType(InputType.TYPE_CLASS_TEXT);}
-	            			    	   else {input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);}
-	            			       }
-	            			   }
-	            			);     
-	            		    new AlertDialog.Builder(Restore_Menu.this)
-	            		    .setTitle("Restore from file")
-	            		    .setMessage("Enter your password")
-	            		    .setView(layout)
-	            		    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-	            		        public void onClick(DialogInterface dialog, int whichButton) {
-	            		            Editable value = input.getText(); 
-	            		            WalletCore wc = new WalletCore();
-	            					String m;
-	            					char[] password = new char[input.getText().length()];
-	            					for (int i=0; i<input.getText().length(); i++){
-	            						password[i]=input.getText().charAt(i);
-	            					}
-	            					byte[] salt = new byte[]{0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00};
-	            					SecretKeyFactory kf = null;
-	            					try {kf = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");} 
-	            					catch (NoSuchAlgorithmException e1) {e1.printStackTrace();	}
-	            					PBEKeySpec spec = new PBEKeySpec(password, salt, 8192, 256);
-	            					SecretKey tmp = null;
-	            					try {tmp = kf.generateSecret(spec);} 
-	            					catch (InvalidKeySpecException e1) {e1.printStackTrace();}
-	            					SecretKey AESKey = new SecretKeySpec(tmp.getEncoded(), "AES");	
-	            					Cipher cipher = null;
-									try {cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");} 
-									catch (NoSuchAlgorithmException e) {e.printStackTrace();} 
-									catch (NoSuchPaddingException e) {e.printStackTrace();}
-	    	            		    try {cipher.init(Cipher.DECRYPT_MODE, AESKey);} 
-	    	            		    catch (InvalidKeyException e) {e.printStackTrace();}
-	    	            		    String mnemonic = null;
-	    	            		    try {mnemonic = new String(cipher.doFinal(cipherbytes));} 
-	    	            		    catch (IllegalBlockSizeException e) {e.printStackTrace();} 
-	    	            		    catch (BadPaddingException e) {e.printStackTrace();}
-	    	            		    Toast.makeText(getApplicationContext(), mnemonic, Toast.LENGTH_LONG).show();
-	    	            		    String[] inputstring = mnemonic.split(" ");
-	    	        				if (inputstring.length == 12){
-	    	        					List<String> words = new ArrayList<String>();		
-	    	        					for (String s: inputstring){words.add(s);}
-	    	        					MnemonicCode mc = null;
-	    	        					try {mc = new MnemonicCode();} 
-	    	        					catch (IOException e) {e.printStackTrace();}
-	    	        					WalletCore wc2 = new WalletCore();
-	    	        					wc2.saveSeedBytes(Restore_Menu.this, mc.toSeed(words, ""));
-	    	        					wc2.saveMnemonic(Restore_Menu.this, inputstring);
-	    	        					BAPreferences.ConfigPreference().setInitialized(true);
-	    	        					startActivity (new Intent(Restore_Menu.this, Pair_wallet.class));
-	    	        				}
-	            		        }
-	            		    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-	            		        public void onClick(DialogInterface dialog, int whichButton) {
-	            		            // Do nothing.
-	            		        }
-	            		    }).show();
-	                    	
-	                    } catch (IOException e) {
-							e.printStackTrace();
-						}
-	                    finally {
-	                    	if (in != null) {
-	                    		try {in.close();} catch (IOException e) {e.printStackTrace();}
-	                    	}
-	                    }
+	                	showDecryptDialog(path);
 	                }
 	            }
 	            break;
 	    }
+	}
+	
+	private void showDecryptDialog(final String path) {
+		LinearLayout layout = new LinearLayout(this);
+		layout.setOrientation(LinearLayout.VERTICAL);
+		final EditText input = new EditText(this);
+		input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+		input.setHint("Password");
+		layout.addView(input);
+
+		final CheckBox showpw = new CheckBox(this);
+		showpw.setText("Show Password?");
+		showpw.setChecked(false);
+		layout.addView(showpw);
+		showpw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+		       @Override
+		       public void onCheckedChanged(CompoundButton buttonView,boolean isChecked) {
+		    	   if (showpw.isChecked()){input.setInputType(InputType.TYPE_CLASS_TEXT);}
+		    	   else {input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);}
+		       }
+		   }
+		);     
+	    new AlertDialog.Builder(Restore_Menu.this)
+	    .setTitle("Restore from file")
+	    .setMessage("Enter your password")
+	    .setView(layout)
+	    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+	        public void onClick(DialogInterface dialog, int whichButton) {
+	        	try {
+	        		Editable value = input.getText(); 
+		            WalletCore wc = new WalletCore();
+        		    
+		            String mnemonic = FileBackup.getAndDecryptBackupFileContent(path, input.getText().toString());
+		            
+        		    Toast.makeText(getApplicationContext(), mnemonic, Toast.LENGTH_LONG).show();
+        		    String[] inputstring = mnemonic.split(" ");
+    				if (inputstring.length == 12){
+    					List<String> words = new ArrayList<String>();		
+    					for (String s: inputstring){words.add(s);}
+    					MnemonicCode mc = null;
+    					try {mc = new MnemonicCode();} 
+    					catch (IOException e) {e.printStackTrace();}
+    					WalletCore wc2 = new WalletCore();
+    					wc2.saveSeedBytes(Restore_Menu.this, mc.toSeed(words, ""));
+    					wc2.saveMnemonic(Restore_Menu.this, inputstring);
+    					BAPreferences.ConfigPreference().setInitialized(true);
+    					startActivity (new Intent(Restore_Menu.this, Pair_wallet.class));
+    				}
+	        	} 
+	        	catch (CannotRestoreBackupFileException e) {
+					e.printStackTrace();
+        		    Toast.makeText(getApplicationContext(), "Could not restore wallet from file", Toast.LENGTH_LONG).show();
+
+				}	            		            
+	        }
+	    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+	        public void onClick(DialogInterface dialog, int whichButton) {
+	            // Do nothing.
+	        }
+	    }).show();
 	}
 }
 	
