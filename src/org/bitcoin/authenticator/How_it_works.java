@@ -2,6 +2,9 @@ package org.bitcoin.authenticator;
 
 import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
 
+import com.viewpagerindicator.CirclePageIndicator;
+import com.viewpagerindicator.TitlePageIndicator;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -36,8 +39,12 @@ public class How_it_works extends Activity {
 	    paired = BAPreferences.ConfigPreference().getPaired(false);
 	    pager.setOffscreenPageLimit(5);
 	    pager.setAdapter(adapter);
-	    pager.setOnPageChangeListener(new OnPageChangeListener() {
-	        public void onPageScrollStateChanged(int state) {}
+	    
+	    //Bind the title indicator to the adapter
+	    CirclePageIndicator titleIndicator = (CirclePageIndicator)findViewById(R.id.indicator);
+	    titleIndicator.setViewPager(pager);
+	    titleIndicator.setOnPageChangeListener(new OnPageChangeListener() {
+	    	public void onPageScrollStateChanged(int state) {}
 	        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {}
 
 	        public void onPageSelected(int position) {

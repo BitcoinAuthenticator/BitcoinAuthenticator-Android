@@ -6,7 +6,8 @@
     <android.support.v4.view.ViewPager
         android:id="@+id/how_it_works_pager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="0dp"
+        android:layout_weight="15">
 
         		<!-- Page 1 -->
             	<ScrollView android:id="@+id/how_it_works_page_one"
@@ -196,6 +197,13 @@
             				android:orientation="vertical" />
 
 	</android.support.v4.view.ViewPager>
-	
+
+	<com.viewpagerindicator.CirclePageIndicator
+        style="@style/CustomCirclePageIndicator"
+        android:id="@+id/indicator"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+    	android:layout_weight="1"
+    	android:paddingTop="10dp"/>
 </LinearLayout>
 

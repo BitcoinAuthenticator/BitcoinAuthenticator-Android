@@ -61,5 +61,13 @@
         <item name="android:topBright">@color/transparent</item>
         <item name="android:topDark">@color/transparent</item>
 	</style>
+	
+    <style name="CustomCirclePageIndicator">
+    	<item name="fillColor">#e3e3e3</item>
+    	<item name="unselectedColor">#e3e3e3</item>
+    	<item name="centered">true</item>
+    	<item name="strokeColor">@null</item>
+    	<!--<item name="pageColor">@android:color/white</item>-->
+	</style>
 
 </resources>
