@@ -56,20 +56,6 @@ git clone https://github.com/JakeWharton/Android-ViewPagerIndicator.git
 2. import the library into eclipse as an android project
 3. in case of jar mismatch, delete support library and add bitcoinauthenticator's support library as an external jar
 
-## Building
-1. Clone the Bitcoin Authenticator project:<br>
-```
-$ git clone https://github.com/cpacia/BitcoinAuthenticator.git
-```
-2. 
-```
-$ cd BitcoinAuthenticator
-```
-3. build: <br>
-```
-$ mvn clean package
-```
-
 ## Import to eclipse
 1. open Eclipse and import the project as an Existing maven project
 2. make sure the src folder is marked as source:<Br> 
@@ -84,11 +70,11 @@ Package Explorer -> Properties -> Android -> under Library -> Add google_play_se
 3.2.  ```
 Package Explorer -> Properties -> Android -> under Library -> Add aFIleChooser  
 ```
-3.3. ```
-Package Explorer -> Properties -> Android -> under Library -> Add <view pager library>  
-```
+3.3.  ```
+Package Explorer -> Properties -> Android -> under Library -> Add <view pager library>   
+``` 
 
-5. Right click on the BitcoinAuthenticator project:
+5. Right click on the BitcoinAuthenticator project: 
 
 ```Package Explorer -> Properties -> Java Build Path -> Order and Export -> check Android Private Libraries```
 
