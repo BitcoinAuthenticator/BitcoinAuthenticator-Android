@@ -9,6 +9,7 @@ import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
 import org.bitcoin.authenticator.core.exceptions.NoSeedOrMnemonicsFound;
 
 import android.annotation.SuppressLint;
@@ -65,17 +66,6 @@ public class WalletCore {
 		return HDSeed;
 	}
 	
-	public void saveSeedBytes(Context c, byte[] seed){
-		try
-		{
-		    //String FILENAME = "seed";
-		    FileOutputStream outputStream = c.openFileOutput(SEED_FILE_NAME, Context.MODE_PRIVATE);
-		    outputStream.write(seed);
-		    outputStream.close();
-		}
-		catch (final Exception ex) { Log.e("JAVA_DEBUGGING", "Exception while creating save file!"); ex.printStackTrace(); }
-	}
-	
 	public void saveMnemonic(Context c, String[] strArray){
 		String strMnemonic = Arrays.toString(strArray);
 		strMnemonic = strMnemonic.replace("[", "");
@@ -123,12 +113,40 @@ public class WalletCore {
 		return temp;
 	}
 	
-	public DeterministicSeed getDeterministicSeed(Context c) throws Exception{
-		List<String> mnemonic = getMnemonic(c);
-		MnemonicCode ms = new MnemonicCode();
-		byte[] entropy = ms.toEntropy(mnemonic);
-		DeterministicSeed seed = new DeterministicSeed(entropy, "", Utils.currentTimeSeconds());
-		return seed;
+	public DeterministicSeed getDeterministicSeed(Context c) throws NoSeedOrMnemonicsFound {
+		try {
+			List<String> mnemonic = getMnemonic(c);
+			MnemonicCode ms = new MnemonicCode();
+			byte[] entropy = ms.toEntropy(mnemonic);
+			DeterministicSeed seed = new DeterministicSeed(entropy, "", Utils.currentTimeSeconds());
+			return seed;
+		}
+		catch(Exception e) {
+			throw new NoSeedOrMnemonicsFound("Failed to generate a DeterministicSeed");
+		}
+	}
+	
+	public void saveSeedBytes(Context c, byte[] seed){
+		try
+		{
+		    FileOutputStream outputStream = c.openFileOutput(SEED_FILE_NAME, Context.MODE_PRIVATE);
+		    outputStream.write(seed);
+		    outputStream.close();
+		}
+		catch (final Exception ex) { Log.e("asdf", "Exception while creating save file!"); ex.printStackTrace(); }
 	}
 		
+	public byte[] getSeedBytes(Context c) {
+		try
+		{
+		    //String FILENAME = "seed";
+		    FileInputStream inputStream = c.openFileInput(SEED_FILE_NAME);
+		    byte[] ret = IOUtils.toByteArray(inputStream);	
+		    return ret;
+		}
+		catch (final Exception ex) { 
+			ex.printStackTrace(); 
+			return null;
+		}
+	}
 }

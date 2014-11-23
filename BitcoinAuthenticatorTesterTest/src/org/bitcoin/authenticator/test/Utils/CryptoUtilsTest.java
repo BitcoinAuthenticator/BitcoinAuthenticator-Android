@@ -1,4 +1,4 @@
-package org.bitcoin.authenticator.test.Utils;
+package org.bitcoin.authenticator.test.utils;
 
 import static org.junit.Assert.*;
 
