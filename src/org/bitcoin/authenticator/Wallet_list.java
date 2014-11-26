@@ -8,8 +8,6 @@ import java.util.Set;
 import javax.crypto.SecretKey;
 
 import org.bitcoin.authenticator.ConfirmTxDialog.TxDialogResponse;
-import org.bitcoin.authenticator.Connection.CannotConnectToWalletException;
-import org.bitcoin.authenticator.Message.CouldNotSendRequestIDException;
 import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
 import org.bitcoin.authenticator.Events.GlobalEvents;
 import org.bitcoin.authenticator.GcmUtil.GcmIntentService;
@@ -20,6 +18,9 @@ import org.bitcoin.authenticator.dialogs.BAAlertDialogBase.SingleInputOnClickLis
 import org.bitcoin.authenticator.dialogs.BADeleteDialog;
 import org.bitcoin.authenticator.dialogs.BAPopupMenu;
 import org.bitcoin.authenticator.dialogs.BASingleInputDialog;
+import org.bitcoin.authenticator.net.Message;
+import org.bitcoin.authenticator.net.Connection.CannotConnectToWalletException;
+import org.bitcoin.authenticator.net.Message.CouldNotSendRequestIDException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONArray;

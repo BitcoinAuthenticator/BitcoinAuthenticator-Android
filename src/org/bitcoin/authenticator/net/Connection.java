@@ -1,4 +1,4 @@
-package org.bitcoin.authenticator;
+package org.bitcoin.authenticator.net;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -9,7 +9,6 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 
-import org.bitcoin.authenticator.net.PongPayload;
 
 import android.util.Log;
 

@@ -12,8 +12,9 @@ import java.util.Map;
 
 import javax.crypto.*;
 
-import org.bitcoin.authenticator.Connection.CannotConnectToWalletException;
 import org.bitcoin.authenticator.GcmUtil.GcmUtilGlobal;
+import org.bitcoin.authenticator.net.Connection;
+import org.bitcoin.authenticator.net.Connection.CannotConnectToWalletException;
 import org.bitcoin.authenticator.utils.EncodingUtils;
 import org.json.simple.JSONValue;
 

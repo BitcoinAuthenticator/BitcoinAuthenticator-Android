@@ -15,10 +15,10 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
-import org.bitcoin.authenticator.Connection.CannotConnectToWalletException;
 import org.bitcoin.authenticator.PairingProtocol.CouldNotPairToWalletException;
 import org.bitcoin.authenticator.PairingProtocol.PairingQRData;
 import org.bitcoin.authenticator.GcmUtil.GcmUtilGlobal;
+import org.bitcoin.authenticator.net.Connection.CannotConnectToWalletException;
 import org.bitcoin.authenticator.utils.EncodingUtils;
 
 import com.google.zxing.integration.android.IntentIntegrator;
