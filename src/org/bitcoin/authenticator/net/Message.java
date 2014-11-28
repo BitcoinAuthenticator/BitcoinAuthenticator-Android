@@ -1,4 +1,4 @@
-package org.bitcoin.authenticator;
+package org.bitcoin.authenticator.net;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
@@ -16,7 +16,8 @@ import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
-import org.bitcoin.authenticator.net.CannotProcessRequestPayload;
+import org.bitcoin.authenticator.TxData;
+import org.bitcoin.authenticator.Utils;
 import org.json.simple.JSONObject;
 
 /**

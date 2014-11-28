@@ -3,9 +3,9 @@ package org.bitcoin.authenticator.GcmUtil;
 import java.io.IOException;
 import java.util.Set;
 
-import org.bitcoin.authenticator.Connection;
 import org.bitcoin.authenticator.PairingProtocol;
 import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
+import org.bitcoin.authenticator.net.Connection;
 import org.json.JSONException;
 import org.json.JSONObject;
 
