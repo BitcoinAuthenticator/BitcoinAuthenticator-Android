@@ -516,7 +516,6 @@ public class Wallet_list extends Activity {
     					} catch (CouldNotSendRequestIDException e1) {
     						e1.printStackTrace();
     					}
-
         				if(persistentSocketForTheProcess != null)
     	        			try {tx = msg.receiveTX(sharedsecret, persistentSocketForTheProcess);} 
     	        			catch (Exception e) {e.printStackTrace();}

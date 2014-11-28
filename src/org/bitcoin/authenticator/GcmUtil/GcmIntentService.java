@@ -211,7 +211,7 @@ public class GcmIntentService extends IntentService {
 		 */
 		// 1) 
 		mainIntent.putExtra("WalletID", obj.getString("WalletID"));
-		mainIntent.putExtra("WalletID", obj.getString("WalletID"));
+		mainIntent.putExtra("RequestID", obj.getString("RequestID"));
 		mainIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		// 2) 
 		addRequestToQueue(obj.getString("RequestID"));
