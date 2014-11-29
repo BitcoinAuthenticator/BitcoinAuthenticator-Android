@@ -17,56 +17,66 @@ Bitcoin Authenticator is a P2P bitcoin wallet and android application for creati
 1. Download Eclipse Kepler bundle
 2. Install the Eclipse ADT plugin [From Here](http://developer.android.com/sdk/installing/installing-adt.html)
 3. Install the [m2e](http://www.eclipse.org/m2e/download/) plugin : 
- ```
+```
 help -> install new software -> add -> http://download.eclipse.org/technology/m2e/releases
- ```
+```
 4. Install the Maven [android Configurator](http://rgladwell.github.io/m2e-android/)
 
 5.  Install Google Play Services
-  In Eclipse:
+In Eclipse:
 
-  ```
-  Android SDK Manager -> 
-  -Extras -> Install Google Play Services, Google Play Services for Froyo
-  -Anroid 4.x -> Install Google API
-  ```
-6. Import the google play services for froyo project, in Eclipse: 
+```
+Android SDK Manager -> 
+-Extras -> Install Google Play Services, Google Play Services for Froyo
+-Anroid 4.x -> Install Google API
+```
 
-   ```
-  File -> Import -> existing android code into workspace -> 
-  search the project under <your sdk folder>extras/google_play_services_froyo/libproject/google-play-services_lib 
-   ```
+## Dependencies
+###  google_play_services_froyo
 
+1. Import the google play services for froyo project, in Eclipse: 
 
-## Building
-1. Clone the Bitcoin Authenticator project:<br>
- ```
- $ git clone https://github.com/cpacia/BitcoinAuthenticator.git
- ```
-2. 
- ```
- $ cd BitcoinAuthenticator
- ```
-3. build: <br>
- ```
-$ mvn clean package
- ```
+```
+File -> Import -> existing android code into workspace -> 
+search the project under <your sdk folder>extras/google_play_services_froyo/libproject/google-play-services_lib 
+```
+### File Chooser
+1. in your android workspace 
+```
+git clone https://github.com/iPaulPro/aFileChooser.git
+```
+2. import aFileChooser to eclipse as an android project
+3. in case of jar mismatch, delete support library and add bitcoinauthenticator's support library as an external jar
+
+### JakeWharton ViewPager
+1. in your android workspace 
+```
+git clone https://github.com/JakeWharton/Android-ViewPagerIndicator.git
+```
+2. import the library into eclipse as an android project
+3. in case of jar mismatch, delete support library and add bitcoinauthenticator's support library as an external jar
 
 ## Import to eclipse
 1. open Eclipse and import the project as an Existing maven project
 2. make sure the src folder is marked as source:<Br> 
- ```
+```
 right click on project -> build path -> use as source folder
- ```
-3. Right click on the BitcoinAuthenticator project:
+```
+3. Right click on the BitcoinAuthenticator project: 
 
- ```
+3.1. ```
 Package Explorer -> Properties -> Android -> under Library -> Add google_play_services_froyo 
 ```
+3.2.  ```
+Package Explorer -> Properties -> Android -> under Library -> Add aFIleChooser  
+```
+3.3.  ```
+Package Explorer -> Properties -> Android -> under Library -> Add <view pager library>   
+``` 
 
-4. Right click on the BitcoinAuthenticator project:
-	
- ```Package Explorer -> Properties -> Java Build Path -> Order and Export -> check Android Private Libraries```
+5. Right click on the BitcoinAuthenticator project: 
+
+```Package Explorer -> Properties -> Java Build Path -> Order and Export -> check Android Private Libraries```
 
 ## Development 
 Check our future development proposals [here](https://docs.google.com/spreadsheets/d/1o5ZS_L8OppZJit46SzpauJOthI0ncWuIgmo6ZtPevOU/edit?usp=sharing)

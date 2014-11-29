@@ -3,8 +3,9 @@ package org.bitcoin.authenticator.GcmUtil;
 import java.io.IOException;
 import java.util.Set;
 
-import org.bitcoin.authenticator.Connection;
+import org.bitcoin.authenticator.PairingProtocol;
 import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
+import org.bitcoin.authenticator.net.Connection;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -32,16 +33,12 @@ public class ProcessGCMRequest {
     		reqPayload = req.getJSONObject("ReqPayload");
     		ret.IPAddress =  reqPayload.getString("ExternalIP");
     		ret.LocalIP = reqPayload.getString("LocalIP");
-    		String pairID = req.getString("PairingID");
+    		String walletID = req.getString("WalletID");
     		
     		// search wallet index
     		Set<Long> wallets = BAPreferences.ConfigPreference().getWalletIndexList();
-    		for (Long l: wallets){
-    			String fingerprint = BAPreferences.WalletPreference().getFingerprint(Long.toString(l), "null");
-    			if (fingerprint.equals(pairID)){
-    				ret.walletnum = l;
-    			}
-    		}
+    		ret.walletnum = PairingProtocol.getWalletIndexFromString(walletID);
+    		
     		SharedPreferences prefs = mContext.getSharedPreferences("WalletData" + ret.walletnum, 0);
     		SharedPreferences.Editor editor = prefs.edit();
     		editor.putString("ExternalIP", ret.IPAddress);

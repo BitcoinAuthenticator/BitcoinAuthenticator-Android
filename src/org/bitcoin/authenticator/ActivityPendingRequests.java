@@ -7,16 +7,18 @@ import java.util.ArrayList;
 import javax.crypto.SecretKey;
 
 import org.bitcoin.authenticator.ConfirmTxDialog.TxDialogResponse;
-import org.bitcoin.authenticator.Connection.CannotConnectToWalletException;
-import org.bitcoin.authenticator.Message.CouldNotSendRequestIDException;
 import org.bitcoin.authenticator.Wallet_list.WalletItem;
 import org.bitcoin.authenticator.Wallet_list.CustomListAdapter.ViewHolder;
 import org.bitcoin.authenticator.dialogs.BAPopupMenu;
+import org.bitcoin.authenticator.net.Connection;
+import org.bitcoin.authenticator.net.Message;
+import org.bitcoin.authenticator.net.Connection.CannotConnectToWalletException;
+import org.bitcoin.authenticator.net.Message.CouldNotGetTransactionException;
+import org.bitcoin.authenticator.net.Message.CouldNotSendRequestIDException;
 import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
 import org.bitcoin.authenticator.Events.GlobalEvents;
 import org.bitcoin.authenticator.GcmUtil.ProcessGCMRequest;
 import org.bitcoin.authenticator.GcmUtil.RequestType;
-import org.bitcoin.authenticator.Message.CouldNotGetTransactionException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -64,8 +66,8 @@ public class ActivityPendingRequests extends Activity {
 		walletName.setText(getIntent().getStringExtra("walletName"));
 		
 		try {
-			String fingerprint = getIntent().getStringExtra("fingerprint");
-			ArrayList<JSONObject> pendingReq = getGCMPendingRequests(fingerprint);
+			String walletID = getIntent().getStringExtra("walletID");
+			ArrayList<JSONObject> pendingReq = getGCMPendingRequests(walletID);
 			ArrayList<dataClass> data;
 			lv1 = (ListView) findViewById(R.id.lstPendingReq);
 			data = getData(pendingReq);
@@ -121,24 +123,16 @@ public class ActivityPendingRequests extends Activity {
 		return ret;
 	}
 	
-	private ArrayList<JSONObject> getGCMPendingRequests(String fingerprint) throws InterruptedException, JSONException{
+	private ArrayList<JSONObject> getGCMPendingRequests(String walletID) throws InterruptedException, JSONException{
 		// poll pending requests
 		ArrayList<JSONObject> pending = new ArrayList<JSONObject>();
 		ArrayList<String> allPending = new ArrayList<String>();
     	//load from preference
-		SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
-		JSONArray arr;
-		if(settings.getString("pendingList", null) != null){
-			arr = new JSONArray(settings.getString("pendingList", null));
-			for (int i = 0; i < arr.length(); i++)
-				allPending.add(arr.getString(i));
-		}
-		
-		// Load pending request
+		allPending = BAPreferences.ConfigPreference().getPendingList();
 		for(String req:allPending){
-			JSONObject o = new JSONObject(settings.getString(req, null));
-			String fingerPrintFromPairingID = o.getString("PairingID").substring(32,40).toUpperCase();
-			if(fingerPrintFromPairingID.equals(fingerprint))
+			JSONObject o = BAPreferences.ConfigPreference().getPendingRequestAsJsonObject(req);
+			String pendingReqWalletID = Long.toString(PairingProtocol.getWalletIndexFromString(o.getString("WalletID")));
+			if(pendingReqWalletID.equals(walletID))
 			if(o.getBoolean("seen") == false)
 				pending.add(o);
 		}
@@ -235,7 +229,7 @@ public class ActivityPendingRequests extends Activity {
     			try {
     				msg = new Message(ips);
     				//send request id
-    				persistentSocketForTheProcess = msg.sentRequestID(data.reqID, data.getPairingID());
+    				persistentSocketForTheProcess = msg.sentRequestID(data.reqID, data.getWalletID());
     			} 
     			catch (CouldNotSendRequestIDException e) {
 					e.printStackTrace();
@@ -318,7 +312,7 @@ public class ActivityPendingRequests extends Activity {
 	public class dataClass
 	{
 		public String tmp;
-		public String pairingID;
+		public String WalletID;
 		public String reqID;
 		public RequestType ReqType;
 		public String customMsg;
@@ -326,7 +320,7 @@ public class ActivityPendingRequests extends Activity {
 		
 		public dataClass(JSONObject jObj, int index) throws JSONException{
 			this.tmp = jObj.getString("tmp");
-			this.pairingID = jObj.getString("PairingID");
+			this.WalletID = jObj.getString("WalletID");
 			this.reqID = jObj.getString("RequestID");
 			// type
 			if(Integer.parseInt( jObj.getString("RequestType") ) == RequestType.test.getValue()){
@@ -341,7 +335,7 @@ public class ActivityPendingRequests extends Activity {
 		}
 		
 		public String getTmp(){ return this.tmp; }
-		public String getPairingID(){ return this.pairingID; }
+		public String getWalletID(){ return this.WalletID; }
 		public String getReqID(){ return this.reqID; }
 		public RequestType getRequestType(){ return this.ReqType; }
 		public String getCustomMsg(){ return this.customMsg; }

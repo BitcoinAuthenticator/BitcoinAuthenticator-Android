@@ -1,30 +1,50 @@
 package org.bitcoin.authenticator;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.KeySpec;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+import javax.crypto.SecretKey;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
+import javax.crypto.spec.SecretKeySpec;
+
 import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
-import org.bitcoin.authenticator.backup.PaperWallet;
+import org.bitcoin.authenticator.Backup.FileBackup;
+import org.bitcoin.authenticator.Backup.Exceptions.CannotBackupToFileException;
 import org.bitcoin.authenticator.core.WalletCore;
 import org.bitcoin.authenticator.core.exceptions.NoSeedOrMnemonicsFound;
-
 import org.bitcoinj.crypto.MnemonicCode;
 import org.bitcoinj.crypto.MnemonicException.MnemonicLengthException;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.ClipData;
+import android.content.ClipboardManager;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
+import android.text.Editable;
+import android.text.InputType;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,6 +53,8 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.ImageButton;
@@ -67,30 +89,81 @@ public class Show_seed extends Activity {
 	}
 	
 	/**Inflates the menu and adds it to the action bar*/
-	/*@Override
+	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		getMenuInflater().inflate(R.menu.show_seed_menu, menu);
 		return true;
-	}*/
+	}
 
 	/**This method handles the clicks in the option menu*/
-	/*@Override
+	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int id = item.getItemId();
 		if (id == R.id.action_copy){
-			
+			WalletCore wc = new WalletCore();
+			try {
+				String mnemonic = wc.getMnemonicString(getApplicationContext());
+				
+				ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE); 
+				ClipData clip = ClipData.newPlainText("Wallet's mnemonic", mnemonic);
+				clipboard.setPrimaryClip(clip);
+				Toast.makeText(getApplicationContext(), "Copied successfully", Toast.LENGTH_LONG).show();
+			} catch (NoSeedOrMnemonicsFound e) {
+				e.printStackTrace();
+				Toast.makeText(getApplicationContext(), "Could not copy the mnemonic string", Toast.LENGTH_LONG).show();
+			}
 		}
 		if (id == R.id.action_save){
-			
-		}
-		if (id == R.id.action_qr){
-			startActivity (new Intent(Show_seed.this, PaperWallet.class));
-		}
-		if (id == R.id.action_sss){
+			LinearLayout layout = new LinearLayout(this);
+			layout.setOrientation(LinearLayout.VERTICAL);
+			final EditText input = new EditText(this);
+			input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+			input.setHint("Password");
+			layout.addView(input);
+
+			final CheckBox showpw = new CheckBox(this);
+			showpw.setText("Show Password?");
+			showpw.setChecked(false);
+			layout.addView(showpw);
+			showpw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+			       @Override
+			       public void onCheckedChanged(CompoundButton buttonView,boolean isChecked) {
+			    	   if (showpw.isChecked()){input.setInputType(InputType.TYPE_CLASS_TEXT);}
+			    	   else {input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);}
+			       }
+			   }
+			);     
+			new AlertDialog.Builder(Show_seed.this)
+		    .setTitle("Save seed to file")
+		    .setMessage("Enter a password to encrypt your seed")
+		    .setView(layout)
+		    .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+		        public void onClick(DialogInterface dialog, int whichButton) {
+		            WalletCore wc = new WalletCore();
+					String m;
+		            try {
+						m = wc.getMnemonicString(getApplicationContext());
+						FileBackup.backupToFile(m, input.getText().toString());						
+						Toast.makeText(getApplicationContext(), "Saved seed to " + FileBackup.getBackupFileAbsolutePath() + "/backups/", Toast.LENGTH_LONG).show();
+					} catch (NoSeedOrMnemonicsFound e) {
+						e.printStackTrace();
+						Toast.makeText(getApplicationContext(), "Unable to save seed", Toast.LENGTH_LONG).show();
+					}
+					catch (CannotBackupToFileException e) {
+						e.printStackTrace();
+						Toast.makeText(getApplicationContext(), "Unable to save seed", Toast.LENGTH_LONG).show();
+					}
+		        }
+		    }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+		        public void onClick(DialogInterface dialog, int whichButton) {
+		            // Do nothing.
+		        }
+		    }).show();
 			
 		}
 		return super.onOptionsItemSelected(item);
-	}*/
+	}
 	
 	/** Prevents the back button from being pressed. Forces users to confirm they have saved their mnemonic seed.*/
 	@Override

@@ -30,7 +30,6 @@
         android:layout_above="@+id/tvStatus"
         android:layout_alignLeft="@+id/tvStatus"
         android:layout_marginBottom="22dp"
-        android:layout_weight="0.79"
         android:text="QR SCAN CONTENT GOES HERE"
         android:textColor="#FFFFFF"
         android:visibility="invisible" />
@@ -44,28 +43,17 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="18dp"
-        android:text="Enter a name for this wallet and scan the pairing QR code."
+        android:text="When you are ready, scan the QR code presented by your wallet to pair this device."
         android:textColor="#e3e3e3"
         android:textSize="20dp" />
-    
-    <EditText
-        android:id="@+id/txtLabel"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/textView1"
-        android:layout_below="@+id/textView1"
-        android:layout_marginTop="28dp"
-        android:textSize="30dp"
-        android:background="#e3e3e3"
-        android:singleLine="true"
-        android:ems="10" />
 
     <ImageButton
         android:id="@+id/btnScan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/tvStatus"
         android:layout_centerHorizontal="true"
-        android:src="@drawable/qr" />
+        android:layout_centerVertical="true"
+        android:src="@drawable/qr"
+        android:textColor="#e3e3e3" />
 
 </RelativeLayout>

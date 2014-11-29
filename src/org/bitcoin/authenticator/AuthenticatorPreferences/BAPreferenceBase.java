@@ -1,19 +1,20 @@
 package org.bitcoin.authenticator.AuthenticatorPreferences;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.SharedPreferences;
 
 public class BAPreferenceBase {
-	Activity activity;
-	protected void setActivity(Activity value){
-		activity = value;
+	Context context;
+	protected void setContext(Context value){
+		context = value;
 	}
-	protected Activity getActivity(){
-		return activity;
+	protected Context getContext(){
+		return context;
 	}
 	
-	protected SharedPreferences getSharedPreferences(String key, int mode){
-		return getActivity().getSharedPreferences(key,mode);
+	protected SharedPreferences getSharedPreferences(String key, int mode) {
+		return getContext().getSharedPreferences(key,mode);
 	}
 	
 	protected SharedPreferences.Editor getEditor(String key){

@@ -6,7 +6,8 @@
     <android.support.v4.view.ViewPager
         android:id="@+id/how_it_works_pager"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" >
+        android:layout_height="0dp"
+        android:layout_weight="15">
 
         		<!-- Page 1 -->
             	<ScrollView android:id="@+id/how_it_works_page_one"
@@ -107,7 +108,6 @@
             	   
             	        
 	            	    <ImageView
-	            	        android:id="@+id/swipeimg"
 					        android:layout_width="200dp"
 					        android:layout_height="200dp"
 					        android:layout_gravity="center"
@@ -152,9 +152,58 @@
             				android:layout_height="match_parent"
             				android:orientation="vertical" 
             				android:layout_gravity="center">
-          
+            				
+            	    <LinearLayout android:layout_width="match_parent"
+			            android:layout_height="wrap_content"
+			            android:orientation="vertical">
+            	   
+            	        <!-- Spacer -->
+					    <View android:layout_width="fill_parent"
+						        android:layout_height="30dp"
+						        android:background="@color/transparent"/>
+            	        
+	            	    <ImageView
+					        android:layout_width="180dp"
+					        android:layout_height="180dp"
+					        android:layout_gravity="center"
+					        android:src="@drawable/authenticator" />
+	            	    
+	            	    <!-- Spacer -->
+					    <View android:layout_width="fill_parent"
+						        android:layout_height="30dp"
+						        android:background="@color/transparent"/>
+	                 
+	                    
+	                    <!-- Text -->
+	                    <TextView
+					        android:layout_width="wrap_content"
+					        android:layout_height="wrap_content"
+					        android:paddingLeft="10dp"
+					   	    android:paddingRight="10dp"
+					   	    android:lines="10"
+					        android:text="You can download a compatiable desktop wallet at www.bitcoinauthenticator.org\n\nOther features include:\n\n• Automatic Tor usage\n• Onename Integration\n• HD Wallet"
+					        android:textColor="@color/Explanation_Text_Color"
+					        android:autoLink="web"
+					        android:textSize="18sp" />
+	                   
+	                </LinearLayout>
+            	    
             	</ScrollView>
+            	
+            	<!-- Page 5 -->
+            	<LinearLayout android:id="@+id/how_it_works_page_end"
+            	    		android:layout_width="match_parent"
+            				android:layout_height="match_parent"
+            				android:orientation="vertical" />
+
 	</android.support.v4.view.ViewPager>
-	
+
+	<com.viewpagerindicator.CirclePageIndicator
+        style="@style/CustomCirclePageIndicator"
+        android:id="@+id/indicator"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+    	android:layout_weight="1"
+    	android:paddingTop="10dp"/>
 </LinearLayout>
 

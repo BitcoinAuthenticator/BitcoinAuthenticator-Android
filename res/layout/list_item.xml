@@ -53,7 +53,7 @@
 			        android:typeface="sans" />
 			    
 			    <TextView
-			        android:id="@+id/wallet_fingerprint"
+			        android:id="@+id/wallet_id"
 			        android:layout_width="wrap_content"
 				    android:layout_height="wrap_content"
 			   	    android:paddingTop="1dip"

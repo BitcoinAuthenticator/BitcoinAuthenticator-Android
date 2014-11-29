@@ -9,15 +9,16 @@ import java.math.BigInteger;
 import java.security.InvalidKeyException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Set;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
-import org.bitcoin.authenticator.Connection.CannotConnectToWalletException;
 import org.bitcoin.authenticator.PairingProtocol.CouldNotPairToWalletException;
 import org.bitcoin.authenticator.PairingProtocol.PairingQRData;
 import org.bitcoin.authenticator.GcmUtil.GcmUtilGlobal;
+import org.bitcoin.authenticator.net.Connection.CannotConnectToWalletException;
 import org.bitcoin.authenticator.utils.EncodingUtils;
 
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -53,7 +54,6 @@ import android.widget.Toast;
 public class Pair_wallet extends Activity {
 	
 	ProgressDialog mProgressDialog;
-	private EditText txtID;
 	private CheckBox chkForceAccountID;
 	private EditText accountID;
 
@@ -67,7 +67,6 @@ public class Pair_wallet extends Activity {
 	/**Sets up the Scan button component*/
 	private void setupScanButton(){
 		ImageButton scanBtn = (ImageButton) findViewById(R.id.btnScan);
-		txtID = (EditText) findViewById(R.id.txtLabel);
 		
 		//Check and make sure the user entered a name, if not display a warning dialog.
 		scanBtn.setOnClickListener(new OnClickListener() {
@@ -90,38 +89,23 @@ public class Pair_wallet extends Activity {
 					// Showing Alert Message
 					alertDialog.show();
 			}
-			
-			private boolean validateForm(){
-				/**
-				 * check name
-				 */
-				String check = txtID.getText().toString();
-				if (check.matches("")){
-					showError("Please enter a label for this wallet");
-					return false;
-				}
-				
-				return true;
-			}
-			
+						
 			@SuppressLint("ShowToast")
 			@SuppressWarnings("deprecation")
 			@Override
 			public void onClick(View v) {			
-				if(validateForm()) {
-					try {
-						launchScanActivity();
-					} catch (Exception e) {
-						e.printStackTrace();
-						Toast.makeText(getApplicationContext(), "ERROR:" + e, 1).show();
-					}
-					catch (Error e)
-					{
-						/* Download zxing */
-						Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
-						Intent marketIntent = new Intent(Intent.ACTION_VIEW,marketUri);
-						startActivity(marketIntent);
-					}
+				try {
+					launchScanActivity();
+				} catch (Exception e) {
+					e.printStackTrace();
+					Toast.makeText(getApplicationContext(), "ERROR:" + e, 1).show();
+				}
+				catch (Error e)
+				{
+					/* Download zxing */
+					Uri marketUri = Uri.parse("market://details?id=com.google.zxing.client.android");
+					Intent marketIntent = new Intent(Intent.ACTION_VIEW,marketUri);
+					startActivity(marketIntent);
 				}
 			}
 		});
@@ -161,12 +145,10 @@ public class Pair_wallet extends Activity {
 				
 				mProgressDialog.hide();
 				mProgressDialog = null;
-				txtID.setText("");
 				
 				return;
 			}
 
-			qrData.fingerprint = PairingProtocol.getPairingIDDigest(qrData.walletIndex, GcmUtilGlobal.gcmRegistrationToken);
 			//Start the pairing protocol
 			connectTask conx = new connectTask(qrData);
 		    conx.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
@@ -185,21 +167,21 @@ public class Pair_wallet extends Activity {
 	public class connectTask extends AsyncTask<String,String,PairingProtocol> {
 		
 		private String IPAddress;
-		private String fingerprint;
 		private String walletType;
 		private String LocalIP;
 		private String AESKey;
+		private String pairingName;
 		private long walletIndex;
 		private int networkType;
 		
 		public connectTask(PairingQRData qrData){
-			this.IPAddress = qrData.IPAddress;
-			this.fingerprint = qrData.fingerprint;
-			this.walletType = qrData.walletType;
-			this.LocalIP = qrData.LocalIP;
-			this.AESKey = qrData.AESKey;
-			this.walletIndex = qrData.walletIndex;
-			this.networkType = qrData.networkType;
+			this.IPAddress 		= qrData.IPAddress;
+			this.walletType		= qrData.walletType;
+			this.LocalIP 		= qrData.LocalIP;
+			this.AESKey 		= qrData.AESKey;
+			this.pairingName 	= qrData.pairingName;
+			this.walletIndex 	= qrData.walletIndex;
+			this.networkType 	= qrData.networkType;
 		}
 		
         @Override
@@ -231,10 +213,15 @@ public class Pair_wallet extends Activity {
 			try {
 				pair2wallet.run(seed, 
 						secretkey, 
-						PairingProtocol.getPairingIDDigest(walletIndex, GcmUtilGlobal.gcmRegistrationToken), 
 						regID, 
 						walletIndex);
-				completePairing(AESKey, IPAddress, LocalIP, walletType, walletIndex, networkType,fingerprint);
+				completePairing(AESKey, 
+						IPAddress, 
+						LocalIP, 
+						walletType, 
+						pairingName, 
+						walletIndex, 
+						networkType);
 			} 
 			catch (CouldNotPairToWalletException e) {
 				e.printStackTrace();
@@ -265,13 +252,25 @@ public class Pair_wallet extends Activity {
     			String IPAddress, 
     			String LocalIP, 
     			String walletType, 
+    			String pairingName,
     			long walletIndex, 
-    			int networkType,
-    			String fingerprint){	
+    			int networkType) {	
+			/*
+			 * check the pairing name does not exist, if it does add a (2) ending to the name
+			 */
+			Set<Long> walletIndexSet= BAPreferences.ConfigPreference().getWalletIndexList();
+			for (Long i:walletIndexSet) {
+				String name = BAPreferences.WalletPreference().getName(Long.toString(i), null);
+				boolean isDeleted = BAPreferences.WalletPreference().getDeleted(Long.toString(i), true);
+				if(name.equals(pairingName) && isDeleted == false) {
+					pairingName = pairingName + " (2)";
+					break;
+				}
+			}
+			
     	    String walletData = Long.toString(walletIndex);
     	    BAPreferences.WalletPreference().setWallet(walletData,
-    	    		txtID.getText().toString(), 
-    	    		fingerprint, 
+    	    		pairingName, 
     	    		walletType, 
     	    		IPAddress, 
     	    		LocalIP,
