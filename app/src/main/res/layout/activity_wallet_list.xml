@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical">
+
+    <RelativeLayout android:layout_width="fill_parent"
+				    android:layout_height="wrap_content"
+				    android:orientation="horizontal"
+				    android:padding="15dp"
+				    android:layout_marginBottom="15dp">
+
+        <TextView
+            android:id="@+id/lblWalletList"
+            android:layout_width="225dp"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="12dp"
+            android:layout_marginTop="7dp"
+            android:text="You will be asked to approve transactions from these wallets. Long press for menu."
+            android:textColor="#e3e3e3"
+            android:textSize="16sp" />
+
+        <ImageView
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_centerVertical="true"
+            android:layout_toRightOf="@+id/lblWalletList"
+            android:background="@drawable/ic_wallet_white" />
+				        
+    </RelativeLayout>
+    
+ 	<android.support.v4.widget.SwipeRefreshLayout
+		 	    	android:id="@+id/wallet_list_swipe_container"
+				    android:layout_width="match_parent"
+				    android:layout_height="match_parent">
+	    <ListView
+	        android:id="@+id/custom_list"
+	        android:layout_width="fill_parent"
+	        android:layout_marginTop="7dp"
+	        android:layout_height="wrap_content"
+	        android:dividerHeight="5.0dp" 
+	        android:divider="@color/transparent"
+	        android:paddingLeft="10dp"
+	        android:paddingRight="10dp"
+	        android:background="#e3e3e3"/>
+    
+    </android.support.v4.widget.SwipeRefreshLayout>
+ 
+</LinearLayout>

@@ -1,0 +1,74 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container3"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="org.bitcoin.authenticator.Show_seed"
+    tools:ignore="MergeRootFrame" >
+
+  	   <RelativeLayout
+  	       android:layout_width="match_parent"
+  	       android:layout_height="wrap_content"
+  	       android:layout_alignParentTop="true"
+  	       android:layout_centerHorizontal="true"
+  	       android:orientation="vertical" >
+
+  	       <TextView
+  	           android:id="@+id/show_seed_AboutSeed"
+  	           android:layout_width="wrap_content"
+  	           android:layout_height="wrap_content"
+  	           android:text="This is your Authenticator Seed. If your mobile device is lost or damaged, you can use it to recover your keys. Please write it down or press the menu button for more backup options and keep it in a safe place."
+  	           android:textColor="#e3e3e3"
+  	           android:textSize="16sp" />
+
+  	       <View
+  	           android:id="@+id/view1"
+  	           android:layout_width="fill_parent"
+  	           android:layout_height="20dp"
+  	           android:background="@color/transparent" />
+
+
+  	       <TextView
+  	           android:id="@+id/show_seed_MnemonicSeed"
+  	           android:layout_width="wrap_content"
+  	           android:layout_height="wrap_content"
+  	           android:layout_alignParentLeft="true"
+  	           android:layout_below="@+id/show_seed_AboutSeed"
+  	           android:layout_marginTop="14dp"
+  	           android:background="@drawable/rounded_corners"
+  	           android:ems="10"
+  	           android:paddingLeft="5dp"
+  	           android:paddingRight="5dp"
+  	           android:textColor="@color/ui_listview_color"
+  	           android:textIsSelectable="true"
+  	           android:textSize="30sp"
+  	           android:textStyle="bold" />
+
+  	       <CheckBox
+  	           android:id="@+id/show_seed_chk_Confirmation"
+  	           android:layout_width="wrap_content"
+  	           android:layout_height="wrap_content"
+  	           android:layout_above="@+id/show_seed_btn_Continue"
+  	           android:layout_alignParentLeft="true"
+  	           android:layout_marginBottom="16dp"
+  	           android:text="I confirm that my seed is saved and secured"
+  	           android:textColor="#e3e3e3"
+  	           android:textStyle="italic" />
+
+  	       <Button
+  	           android:id="@+id/show_seed_btn_Continue"
+  	           android:layout_width="match_parent"
+  	           android:layout_height="wrap_content"
+  	           android:layout_alignParentBottom="true"
+  	           android:layout_weight="0.36"
+  	           android:enabled="false"
+  	           android:text="Continue"
+  	           android:textColor="#FFFFFF" />
+  	   </RelativeLayout>
+  				
+ </RelativeLayout>

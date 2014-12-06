@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <LinearLayout android:layout_width="fill_parent"
+				    android:layout_height="wrap_content"
+				    android:orientation="horizontal"
+				    android:padding="10dp">
+			
+        	<ImageView android:layout_width="60dp"
+				    android:layout_height="60dp"
+				    android:background="@drawable/ic_spend_request"/>
+	        <TextView
+		        android:id="@+id/lblPendingListHead"
+		        android:layout_width="match_parent"
+		        android:layout_marginTop="7dp"
+		        android:layout_marginLeft="12dp"
+		        android:layout_height="wrap_content"
+		        android:text="You will be asked to approve transactions from these wallets. Long press for menu"
+		        android:textColor="@color/ui_text_color"
+		        android:textSize="18sp" />
+				        
+    </LinearLayout>
+     
+     <LinearLayout android:layout_width="match_parent"
+				    android:layout_height="30dp"
+				    android:orientation="horizontal"
+				    android:gravity="center">
+	        
+         <LinearLayout android:layout_width="wrap_content"
+				    android:layout_height="match_parent"
+				    android:orientation="vertical"
+				    android:gravity="center"
+				    android:paddingTop="5dp">
+				    
+             <ImageView android:layout_width="25dp"
+				    android:layout_height="25dp"
+				    android:background="@drawable/ic_wallet_white"
+				    android:layout_gravity="center"
+				    android:dither="true"/>
+				    
+          </LinearLayout>
+	        
+         <TextView
+	        android:id="@+id/lblPendingWalletName"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:text="xxx"
+	        android:textColor="@color/white"
+	        android:textSize="28sp" 
+	        android:paddingLeft="10dp"
+	        android:layout_gravity="center"/>
+         
+	 </LinearLayout>
+    
+    
+    <ListView
+        android:id="@+id/lstPendingReq"
+        android:layout_width="fill_parent"
+        android:layout_marginTop="7dp"
+        android:layout_height="wrap_content"
+        android:divider="@color/transparent"
+        android:dividerHeight="1dp" />
+
+</LinearLayout>

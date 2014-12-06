@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>  
+    <color name="black">#000000</color>
+    <color name="white">#ffffff</color>
+    <color name="transparent">#00000000</color>
+    <color name="ui_background_color">#292A2E</color>
+    <color name="ui_listview_color">#292A2E</color>
+    <color name="ui_title_bar_color">#899EA8</color>
+    <color name="ui_text_color">#BFDAEF</color>
+    <color name="red_UI">#c62f2f</color>
+    <!-- Custom alert dialog colors -->
+    <color name="Alert_Dialog_Text_Color">#292A2E</color>
+    <color name="Alert_Dialog_BG_Color">#ffffff</color>
+    <color name="Alert_Dialog_Input_BG_Color">#e4e3e3</color>
+    <color name="Alert_Dialog_Input_Alert_Red_Color">#dd330c</color>
+    <color name="Alert_Dialog_Input_Alert_Green_Color">#06d03f</color>
+    <!-- Explanation view -->
+    <color name="Explanation_Text_Color">#dddddd</color>
+    <!-- Pull Refresh -->
+    <color name="Pull_Refresh_Color">#b2aeae</color>
+    <!-- Restore buttons background -->
+    <color name="Restore_Button_Background">#dddddd</color>
+</resources>

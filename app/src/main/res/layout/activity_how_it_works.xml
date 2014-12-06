@@ -1,0 +1,209 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <android.support.v4.view.ViewPager
+        android:id="@+id/how_it_works_pager"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="15">
+
+        		<!-- Page 1 -->
+            	<ScrollView android:id="@+id/how_it_works_page_one"
+            	    		android:layout_width="match_parent"
+            				android:layout_height="match_parent"
+            				android:orientation="vertical" 
+            				android:layout_gravity="center">
+            				
+            	    <LinearLayout android:layout_width="match_parent"
+			            android:layout_height="wrap_content"
+			            android:orientation="vertical" 
+			            android:layout_gravity="center">
+			           
+            				
+	            	    <ImageView
+					        android:layout_width="200dp"
+					        android:layout_height="200dp"
+					        android:layout_gravity="center"
+					        android:src="@drawable/expl_why" />
+	                    
+            	         <!-- Title -->
+	                    <TextView
+					        android:layout_width="wrap_content"
+					        android:layout_height="wrap_content"
+					        android:paddingTop="15dp"
+					        android:paddingLeft="10dp"
+					        android:layout_gravity="top"
+					        android:text="Passwords Aren’t Enough"
+					        android:textColor="@color/Explanation_Text_Color"
+					        android:textSize="24sp" />
+	                    
+	                    <!-- Text -->
+	                    <TextView
+					        android:layout_width="wrap_content"
+					        android:layout_height="wrap_content"
+					        android:paddingLeft="10dp"
+					        android:paddingRight="10dp"
+					        android:paddingTop="15dp"
+					        android:text="It isn't very difficult for a hacker to steal your bitcoins. A simple keylogger is usually enough to compromise your wallet."
+					        android:textColor="@color/Explanation_Text_Color"
+					        android:textSize="18sp" />
+	                </LinearLayout>
+            	    
+            	</ScrollView>
+              
+        		<!-- Page 2 -->
+            	<ScrollView android:id="@+id/how_it_works_page_two"
+            	    		android:layout_width="match_parent"
+            				android:layout_height="match_parent"
+            				android:orientation="vertical" 
+            				android:layout_gravity="center">
+            				
+            	    <LinearLayout android:layout_width="match_parent"
+			            android:layout_height="wrap_content"
+			            android:orientation="vertical" 
+			            android:layout_gravity="center">
+            				
+	            	    <ImageView
+					        android:layout_width="200dp"
+					        android:layout_height="200dp"
+					        android:layout_gravity="center"
+					        android:src="@drawable/expl_what" />
+	                    
+	                    <!-- Title -->
+	                    <TextView
+					        android:layout_width="wrap_content"
+					        android:layout_height="wrap_content"
+					        android:paddingTop="15dp"
+					        android:paddingLeft="10dp"
+					        android:text="Decentralized 2FA"
+					        android:textColor="@color/Explanation_Text_Color"
+					        android:textSize="24sp" />
+	                    
+	                    <!-- Text -->
+	                    <TextView
+					        android:layout_width="wrap_content"
+					        android:layout_height="wrap_content"
+					        android:paddingLeft="10dp"
+					         android:paddingRight="10dp"
+					        android:paddingTop="15dp"
+					        android:text="Bitcoin Authenticator is a decentralized 2-factor authentication solution for android mobile devices.\n\nWhen activated it makes it substantially harder for an attacker to steal your bitcoins."
+					        android:textColor="@color/Explanation_Text_Color"
+					        android:textSize="18sp" />
+	                </LinearLayout>
+            	    
+            	</ScrollView>
+            	
+            	<!-- Page 3 -->
+            	<ScrollView android:id="@+id/how_it_works_page_three"
+            	    		android:layout_width="match_parent"
+            				android:layout_height="match_parent"
+            				android:orientation="vertical" 
+            				android:layout_gravity="center">
+            				
+            	    <LinearLayout android:layout_width="match_parent"
+			            android:layout_height="wrap_content"
+			            android:orientation="vertical">
+            	   
+            	        
+	            	    <ImageView
+					        android:layout_width="200dp"
+					        android:layout_height="200dp"
+					        android:layout_gravity="center"
+					        android:src="@drawable/expl_how" />
+	            	    
+	            	    <!-- Spacer -->
+					    <View android:layout_width="fill_parent"
+						        android:layout_height="30dp"
+						        android:background="@color/transparent"/>
+	                    
+	                    <!-- Title -->
+	                    <TextView
+					        android:layout_width="wrap_content"
+					        android:layout_height="wrap_content"
+					        android:paddingLeft="10dp"
+					        android:text="How It Works"
+					        android:textColor="@color/Explanation_Text_Color"
+					        android:textSize="24sp" />
+	                    
+	                    <!-- Spacer -->
+					    <View android:layout_width="fill_parent"
+						        android:layout_height="15dp"
+						        android:background="@color/transparent"/>
+	                    
+	                    <!-- Text -->
+	                    <TextView
+					        android:layout_width="wrap_content"
+					        android:layout_height="wrap_content"
+					        android:paddingLeft="10dp"
+					         android:paddingRight="10dp"
+					        android:text="When paired with Bitcoin Authenticator, your wallet will generate multi-signiture addresses which require two keys to sign a transaction. One set of keys will be kept here on your mobile device, the other in your wallet. When your wallet creates a transaction, this app will prompt you for approval. If one device is compromised, your bitcoins are still safe."
+					        android:textColor="@color/Explanation_Text_Color"
+					        android:textSize="18sp" />
+	                   
+	                </LinearLayout>
+            	    
+            	</ScrollView>
+            	
+            	<!-- Page 4 -->
+            	<ScrollView android:id="@+id/how_it_works_page_four"
+            	    		android:layout_width="match_parent"
+            				android:layout_height="match_parent"
+            				android:orientation="vertical" 
+            				android:layout_gravity="center">
+            				
+            	    <LinearLayout android:layout_width="match_parent"
+			            android:layout_height="wrap_content"
+			            android:orientation="vertical">
+            	   
+            	        <!-- Spacer -->
+					    <View android:layout_width="fill_parent"
+						        android:layout_height="30dp"
+						        android:background="@color/transparent"/>
+            	        
+	            	    <ImageView
+					        android:layout_width="180dp"
+					        android:layout_height="180dp"
+					        android:layout_gravity="center"
+					        android:src="@drawable/authenticator" />
+	            	    
+	            	    <!-- Spacer -->
+					    <View android:layout_width="fill_parent"
+						        android:layout_height="30dp"
+						        android:background="@color/transparent"/>
+	                 
+	                    
+	                    <!-- Text -->
+	                    <TextView
+					        android:layout_width="wrap_content"
+					        android:layout_height="wrap_content"
+					        android:paddingLeft="10dp"
+					   	    android:paddingRight="10dp"
+					   	    android:lines="10"
+					        android:text="You can download a compatiable desktop wallet at www.bitcoinauthenticator.org\n\nOther features include:\n\n• Automatic Tor usage\n• Onename Integration\n• HD Wallet"
+					        android:textColor="@color/Explanation_Text_Color"
+					        android:autoLink="web"
+					        android:textSize="18sp" />
+	                   
+	                </LinearLayout>
+            	    
+            	</ScrollView>
+            	
+            	<!-- Page 5 -->
+            	<LinearLayout android:id="@+id/how_it_works_page_end"
+            	    		android:layout_width="match_parent"
+            				android:layout_height="match_parent"
+            				android:orientation="vertical" />
+
+	</android.support.v4.view.ViewPager>
+
+	<com.viewpagerindicator.CirclePageIndicator
+        style="@style/CustomCirclePageIndicator"
+        android:id="@+id/indicator"
+        android:layout_width="fill_parent"
+        android:layout_height="0dp"
+    	android:layout_weight="1"
+    	android:paddingTop="10dp"/>
+</LinearLayout>
+

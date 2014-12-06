@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" 
+    android:background="@color/Alert_Dialog_BG_Color">
+    
+    <LinearLayout  android:layout_width="fill_parent"
+				    android:layout_height="wrap_content"
+				    android:orientation="horizontal"
+				    android:background="@color/transparent">       	  
+        <TextView
+	        android:id="@+id/dialog_confirm_tx_title"
+	        android:layout_width="wrap_content"
+	        android:layout_height="fill_parent"
+	        android:background="@color/transparent"
+	        android:layout_marginLeft="5dip"
+	        android:text="Delete"
+	        android:textColor="@color/Alert_Dialog_Text_Color"
+	        android:textSize="26dip"
+	        android:textStyle="bold"
+	        android:typeface="sans" />
+        
+	</LinearLayout>
+    
+    <!-- Spacer -->
+    <View android:layout_width="fill_parent"
+	        android:layout_height="15dp"
+	        android:background="@color/transparent"/>
+    
+    <TextView
+        android:id="@+id/dialog_confirm_tx_text"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/transparent"
+        android:layout_marginLeft="5dip"
+        android:text=""
+        android:textColor="@color/Alert_Dialog_Text_Color"
+        android:textSize="14dip"
+        android:textStyle="bold"
+        android:typeface="sans" />
+    	        
+    <!-- Spacer -->
+    <View android:layout_width="fill_parent"
+	        android:layout_height="15dp"
+	        android:background="@color/transparent"/>
+	
+    <LinearLayout  android:layout_width="fill_parent"
+				    android:layout_height="wrap_content"
+				    android:orientation="horizontal"
+				    android:background="@color/transparent">
+				    
+        <TextView android:id="@+id/dialog_confirm_tx_confirm_button"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_weight="50"
+	        android:textColor="@color/Alert_Dialog_Input_Alert_Green_Color"
+	        android:background="@color/transparent"
+	        android:gravity="center"
+	        android:text="Authorize"
+	        android:textSize="20dip"
+	        android:textStyle="bold"
+	        android:typeface="sans"/>
+        
+        <TextView android:id="@+id/dialog_confirm_tx_dont_authorize_button"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_weight="50"
+	        android:textColor="@color/Alert_Dialog_Text_Color"
+	        android:background="@color/transparent"
+	        android:gravity="center"
+	        android:text="Don't Authorize"
+        	android:textSize="20dip"
+	        android:textStyle="bold"
+	        android:typeface="sans"/>
+        
+        <TextView android:id="@+id/dialog_confirm_tx_cancel_button"
+	        android:layout_width="fill_parent"
+	        android:layout_height="wrap_content"
+	        android:layout_weight="50"
+	        android:textColor="@color/Alert_Dialog_Text_Color"
+	        android:background="@color/transparent"
+	        android:gravity="center"
+	        android:text="Cancel"
+        	android:textSize="20dip"
+	        android:textStyle="bold"
+	        android:typeface="sans"/>
+        
+	</LinearLayout>
+    
+</LinearLayout>
