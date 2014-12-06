@@ -1,4 +1,4 @@
-package org.bitcoin.bitcoinauthenticator;
+package org.bitcoin.authenticator;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;
