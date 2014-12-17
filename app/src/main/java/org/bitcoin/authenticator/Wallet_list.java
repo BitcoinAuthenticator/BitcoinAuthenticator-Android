@@ -16,8 +16,8 @@ import org.bitcoin.authenticator.dialogs.BAAlertDialogBase.SingleInputOnClickLis
 import org.bitcoin.authenticator.dialogs.BADeleteDialog;
 import org.bitcoin.authenticator.dialogs.BAPopupMenu;
 import org.bitcoin.authenticator.dialogs.BASingleInputDialog;
-import org.bitcoin.authenticator.tests.backup.net.Message;
-import org.bitcoin.authenticator.tests.backup.net.Message.CouldNotSendRequestIDException;
+import org.bitcoin.authenticator.net.Message;
+import org.bitcoin.authenticator.net.Message.CouldNotSendRequestIDException;
 import org.json.JSONException;
 import org.json.JSONObject;
 

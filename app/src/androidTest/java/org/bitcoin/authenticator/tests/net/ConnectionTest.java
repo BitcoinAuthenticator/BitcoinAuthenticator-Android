@@ -2,7 +2,7 @@ package org.bitcoin.authenticator.tests.net;
 
 import junit.framework.TestCase;
 
-import org.bitcoin.authenticator.tests.backup.net.Connection;
+import org.bitcoin.authenticator.net.Connection;
 import org.junit.Test;
 
 public class ConnectionTest extends TestCase {

@@ -1,4 +1,4 @@
-package org.bitcoin.authenticator.tests.backup.net;
+package org.bitcoin.authenticator.net;
 
 import java.io.ByteArrayOutputStream;
 import java.net.Socket;

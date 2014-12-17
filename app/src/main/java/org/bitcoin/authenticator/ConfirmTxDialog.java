@@ -15,7 +15,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
-import org.bitcoin.authenticator.tests.backup.net.Message;
+import org.bitcoin.authenticator.net.Message;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.simple.JSONArray;
