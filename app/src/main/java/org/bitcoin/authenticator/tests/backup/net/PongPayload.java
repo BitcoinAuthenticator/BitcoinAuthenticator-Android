@@ -1,4 +1,4 @@
-package org.bitcoin.authenticator.net;
+package org.bitcoin.authenticator.tests.backup.net;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;

@@ -1,9 +1,6 @@
-package org.bitcoin.authenticator.net;
+package org.bitcoin.authenticator.tests.backup.net;
 
 import java.io.ByteArrayOutputStream;
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
 import java.net.Socket;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;

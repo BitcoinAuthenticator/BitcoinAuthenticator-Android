@@ -1,4 +1,4 @@
-package org.bitcoin.authenticator.net;
+package org.bitcoin.authenticator.tests.backup.net;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -6,8 +6,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.SocketException;
-import java.net.UnknownHostException;
 
 
 import android.util.Log;

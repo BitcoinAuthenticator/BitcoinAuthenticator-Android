@@ -2,17 +2,59 @@
 <pre-dex-items>
 
     <item
-        dex="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/app/build/intermediates/pre-dexed/debug/support-annotations-21.0.2-e60e5cc10ff1cbf67f42daa5b4f2730bbe2f5b19.jar"
-        jar="/android-sdk-macosx/extras/android/m2repository/com/android/support/support-annotations/21.0.2/support-annotations-21.0.2.jar"
-        jumboMode="false"
-        revision="21.1.0"
-        sha1="99373741f99a0556ee293c41e8faa1ca3ae8a4e6"/>
-    <item
         dex="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/app/build/intermediates/pre-dexed/debug/android-integration-2.3.0-a6c6ab3043124d9808cca0863bb0a8c83e3b8233.jar"
         jar="/Users/alonmuroch/.gradle/caches/modules-2/files-2.1/com.google.zxing/android-integration/2.3.0/5db9e9818724a2d8d392ae25c658bfe552a8cbc1/android-integration-2.3.0.jar"
         jumboMode="false"
         revision="21.1.0"
         sha1="5db9e9818724a2d8d392ae25c658bfe552a8cbc1"/>
+    <item
+        dex="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/app/build/intermediates/pre-dexed/debug/jcip-annotations-1.0-468f25ff3226bd84e6febf4695d844920ef3f77c.jar"
+        jar="/Users/alonmuroch/.gradle/caches/modules-2/files-2.1/net.jcip/jcip-annotations/1.0/afba4942caaeaf46aab0b976afd57cc7c181467e/jcip-annotations-1.0.jar"
+        jumboMode="false"
+        revision="21.1.0"
+        sha1="afba4942caaeaf46aab0b976afd57cc7c181467e"/>
+    <item
+        dex="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/app/build/intermediates/pre-dexed/debug/classes-2e500bd26caed311766ba1c5aedca91524350b88.jar"
+        jar="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.2/classes.jar"
+        jumboMode="false"
+        revision="21.1.0"
+        sha1="d1bf02de1c56d942e7a9d093b8610ba1ef4128e3"/>
+    <item
+        dex="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/app/build/intermediates/pre-dexed/debug/internal_impl-21.0.2-d249abd45e1f57a87e45286f7310bdd83257af9e.jar"
+        jar="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.2/libs/internal_impl-21.0.2.jar"
+        jumboMode="false"
+        revision="21.1.0"
+        sha1="962e8b12569c56dbdcf8367eb4eac8bb129cd18f"/>
+    <item
+        dex="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/app/build/intermediates/pre-dexed/debug/protobuf-java-2.5.0-6082a1026bc5891a796a627f2af8bb9bbfbd7aa0.jar"
+        jar="/Users/alonmuroch/.gradle/caches/modules-2/files-2.1/com.google.protobuf/protobuf-java/2.5.0/a10732c76bfacdbd633a7eb0f7968b1059a65dfa/protobuf-java-2.5.0.jar"
+        jumboMode="false"
+        revision="21.1.0"
+        sha1="a10732c76bfacdbd633a7eb0f7968b1059a65dfa"/>
+    <item
+        dex="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/app/build/intermediates/pre-dexed/debug/guava-16.0.1-af12572cdd461728c9b5dd866eaf972976d741d0.jar"
+        jar="/Users/alonmuroch/.gradle/caches/modules-2/files-2.1/com.google.guava/guava/16.0.1/5fa98cd1a63c99a44dd8d3b77e4762b066a5d0c5/guava-16.0.1.jar"
+        jumboMode="false"
+        revision="21.1.0"
+        sha1="5fa98cd1a63c99a44dd8d3b77e4762b066a5d0c5"/>
+    <item
+        dex="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/app/build/intermediates/pre-dexed/debug/classes-fe3bf055b13701c2581486679fdcb758c4d21782.jar"
+        jar="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/app/build/intermediates/exploded-aar/BitcoinAuthenticator/aFileChooser/unspecified/classes.jar"
+        jumboMode="false"
+        revision="21.1.0"
+        sha1="45cfe68aad73c3c26ad13e1f591f78f3a04f4e91"/>
+    <item
+        dex="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/app/build/intermediates/pre-dexed/debug/orchid-1.0-ca10871f66cff9783825c3915e026ea08cbe07a0.jar"
+        jar="/Users/alonmuroch/.gradle/caches/modules-2/files-2.1/org.bitcoinj/orchid/1.0/bd98285f39f88875bb91bde940d6ca2d020edaa4/orchid-1.0.jar"
+        jumboMode="false"
+        revision="21.1.0"
+        sha1="bd98285f39f88875bb91bde940d6ca2d020edaa4"/>
+    <item
+        dex="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/app/build/intermediates/pre-dexed/debug/support-annotations-21.0.2-e60e5cc10ff1cbf67f42daa5b4f2730bbe2f5b19.jar"
+        jar="/android-sdk-macosx/extras/android/m2repository/com/android/support/support-annotations/21.0.2/support-annotations-21.0.2.jar"
+        jumboMode="false"
+        revision="21.1.0"
+        sha1="99373741f99a0556ee293c41e8faa1ca3ae8a4e6"/>
     <item
         dex="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/app/build/intermediates/pre-dexed/debug/qrgen-1.3-974bc624d82ae0f2b37c74042e947bfca3ff9256.jar"
         jar="/Users/alonmuroch/.gradle/caches/modules-2/files-2.1/net.glxn/qrgen/1.3/e581726a5bffa3a5d624506ae145acbac3cc4a17/qrgen-1.3.jar"
@@ -38,23 +80,11 @@
         revision="21.1.0"
         sha1="2006fc2650edf23d0f4ab32b103914609b3946e1"/>
     <item
-        dex="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/app/build/intermediates/pre-dexed/debug/jcip-annotations-1.0-468f25ff3226bd84e6febf4695d844920ef3f77c.jar"
-        jar="/Users/alonmuroch/.gradle/caches/modules-2/files-2.1/net.jcip/jcip-annotations/1.0/afba4942caaeaf46aab0b976afd57cc7c181467e/jcip-annotations-1.0.jar"
-        jumboMode="false"
-        revision="21.1.0"
-        sha1="afba4942caaeaf46aab0b976afd57cc7c181467e"/>
-    <item
         dex="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/app/build/intermediates/pre-dexed/debug/core-2.0-a1aee37334ad96dd58f4c6fa1f9e643165879625.jar"
         jar="/Users/alonmuroch/.gradle/caches/modules-2/files-2.1/com.google.zxing/core/2.0/1a5b8ccf93ca2fb7c40a94417f8485e3c8b4a6/core-2.0.jar"
         jumboMode="false"
         revision="21.1.0"
         sha1="001a5b8ccf93ca2fb7c40a94417f8485e3c8b4a6"/>
-    <item
-        dex="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/app/build/intermediates/pre-dexed/debug/classes-2e500bd26caed311766ba1c5aedca91524350b88.jar"
-        jar="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.2/classes.jar"
-        jumboMode="false"
-        revision="21.1.0"
-        sha1="d1bf02de1c56d942e7a9d093b8610ba1ef4128e3"/>
     <item
         dex="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/app/build/intermediates/pre-dexed/debug/jsr305-2.0.1-cd0ecf1d17a953d0c20e9902cd89003302ef11af.jar"
         jar="/Users/alonmuroch/.gradle/caches/modules-2/files-2.1/com.google.code.findbugs/jsr305/2.0.1/516c03b21d50a644d538de0f0369c620989cd8f0/jsr305-2.0.1.jar"
@@ -74,12 +104,6 @@
         revision="21.1.0"
         sha1="562424e36df3d2327e8e9301a76027fca17d54ea"/>
     <item
-        dex="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/app/build/intermediates/pre-dexed/debug/internal_impl-21.0.2-d249abd45e1f57a87e45286f7310bdd83257af9e.jar"
-        jar="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/app/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.2/libs/internal_impl-21.0.2.jar"
-        jumboMode="false"
-        revision="21.1.0"
-        sha1="962e8b12569c56dbdcf8367eb4eac8bb129cd18f"/>
-    <item
         dex="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/app/build/intermediates/pre-dexed/debug/library-2.4.0-ccc6e5efa9e892cd1ab98cc45ebb31447ebebc96.jar"
         jar="/Users/alonmuroch/.gradle/caches/modules-2/files-2.1/com.nineoldandroids/library/2.4.0/e9b63380f3a242dbdbf103a2355ad7e43bad17cb/library-2.4.0.jar"
         jumboMode="false"
@@ -98,41 +122,29 @@
         revision="21.1.0"
         sha1="b1b6ea3b7e4aa4f492509a4952029cd8e48019ad"/>
     <item
-        dex="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/app/build/intermediates/pre-dexed/debug/protobuf-java-2.5.0-6082a1026bc5891a796a627f2af8bb9bbfbd7aa0.jar"
-        jar="/Users/alonmuroch/.gradle/caches/modules-2/files-2.1/com.google.protobuf/protobuf-java/2.5.0/a10732c76bfacdbd633a7eb0f7968b1059a65dfa/protobuf-java-2.5.0.jar"
-        jumboMode="false"
-        revision="21.1.0"
-        sha1="a10732c76bfacdbd633a7eb0f7968b1059a65dfa"/>
-    <item
-        dex="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/app/build/intermediates/pre-dexed/debug/guava-16.0.1-af12572cdd461728c9b5dd866eaf972976d741d0.jar"
-        jar="/Users/alonmuroch/.gradle/caches/modules-2/files-2.1/com.google.guava/guava/16.0.1/5fa98cd1a63c99a44dd8d3b77e4762b066a5d0c5/guava-16.0.1.jar"
-        jumboMode="false"
-        revision="21.1.0"
-        sha1="5fa98cd1a63c99a44dd8d3b77e4762b066a5d0c5"/>
-    <item
         dex="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/app/build/intermediates/pre-dexed/debug/classes-46194ac004f8ad1dffed7ef4711f4241a3ae530f.jar"
         jar="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/app/build/intermediates/exploded-aar/com.google.android.gms/play-services/3.2.65/classes.jar"
         jumboMode="false"
         revision="21.1.0"
         sha1="23023656ba91dc12e963cf7d5682db5d2aba6262"/>
     <item
-        dex="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/app/build/intermediates/pre-dexed/debug/classes-fe3bf055b13701c2581486679fdcb758c4d21782.jar"
-        jar="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/app/build/intermediates/exploded-aar/BitcoinAuthenticator/aFileChooser/unspecified/classes.jar"
-        jumboMode="false"
-        revision="21.1.0"
-        sha1="45cfe68aad73c3c26ad13e1f591f78f3a04f4e91"/>
-    <item
-        dex="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/app/build/intermediates/pre-dexed/debug/orchid-1.0-ca10871f66cff9783825c3915e026ea08cbe07a0.jar"
-        jar="/Users/alonmuroch/.gradle/caches/modules-2/files-2.1/org.bitcoinj/orchid/1.0/bd98285f39f88875bb91bde940d6ca2d020edaa4/orchid-1.0.jar"
-        jumboMode="false"
-        revision="21.1.0"
-        sha1="bd98285f39f88875bb91bde940d6ca2d020edaa4"/>
-    <item
         dex="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/app/build/intermediates/pre-dexed/debug/javase-2.0-088610ab3a05a75199d3e3cc99aa45fa14084ef5.jar"
         jar="/Users/alonmuroch/.gradle/caches/modules-2/files-2.1/com.google.zxing/javase/2.0/d6384ed133a5d2ae38b9cdece13a56564f91066e/javase-2.0.jar"
         jumboMode="false"
         revision="21.1.0"
         sha1="d6384ed133a5d2ae38b9cdece13a56564f91066e"/>
+    <item
+        dex="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/app/build/intermediates/pre-dexed/test/debug/junit-dep-4.10-4b47c29e8659a5f7441781bf059beda59dad71c0.jar"
+        jar="/Users/alonmuroch/.gradle/caches/modules-2/files-2.1/junit/junit-dep/4.10/64417b3bafdecd366afa514bd5beeae6c1f85ece/junit-dep-4.10.jar"
+        jumboMode="false"
+        revision="21.1.0"
+        sha1="64417b3bafdecd366afa514bd5beeae6c1f85ece"/>
+    <item
+        dex="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/app/build/intermediates/pre-dexed/test/debug/hamcrest-core-1.1-24fa9fdca015e9bf49d65493099e69fa1644cdab.jar"
+        jar="/Users/alonmuroch/.gradle/caches/modules-2/files-2.1/org.hamcrest/hamcrest-core/1.1/860340562250678d1a344907ac75754e259cdb14/hamcrest-core-1.1.jar"
+        jumboMode="false"
+        revision="21.1.0"
+        sha1="860340562250678d1a344907ac75754e259cdb14"/>
     <item
         dex="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/app/build/intermediates/pre-dexed/debug/bitcoinj-core-0.12-27d489f3bb55c25107873249ab00a3adedb2b25f.jar"
         jar="/Users/alonmuroch/.gradle/caches/modules-2/files-2.1/org.bitcoinj/bitcoinj-core/0.12/83df7d3026f4750276ab36bf7d869f9e9c29019c/bitcoinj-core-0.12.jar"

@@ -7,46 +7,34 @@ import java.util.ArrayList;
 import javax.crypto.SecretKey;
 
 import org.bitcoin.authenticator.ConfirmTxDialog.TxDialogResponse;
-import org.bitcoin.authenticator.Wallet_list.WalletItem;
-import org.bitcoin.authenticator.Wallet_list.CustomListAdapter.ViewHolder;
 import org.bitcoin.authenticator.dialogs.BAPopupMenu;
-import org.bitcoin.authenticator.net.Connection;
-import org.bitcoin.authenticator.net.Message;
-import org.bitcoin.authenticator.net.Connection.CannotConnectToWalletException;
-import org.bitcoin.authenticator.net.Message.CouldNotGetTransactionException;
-import org.bitcoin.authenticator.net.Message.CouldNotSendRequestIDException;
+import org.bitcoin.authenticator.tests.backup.net.Connection;
+import org.bitcoin.authenticator.tests.backup.net.Message;
+import org.bitcoin.authenticator.tests.backup.net.Message.CouldNotGetTransactionException;
+import org.bitcoin.authenticator.tests.backup.net.Message.CouldNotSendRequestIDException;
 import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
 import org.bitcoin.authenticator.Events.GlobalEvents;
 import org.bitcoin.authenticator.GcmUtil.ProcessGCMRequest;
 import org.bitcoin.authenticator.GcmUtil.RequestType;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.app.Activity;
-import android.app.ActionBar;
-import android.app.Fragment;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.AdapterView.OnItemClickListener;
-import android.os.Build;
 
 public class ActivityPendingRequests extends Activity {
 

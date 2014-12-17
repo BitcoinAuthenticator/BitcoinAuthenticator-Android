@@ -4,17 +4,13 @@ package org.bitcoin.authenticator;
 
 import java.io.*;
 import java.math.BigInteger;
-import java.net.Socket;
-import java.nio.ByteBuffer;
 import java.security.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import javax.crypto.*;
 
-import org.bitcoin.authenticator.GcmUtil.GcmUtilGlobal;
-import org.bitcoin.authenticator.net.Connection;
-import org.bitcoin.authenticator.net.Connection.CannotConnectToWalletException;
+import org.bitcoin.authenticator.tests.backup.net.Connection;
 import org.bitcoin.authenticator.utils.EncodingUtils;
 import org.json.simple.JSONValue;
 

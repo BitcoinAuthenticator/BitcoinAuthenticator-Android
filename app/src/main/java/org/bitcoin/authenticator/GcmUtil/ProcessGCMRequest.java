@@ -1,18 +1,15 @@
 package org.bitcoin.authenticator.GcmUtil;
 
-import java.io.IOException;
 import java.util.Set;
 
 import org.bitcoin.authenticator.PairingProtocol;
 import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
-import org.bitcoin.authenticator.net.Connection;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
-import android.widget.Toast;
 
 public class ProcessGCMRequest {
 	private  JSONObject req;
