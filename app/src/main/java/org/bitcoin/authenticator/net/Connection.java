@@ -25,32 +25,34 @@ public class Connection {
 	}
 	
 	/** Closes the connection */
-	private void dispose(Socket socket, DataInputStream in, DataOutputStream out) {
+	private void dispose(Socket socket, DataInputStream in, DataOutputStream out) throws IOException {
 		if(socket != null)
-		try { socket.close(); } catch(IOException e){ };
-		
+            socket.close();
+
 		if(in != null)
-		try { in.close(); } catch(IOException e){ };
-		
+            in.close();
+
 		if(out != null)
-		try { out.close(); } catch(IOException e){ };
+            out.close();
 	}
-	
-	/**
-	 * Will check if a connection is possible, if so will return a socket <b>without</b> timeout
-	 * 
-	 * @param ip
-	 * @return
-	 * @throws CannotConnectToWalletException
-	 */
-	private Socket generateSocket(String[] ips) throws CannotConnectToWalletException {
-		Socket s = null;
+
+    /**
+     * Will try and connect to the authenticator with the passed ips.
+     * A connection will be considered valid if a valid pong message is received.
+     * Will return a socket <b>without</b> timeout
+     *
+     * @param ips
+     * @return
+     * @throws CannotConnectToWalletException
+     */
+	public Socket generateSockeToAuthenticator(Socket s, String[] ips) throws CannotConnectToWalletException {
 		for(String ip:ips)
 			try {
 				Log.i("asdf", "Trying to connect to: " + ip);
 				
 				InetAddress walletAddr = InetAddress.getByName(ip);
-				s = new Socket();
+                if(s == null)
+				    s = new Socket();
 				s.connect(new InetSocketAddress(walletAddr, PORT), 1000);
 				s.setSoTimeout(0);
 				
@@ -68,14 +70,13 @@ public class Connection {
 				
 				return s;		
 			}
-			catch(Exception e) { }
+			catch(Exception e) { e.printStackTrace(); }
 		
 		if(s == null)
 			throw new CannotConnectToWalletException("Could Not Connect to wallet");
 		return s;
 	}
-	
-	
+
 	/*
 	 * API
 	 * 
@@ -94,24 +95,33 @@ public class Connection {
 		return writeContinuous(new String[]{ ip }, payload);
 	}
 	public Socket writeContinuous(String[] ips, byte[] payload) throws CannotConnectToWalletException {
-		Socket s = generateSocket(ips);
-		
-		try {
-			write(s, payload);
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new CannotConnectToWalletException("Couldn't connect to wallet");
-		}
-		
-		return s;
+		Socket s = null;
+        s = generateSockeToAuthenticator(s, ips);
+        return  writeContinuous(s, payload);
 	}
+
+    public Socket writeContinuous(Socket s, byte[] payload) throws CannotConnectToWalletException {
+        try {
+            write(s, payload);
+        } catch (IOException e) {
+            e.printStackTrace();
+            throw new CannotConnectToWalletException("Couldn't connect to wallet");
+        }
+
+        return s;
+    }
 	
 	public void writeAndClose(String ip, byte[] payload) throws CannotConnectToWalletException {
 		writeAndClose(new String[]{ ip }, payload);
 	}
 	public void writeAndClose(String[] ips, byte[] payload) throws CannotConnectToWalletException {
-		Socket s = writeContinuous(ips, payload);
-		this.dispose(s, null, null);
+        try {
+            Socket s = writeContinuous(ips, payload);
+            this.dispose(s, null, null);
+        }
+        catch(Exception e) {
+            throw new CannotConnectToWalletException(e.getMessage());
+        }
 	}
 	public void writeAndClose(Socket s, byte[] payload) throws CannotConnectToWalletException {
 		try {
@@ -130,17 +140,12 @@ public class Connection {
 		out = new DataOutputStream(s.getOutputStream());
 		out.writeInt(payload.length);
 		out.write(payload);
-		
-//		if(out != null)
-//			try {
-//				out.close();
-//			} catch (IOException e) { e.printStackTrace(); }
 	}
 	
 	public byte[] readContinuous(Socket s) throws CannotReadFromWalletException {
 		try {
-			byte[] ret;
-			ret = read(s);
+			byte[] ret = null;
+			read(s, ret);
 						
 			return ret;
 		}
@@ -158,29 +163,19 @@ public class Connection {
 			e.printStackTrace();
 			throw new CannotReadFromWalletException("Couldn't read from wallet");
 		}
-		finally {
-//			try {
-//				s.close();
-//			} catch (IOException e) { }
-		}
 	}
 	
-	private byte[] read(Socket s) throws IOException {
+	private byte[] read(Socket s, byte[] readBytes) throws IOException {
 		int previousTimeout = s.getSoTimeout();
 		try {
 			s.setSoTimeout(3000);
 			
 			DataInputStream in = new DataInputStream(s.getInputStream());
 			int size = in.readInt();
-			byte[] payload = new byte[size];
-			in.read(payload);
-			
-//			if(in != null)
-//				try {
-//					in.close();
-//				} catch (IOException e) { e.printStackTrace(); }
-			
-			return payload;
+            readBytes = new byte[size];
+			in.read(readBytes);
+
+			return readBytes;
 		}
 		catch (IOException e) {
 			throw new IOException(e.toString());
