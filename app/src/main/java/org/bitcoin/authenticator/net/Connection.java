@@ -57,14 +57,13 @@ public class Connection {
 				s.setSoTimeout(0);
 				
 				// verify we are connected to an authenticator
-				try {
-					if(!PongPayload.isValidPongPayload(this.readContinuous(s))) {
-						s.close();
-						throw new CannotConnectToWalletException("");
-					}
-				} catch (Exception e) {
-					throw new Exception("");
-				}
+                if(!PongPayload.isValidPongPayload(this.readContinuous(s))) {
+                    try { s.close(); }
+                    catch(IOException e) { e.printStackTrace(); }
+                    s = null;
+
+                    throw new CannotConnectToWalletException("Returned pong message is not valid");
+                }
 				
 				Log.i("asdf", "Connected to: " + ip);
 				

@@ -494,7 +494,7 @@ public class Wallet_list extends Activity {
                     	persistentSocketForTheProcess = null;
         				try {
         					msg = new Message(ips);
-    						persistentSocketForTheProcess = msg.sentRequestID(
+    						persistentSocketForTheProcess = msg.sendRequestID(
     								getIntent().getStringExtra("RequestID"),
     								getIntent().getStringExtra("WalletID"));
     					} catch (CouldNotSendRequestIDException e1) {

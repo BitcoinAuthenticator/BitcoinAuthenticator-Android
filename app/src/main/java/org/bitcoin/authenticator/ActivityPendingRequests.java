@@ -217,7 +217,7 @@ public class ActivityPendingRequests extends Activity {
     			try {
     				msg = new Message(ips);
     				//send request id
-    				persistentSocketForTheProcess = msg.sentRequestID(data.reqID, data.getWalletID());
+    				persistentSocketForTheProcess = msg.sendRequestID(data.reqID, data.getWalletID());
     			} 
     			catch (CouldNotSendRequestIDException e) {
 					e.printStackTrace();

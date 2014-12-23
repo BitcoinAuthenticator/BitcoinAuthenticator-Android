@@ -28,19 +28,20 @@ public class Message {
 	public Message(String[] ips){
 		if (ips == null || ips.length == 0)
 			throw new IllegalArgumentException("No ips were provided");
-		this.ips = ips;
+		setIPs(ips);
 	}
 	
 	@SuppressWarnings("unchecked")
-	public Socket sentRequestID(String requestID, String walletID) throws CouldNotSendRequestIDException{
+	public Socket sendRequestID(String requestID, String walletID) throws CouldNotSendRequestIDException{
 		try {
 			JSONObject jo = new JSONObject();
 			jo.put("requestID", requestID);
 			jo.put("pairingID", walletID); // the walletID in the authenticator is the pairing id in the wallet
 			byte[] payload = jo.toString().getBytes();
-			return Connection.getInstance().writeContinuous(ips, payload);
+			return Connection.getInstance().writeContinuous(getIPs(), payload);
 		}
 		catch(Exception e) {
+            e.printStackTrace();
 			throw new CouldNotSendRequestIDException("Couldn't send request ID to wallet");
 		}
 	}
@@ -101,15 +102,15 @@ public class Message {
 		}
 	}
 
-	/**
-	 * Method to send the transaction signature back to the wallet.
-	 * It calculates the HMAC of the signature, concatenates it, and encrypts it with AES.
-	 * 
-	 * @param sig
-	 * @param sharedsecret
-	 * @param ip
-	 * @throws CouldNotSendEncryptedException
-	 */
+    /**
+     * Method to send the transaction signature back to the wallet.
+     * It calculates the HMAC of the signature, concatenates it, and encrypts it with AES.
+     *
+     * @param sig
+     * @param sharedsecret
+     * @param s
+     * @throws CouldNotSendEncryptedException
+     */
 	public void sendEncrypted (byte[] sig, SecretKey sharedsecret, Socket s) throws CouldNotSendEncryptedException{
 		try {
 			//Calculate the HMAC
@@ -146,5 +147,12 @@ public class Message {
 			super(str);
 		}
 	}
-	
+
+    public void setIPs(String[] ips) {
+        this.ips = ips;
+    }
+
+    public String[] getIPs() {
+        return this.ips;
+    }
 }

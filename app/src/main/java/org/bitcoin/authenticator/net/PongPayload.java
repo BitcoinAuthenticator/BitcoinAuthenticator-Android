@@ -16,7 +16,7 @@ public class PongPayload extends JSONObject{
 			if(jsonObject.containsKey("WELCOME_BACK_AUTHENTICATOR"))
 				return true;
 			return false;
-		} catch (ParseException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return false;
