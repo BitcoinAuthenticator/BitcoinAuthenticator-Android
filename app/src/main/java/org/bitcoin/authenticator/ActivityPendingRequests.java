@@ -10,12 +10,12 @@ import org.bitcoin.authenticator.ConfirmTxDialog.TxDialogResponse;
 import org.bitcoin.authenticator.dialogs.BAPopupMenu;
 import org.bitcoin.authenticator.net.Connection;
 import org.bitcoin.authenticator.net.Message;
-import org.bitcoin.authenticator.net.Message.CouldNotGetTransactionException;
-import org.bitcoin.authenticator.net.Message.CouldNotSendRequestIDException;
 import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
 import org.bitcoin.authenticator.Events.GlobalEvents;
 import org.bitcoin.authenticator.GcmUtil.ProcessGCMRequest;
 import org.bitcoin.authenticator.GcmUtil.RequestType;
+import org.bitcoin.authenticator.net.exceptions.CouldNotGetTransactionException;
+import org.bitcoin.authenticator.net.exceptions.CouldNotSendRequestIDException;
 import org.json.JSONException;
 import org.json.JSONObject;
 

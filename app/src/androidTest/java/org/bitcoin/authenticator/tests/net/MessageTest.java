@@ -12,7 +12,6 @@ import org.json.simple.JSONObject;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 
 import java.net.Socket;
 import java.sql.DriverManager;
@@ -46,7 +45,7 @@ public class MessageTest extends TestCase {
 
         String reqID = "i am the req id";
         String walletID = "i am the wallet id";
-        byte[] payload;
+        byte[] payload = null;
         {
             JSONObject jo = new JSONObject();
             jo.put("requestID", reqID);
@@ -61,10 +60,9 @@ public class MessageTest extends TestCase {
 
         Connection conn = Mockito.mock(Connection.class);
         try {
-            Mockito.when(conn.writeContinuous(ips, payload)).thenReturn(s);
+            Mockito.when(conn.writeContinuous(ips, payload)).thenReturn(null);
         }
         catch(Connection.CannotConnectToWalletException e) { assertTrue(false); }
-        PowerMockito.mockStatic(Connection.class);
         Mockito.when(Connection.getInstance()).thenReturn(conn);
 
         ArgumentCaptor<byte[]> argPayload = ArgumentCaptor.forClass(byte[].class);

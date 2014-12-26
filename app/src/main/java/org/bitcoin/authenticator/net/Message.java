@@ -15,6 +15,9 @@ import javax.crypto.SecretKey;
 
 import org.bitcoin.authenticator.TxData;
 import org.bitcoin.authenticator.Utils;
+import org.bitcoin.authenticator.net.exceptions.CouldNotGetTransactionException;
+import org.bitcoin.authenticator.net.exceptions.CouldNotSendEncryptedException;
+import org.bitcoin.authenticator.net.exceptions.CouldNotSendRequestIDException;
 import org.json.simple.JSONObject;
 
 /**
@@ -32,7 +35,7 @@ public class Message {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public Socket sendRequestID(String requestID, String walletID) throws CouldNotSendRequestIDException{
+	public Socket sendRequestID(String requestID, String walletID) throws CouldNotSendRequestIDException {
 		try {
 			JSONObject jo = new JSONObject();
 			jo.put("requestID", requestID);
@@ -43,12 +46,6 @@ public class Message {
 		catch(Exception e) {
             e.printStackTrace();
 			throw new CouldNotSendRequestIDException("Couldn't send request ID to wallet");
-		}
-	}
-	
-	static public class CouldNotSendRequestIDException extends Exception {
-		public CouldNotSendRequestIDException(String str) {
-			super(str);
 		}
 	}
 	
@@ -95,12 +92,6 @@ public class Message {
 		}
 		
 	}
-	
-	static public class CouldNotGetTransactionException extends Exception {
-		public CouldNotGetTransactionException(String str) {
-			super(str);
-		}
-	}
 
     /**
      * Method to send the transaction signature back to the wallet.
@@ -141,12 +132,6 @@ public class Message {
 		}
 		
     }
-	
-	static public class CouldNotSendEncryptedException extends Exception {
-		public CouldNotSendEncryptedException(String str) {
-			super(str);
-		}
-	}
 
     public void setIPs(String[] ips) {
         this.ips = ips;
