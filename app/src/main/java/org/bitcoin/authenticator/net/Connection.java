@@ -69,7 +69,10 @@ public class Connection {
 				
 				return s;		
 			}
-			catch(Exception e) { e.printStackTrace(); }
+			catch(Exception e) {
+                e.printStackTrace();
+                s = null;
+            }
 		
 		if(s == null)
 			throw new CannotConnectToWalletException("Could Not Connect to wallet");
@@ -143,10 +146,7 @@ public class Connection {
 	
 	public byte[] readContinuous(Socket s) throws CannotReadFromWalletException {
 		try {
-			byte[] ret = null;
-			read(s, ret);
-						
-			return ret;
+			return read(s);
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -164,8 +164,9 @@ public class Connection {
 		}
 	}
 	
-	private byte[] read(Socket s, byte[] readBytes) throws IOException {
+	private byte[] read(Socket s) throws IOException {
 		int previousTimeout = s.getSoTimeout();
+        byte[] readBytes = null;
 		try {
 			s.setSoTimeout(3000);
 			
@@ -173,8 +174,6 @@ public class Connection {
 			int size = in.readInt();
             readBytes = new byte[size];
 			in.read(readBytes);
-
-			return readBytes;
 		}
 		catch (IOException e) {
 			throw new IOException(e.toString());
@@ -182,6 +181,8 @@ public class Connection {
 		finally {
 			s.setSoTimeout(previousTimeout);
 		}
+
+        return readBytes;
 	}
 	
 	public static class CannotConnectToWalletException extends Exception {

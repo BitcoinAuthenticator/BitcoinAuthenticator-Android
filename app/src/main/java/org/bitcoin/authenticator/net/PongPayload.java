@@ -1,5 +1,7 @@
 package org.bitcoin.authenticator.net;
 
+import android.util.Log;
+
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -9,16 +11,20 @@ public class PongPayload extends JSONObject{
 	static public boolean isValidPongPayload(byte[] payload) {
 		try {
 			String strJson = new String(payload);
-			JSONParser parser=new JSONParser();	  
+            Log.i("asdf","Received PONG msg: " + strJson);
+            JSONParser parser=new JSONParser();
 			Object obj = parser.parse(strJson);
 			JSONObject jsonObject = (JSONObject) obj;
 			
-			if(jsonObject.containsKey("WELCOME_BACK_AUTHENTICATOR"))
-				return true;
-			return false;
+			if(jsonObject.containsKey("WELCOME_BACK_AUTHENTICATOR")) {
+                Log.i("asdf","Received PONG msg valid");
+                return true;
+            }
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
+        Log.i("asdf","Received PONG msg not valid");
 		return false;
 	}
 	

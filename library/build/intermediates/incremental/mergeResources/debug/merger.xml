@@ -2,117 +2,117 @@
 <merger version="2" >
 
     <dataSet config="21.0.2" >
-        <source path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/library/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.2/res" />
+        <source path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/library/build/intermediates/exploded-aar/com.android.support/support-v4/21.0.2/res" />
     </dataSet>
     <dataSet config="main" >
-        <source path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/library/src/main/res" >
+        <source path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/library/src/main/res" >
             <file
                 name="vpi__dark_theme"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/library/src/main/res/color/vpi__dark_theme.xml"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/library/src/main/res/color/vpi__dark_theme.xml"
                 qualifiers=""
                 type="color" />
             <file
                 name="vpi__light_theme"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/library/src/main/res/color/vpi__light_theme.xml"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/library/src/main/res/color/vpi__light_theme.xml"
                 qualifiers=""
                 type="color" />
             <file
                 name="vpi__tab_indicator"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/library/src/main/res/drawable/vpi__tab_indicator.xml"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/library/src/main/res/drawable/vpi__tab_indicator.xml"
                 qualifiers=""
                 type="drawable" />
             <file
                 name="vpi__tab_selected_focused_holo"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/library/src/main/res/drawable-hdpi/vpi__tab_selected_focused_holo.9.png"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/library/src/main/res/drawable-hdpi/vpi__tab_selected_focused_holo.9.png"
                 qualifiers="hdpi-v4"
                 type="drawable" />
             <file
                 name="vpi__tab_selected_holo"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/library/src/main/res/drawable-hdpi/vpi__tab_selected_holo.9.png"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/library/src/main/res/drawable-hdpi/vpi__tab_selected_holo.9.png"
                 qualifiers="hdpi-v4"
                 type="drawable" />
             <file
                 name="vpi__tab_selected_pressed_holo"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/library/src/main/res/drawable-hdpi/vpi__tab_selected_pressed_holo.9.png"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/library/src/main/res/drawable-hdpi/vpi__tab_selected_pressed_holo.9.png"
                 qualifiers="hdpi-v4"
                 type="drawable" />
             <file
                 name="vpi__tab_unselected_focused_holo"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/library/src/main/res/drawable-hdpi/vpi__tab_unselected_focused_holo.9.png"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/library/src/main/res/drawable-hdpi/vpi__tab_unselected_focused_holo.9.png"
                 qualifiers="hdpi-v4"
                 type="drawable" />
             <file
                 name="vpi__tab_unselected_holo"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/library/src/main/res/drawable-hdpi/vpi__tab_unselected_holo.9.png"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/library/src/main/res/drawable-hdpi/vpi__tab_unselected_holo.9.png"
                 qualifiers="hdpi-v4"
                 type="drawable" />
             <file
                 name="vpi__tab_unselected_pressed_holo"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/library/src/main/res/drawable-hdpi/vpi__tab_unselected_pressed_holo.9.png"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/library/src/main/res/drawable-hdpi/vpi__tab_unselected_pressed_holo.9.png"
                 qualifiers="hdpi-v4"
                 type="drawable" />
             <file
                 name="vpi__tab_selected_focused_holo"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/library/src/main/res/drawable-mdpi/vpi__tab_selected_focused_holo.9.png"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/library/src/main/res/drawable-mdpi/vpi__tab_selected_focused_holo.9.png"
                 qualifiers="mdpi-v4"
                 type="drawable" />
             <file
                 name="vpi__tab_selected_holo"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/library/src/main/res/drawable-mdpi/vpi__tab_selected_holo.9.png"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/library/src/main/res/drawable-mdpi/vpi__tab_selected_holo.9.png"
                 qualifiers="mdpi-v4"
                 type="drawable" />
             <file
                 name="vpi__tab_selected_pressed_holo"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/library/src/main/res/drawable-mdpi/vpi__tab_selected_pressed_holo.9.png"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/library/src/main/res/drawable-mdpi/vpi__tab_selected_pressed_holo.9.png"
                 qualifiers="mdpi-v4"
                 type="drawable" />
             <file
                 name="vpi__tab_unselected_focused_holo"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/library/src/main/res/drawable-mdpi/vpi__tab_unselected_focused_holo.9.png"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/library/src/main/res/drawable-mdpi/vpi__tab_unselected_focused_holo.9.png"
                 qualifiers="mdpi-v4"
                 type="drawable" />
             <file
                 name="vpi__tab_unselected_holo"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/library/src/main/res/drawable-mdpi/vpi__tab_unselected_holo.9.png"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/library/src/main/res/drawable-mdpi/vpi__tab_unselected_holo.9.png"
                 qualifiers="mdpi-v4"
                 type="drawable" />
             <file
                 name="vpi__tab_unselected_pressed_holo"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/library/src/main/res/drawable-mdpi/vpi__tab_unselected_pressed_holo.9.png"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/library/src/main/res/drawable-mdpi/vpi__tab_unselected_pressed_holo.9.png"
                 qualifiers="mdpi-v4"
                 type="drawable" />
             <file
                 name="vpi__tab_selected_focused_holo"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/library/src/main/res/drawable-xhdpi/vpi__tab_selected_focused_holo.9.png"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/library/src/main/res/drawable-xhdpi/vpi__tab_selected_focused_holo.9.png"
                 qualifiers="xhdpi-v4"
                 type="drawable" />
             <file
                 name="vpi__tab_selected_holo"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/library/src/main/res/drawable-xhdpi/vpi__tab_selected_holo.9.png"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/library/src/main/res/drawable-xhdpi/vpi__tab_selected_holo.9.png"
                 qualifiers="xhdpi-v4"
                 type="drawable" />
             <file
                 name="vpi__tab_selected_pressed_holo"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/library/src/main/res/drawable-xhdpi/vpi__tab_selected_pressed_holo.9.png"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/library/src/main/res/drawable-xhdpi/vpi__tab_selected_pressed_holo.9.png"
                 qualifiers="xhdpi-v4"
                 type="drawable" />
             <file
                 name="vpi__tab_unselected_focused_holo"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/library/src/main/res/drawable-xhdpi/vpi__tab_unselected_focused_holo.9.png"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/library/src/main/res/drawable-xhdpi/vpi__tab_unselected_focused_holo.9.png"
                 qualifiers="xhdpi-v4"
                 type="drawable" />
             <file
                 name="vpi__tab_unselected_holo"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/library/src/main/res/drawable-xhdpi/vpi__tab_unselected_holo.9.png"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/library/src/main/res/drawable-xhdpi/vpi__tab_unselected_holo.9.png"
                 qualifiers="xhdpi-v4"
                 type="drawable" />
             <file
                 name="vpi__tab_unselected_pressed_holo"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/library/src/main/res/drawable-xhdpi/vpi__tab_unselected_pressed_holo.9.png"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/library/src/main/res/drawable-xhdpi/vpi__tab_unselected_pressed_holo.9.png"
                 qualifiers="xhdpi-v4"
                 type="drawable" />
             <file
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/library/src/main/res/values/vpi__attrs.xml"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/library/src/main/res/values/vpi__attrs.xml"
                 qualifiers="" >
                 <attr
                     name="strokeWidth"
@@ -299,7 +299,7 @@
                 </declare-styleable>
             </file>
             <file
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/library/src/main/res/values/vpi__colors.xml"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/library/src/main/res/values/vpi__colors.xml"
                 qualifiers="" >
                 <color name="vpi__bright_foreground_holo_light" >@color/vpi__background_holo_dark
                 </color>
@@ -319,7 +319,7 @@
                 </color>
             </file>
             <file
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/library/src/main/res/values/vpi__defaults.xml"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/library/src/main/res/values/vpi__defaults.xml"
                 qualifiers="" >
                 <dimen name="default_title_indicator_title_padding" >5dp
                 </dimen>
@@ -416,7 +416,7 @@ true
                 </bool>
             </file>
             <file
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/library/src/main/res/values/vpi__styles.xml"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/library/src/main/res/values/vpi__styles.xml"
                 qualifiers="" >
 
                 <style
@@ -488,11 +488,11 @@ bold
                 </style>
             </file>
         </source>
-        <source path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/library/build/generated/res/rs/debug" />
-        <source path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/library/build/generated/res/generated/debug" />
+        <source path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/library/build/generated/res/rs/debug" />
+        <source path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/library/build/generated/res/generated/debug" />
     </dataSet>
     <dataSet config="debug" >
-        <source path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/library/src/debug/res" />
+        <source path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/library/src/debug/res" />
     </dataSet>
 
 </merger>

@@ -18,4 +18,4 @@
     style="@style/fileChooserName"
     android:layout_width="fill_parent"
     android:layout_height="?android:attr/listPreferredItemHeight" />
-<!-- From: file:/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/layout/file.xml -->
+<!-- From: file:/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/layout/file.xml -->

@@ -2,94 +2,94 @@
 <merger version="2" >
 
     <dataSet config="main" >
-        <source path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res" >
+        <source path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res" >
             <file
                 name="ic_chooser"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/drawable-hdpi/ic_chooser.png"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/drawable-hdpi/ic_chooser.png"
                 qualifiers="hdpi-v4"
                 type="drawable" />
             <file
                 name="ic_file"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/drawable-hdpi/ic_file.png"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/drawable-hdpi/ic_file.png"
                 qualifiers="hdpi-v4"
                 type="drawable" />
             <file
                 name="ic_folder"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/drawable-hdpi/ic_folder.png"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/drawable-hdpi/ic_folder.png"
                 qualifiers="hdpi-v4"
                 type="drawable" />
             <file
                 name="ic_provider"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/drawable-hdpi/ic_provider.png"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/drawable-hdpi/ic_provider.png"
                 qualifiers="hdpi-v4"
                 type="drawable" />
             <file
                 name="ic_chooser"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/drawable-mdpi/ic_chooser.png"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/drawable-mdpi/ic_chooser.png"
                 qualifiers="mdpi-v4"
                 type="drawable" />
             <file
                 name="ic_file"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/drawable-mdpi/ic_file.png"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/drawable-mdpi/ic_file.png"
                 qualifiers="mdpi-v4"
                 type="drawable" />
             <file
                 name="ic_folder"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/drawable-mdpi/ic_folder.png"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/drawable-mdpi/ic_folder.png"
                 qualifiers="mdpi-v4"
                 type="drawable" />
             <file
                 name="ic_provider"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/drawable-mdpi/ic_provider.png"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/drawable-mdpi/ic_provider.png"
                 qualifiers="mdpi-v4"
                 type="drawable" />
             <file
                 name="ic_chooser"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/drawable-xhdpi/ic_chooser.png"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/drawable-xhdpi/ic_chooser.png"
                 qualifiers="xhdpi-v4"
                 type="drawable" />
             <file
                 name="ic_file"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/drawable-xhdpi/ic_file.png"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/drawable-xhdpi/ic_file.png"
                 qualifiers="xhdpi-v4"
                 type="drawable" />
             <file
                 name="ic_folder"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/drawable-xhdpi/ic_folder.png"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/drawable-xhdpi/ic_folder.png"
                 qualifiers="xhdpi-v4"
                 type="drawable" />
             <file
                 name="ic_provider"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/drawable-xhdpi/ic_provider.png"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/drawable-xhdpi/ic_provider.png"
                 qualifiers="xhdpi-v4"
                 type="drawable" />
             <file
                 name="ic_chooser"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/drawable-xxhdpi/ic_chooser.png"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/drawable-xxhdpi/ic_chooser.png"
                 qualifiers="xxhdpi-v4"
                 type="drawable" />
             <file
                 name="ic_file"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/drawable-xxhdpi/ic_file.png"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/drawable-xxhdpi/ic_file.png"
                 qualifiers="xxhdpi-v4"
                 type="drawable" />
             <file
                 name="ic_folder"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/drawable-xxhdpi/ic_folder.png"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/drawable-xxhdpi/ic_folder.png"
                 qualifiers="xxhdpi-v4"
                 type="drawable" />
             <file
                 name="ic_provider"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/drawable-xxhdpi/ic_provider.png"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/drawable-xxhdpi/ic_provider.png"
                 qualifiers="xxhdpi-v4"
                 type="drawable" />
             <file
                 name="file"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/layout/file.xml"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/layout/file.xml"
                 qualifiers=""
                 type="layout" />
             <file
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/values/bool.xml"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/values/bool.xml"
                 qualifiers="" >
                 <bool name="use_provider" >
 false
@@ -99,7 +99,7 @@ true
                 </bool>
             </file>
             <file
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/values/dimens.xml"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/values/dimens.xml"
                 qualifiers="" >
                 <dimen name="list_padding" >0dp
                 </dimen>
@@ -107,7 +107,7 @@ true
                 </dimen>
             </file>
             <file
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/values/strings.xml"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/values/strings.xml"
                 qualifiers="" >
                 <string name="internal_storage" >Internal storage
                 </string>
@@ -121,7 +121,7 @@ true
                 </string>
             </file>
             <file
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/values/styles.xml"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/values/styles.xml"
                 qualifiers="" >
 
                 <style name="fileChooserName" >
@@ -149,7 +149,7 @@ center_vertical
                 </style>
             </file>
             <file
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/values-ca/strings.xml"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/values-ca/strings.xml"
                 qualifiers="ca" >
                 <string name="choose_file" >Seleccioneu un fitxer
                 </string>
@@ -161,7 +161,7 @@ center_vertical
                 </string>
             </file>
             <file
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/values-de/strings.xml"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/values-de/strings.xml"
                 qualifiers="de" >
                 <string name="error_selecting_file" >Fehler beim Öffnen der Datei
                 </string>
@@ -173,7 +173,7 @@ center_vertical
                 </string>
             </file>
             <file
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/values-es/strings.xml"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/values-es/strings.xml"
                 qualifiers="es" >
                 <string name="error_selecting_file" >Error al seleccionar el archivo
                 </string>
@@ -185,7 +185,7 @@ center_vertical
                 </string>
             </file>
             <file
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/values-fr/strings.xml"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/values-fr/strings.xml"
                 qualifiers="fr" >
                 <string name="storage_removed" >Le stockage a été enlevé ou démonté.
                 </string>
@@ -197,7 +197,7 @@ center_vertical
                 </string>
             </file>
             <file
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/values-ga/strings.xml"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/values-ga/strings.xml"
                 qualifiers="ga" >
                 <string name="empty_directory" >Comhadlann fholamh
                 </string>
@@ -209,7 +209,7 @@ center_vertical
                 </string>
             </file>
             <file
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/values-it/strings.xml"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/values-it/strings.xml"
                 qualifiers="it" >
                 <string name="empty_directory" >Directory vuota
                 </string>
@@ -221,7 +221,7 @@ center_vertical
                 </string>
             </file>
             <file
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/values-ko/strings.xml"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/values-ko/strings.xml"
                 qualifiers="ko" >
                 <string name="storage_removed" >저장소가 제거되었습니다.
                 </string>
@@ -233,7 +233,7 @@ center_vertical
                 </string>
             </file>
             <file
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/values-pl/strings.xml"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/values-pl/strings.xml"
                 qualifiers="pl" >
                 <string name="empty_directory" >Pusty katalog
                 </string>
@@ -245,7 +245,7 @@ center_vertical
                 </string>
             </file>
             <file
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/values-pt-rBR/strings.xml"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/values-pt-rBR/strings.xml"
                 qualifiers="pt-rBR" >
                 <string name="choose_file" >Selecione um Arquivo
                 </string>
@@ -257,7 +257,7 @@ center_vertical
                 </string>
             </file>
             <file
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/values-ru/strings.xml"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/values-ru/strings.xml"
                 qualifiers="ru" >
                 <string name="empty_directory" >Пустая папка
                 </string>
@@ -269,13 +269,13 @@ center_vertical
                 </string>
             </file>
             <file
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/values-v11/strings.xml"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/values-v11/strings.xml"
                 qualifiers="v11" >
                 <string name="choose_file" >Choose a file
                 </string>
             </file>
             <file
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/values-v19/bool.xml"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/values-v19/bool.xml"
                 qualifiers="v19" >
                 <bool name="use_provider" >
 true
@@ -286,15 +286,15 @@ false
             </file>
             <file
                 name="mimetypes"
-                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/xml/mimetypes.xml"
+                path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/xml/mimetypes.xml"
                 qualifiers=""
                 type="xml" />
         </source>
-        <source path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/build/generated/res/rs/release" />
-        <source path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/build/generated/res/generated/release" />
+        <source path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/build/generated/res/rs/release" />
+        <source path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/build/generated/res/generated/release" />
     </dataSet>
     <dataSet config="release" >
-        <source path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/release/res" />
+        <source path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/release/res" />
     </dataSet>
 
 </merger>

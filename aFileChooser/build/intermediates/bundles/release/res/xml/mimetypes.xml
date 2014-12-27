@@ -86,4 +86,4 @@
 	<!-- Android specific -->
 	<type extension=".apk" mimetype="application/vnd.android.package-archive" />
 	
-</MimeTypes><!-- From: file:/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/xml/mimetypes.xml -->
+</MimeTypes><!-- From: file:/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/xml/mimetypes.xml -->

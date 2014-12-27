@@ -2,10 +2,10 @@
 <merger version="2" >
 
     <dataSet config="main" >
-        <source path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/library/src/main/assets" />
+        <source path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/library/src/main/assets" />
     </dataSet>
     <dataSet config="release" >
-        <source path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/library/src/release/assets" />
+        <source path="/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/library/src/release/assets" />
     </dataSet>
 
 </merger>

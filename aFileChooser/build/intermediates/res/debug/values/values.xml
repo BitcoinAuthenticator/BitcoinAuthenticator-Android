@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- From: file:/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/values/bool.xml -->
+    <!-- From: file:/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/values/bool.xml -->
     <eat-comment />
 
     <bool name="use_activity">true</bool>
     <bool name="use_provider">false</bool>
-    <!-- From: file:/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/values/dimens.xml -->
+    <!-- From: file:/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/values/dimens.xml -->
     <eat-comment />
 
     <dimen name="list_item_padding">16dp</dimen>
     <dimen name="list_padding">0dp</dimen>
-    <!-- From: file:/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/values/strings.xml -->
+    <!-- From: file:/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/values/strings.xml -->
     <eat-comment />
 
     <string name="choose_file">Select a file</string>
@@ -19,7 +19,7 @@
     <string name="error_selecting_file">Error selecting File</string>
     <string name="internal_storage">Internal storage</string>
     <string name="storage_removed">Storage was removed or unmounted.</string>
-    <!-- From: file:/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator/aFileChooser/src/main/res/values/styles.xml -->
+    <!-- From: file:/Users/alonmuroch/Documents/workspace_android/BitcoinAuthenticator-Android/aFileChooser/src/main/res/values/styles.xml -->
     <eat-comment />
 
     <style name="fileChooserName">
