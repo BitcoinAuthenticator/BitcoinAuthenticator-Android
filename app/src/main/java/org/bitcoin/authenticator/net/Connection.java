@@ -57,7 +57,7 @@ public class Connection {
 				s.setSoTimeout(0);
 				
 				// verify we are connected to an authenticator
-                if(!PongPayload.isValidPongPayload(this.readContinuous(s))) {
+                if(!PongPayload.isValidPongPayload(readContinuous(s))) {
                     try { s.close(); }
                     catch(IOException e) { e.printStackTrace(); }
                     s = null;
@@ -156,7 +156,9 @@ public class Connection {
 	
 	public byte[] readAndClose(Socket s) throws CannotReadFromWalletException {
 		try {
-			return readContinuous(s);
+			byte[] ret = readContinuous(s);
+            this.dispose(s, null, null);
+            return ret;
 		}
 		catch (Exception e) {
 			e.printStackTrace();
@@ -169,9 +171,9 @@ public class Connection {
         byte[] readBytes = null;
 		try {
 			s.setSoTimeout(3000);
-			
+
 			DataInputStream in = new DataInputStream(s.getInputStream());
-			int size = in.readInt();
+			int size = in.available();
             readBytes = new byte[size];
 			in.read(readBytes);
 		}

@@ -1,5 +1,7 @@
 package org.bitcoin.authenticator;
 
+import com.subgraph.orchid.encoders.Hex;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -22,26 +24,32 @@ public class TxData {
 	public TxData(byte[] payload) throws ParseException{
 		ChildKeyIndex = new ArrayList<Integer>();
 		PublicKeys = new ArrayList<String>();
+
+        // get the json object
 		String strJson = new String(payload);
 		JSONParser parser=new JSONParser();	  
 		Object obj = parser.parse(strJson);
 		JSONObject jsonObject = (JSONObject) obj;
+
+        // get params
 		version = ((Long) jsonObject.get("version")).intValue();
 		numInputs = ((Long) jsonObject.get("ins_n")).intValue();
 		testnet = (Boolean) jsonObject.get("testnet");
-		tx = Utils.hexStringToByteArray((String) jsonObject.get("tx"));
+		tx = Hex.decode((String) jsonObject.get("tx"));
+
+        //get key list
 		JSONArray msg = (JSONArray) jsonObject.get("keylist");
 		Iterator<JSONObject> iterator = msg.iterator();
 		JSONArray jsonlist = new JSONArray();
 		while (iterator.hasNext()) {
 			jsonlist.add(iterator.next());
 		}
-		JSONObject jsonObj = (JSONObject) obj;
+        JSONObject j;
 		for(int i=0; i<jsonlist.size(); i++){
-			jsonObj = (JSONObject) jsonlist.get(i);
-			int index = ((Long) jsonObj.get("index")).intValue();
+			j = (JSONObject) jsonlist.get(i);
+			int index = ((Long) j.get("index")).intValue();
 			ChildKeyIndex.add(index);
-			String pubkey = (String) jsonObj.get("pubkey");
+			String pubkey = (String) j.get("pubkey");
 			PublicKeys.add(pubkey);
 		}
 	}
@@ -72,8 +80,7 @@ public class TxData {
 	}
 	
 	/**Returns the network params*/
-	public boolean getParams() {
+	public boolean getIsTestnet() {
 		return testnet;
 	}
-	
 }

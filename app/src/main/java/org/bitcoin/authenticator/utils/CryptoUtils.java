@@ -1,12 +1,20 @@
 package org.bitcoin.authenticator.utils;
 
+import org.bitcoin.authenticator.Utils;
+import org.spongycastle.util.encoders.Hex;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Arrays;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.Mac;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -34,7 +42,23 @@ public class CryptoUtils {
 		catch (InvalidKeySpecException e1) {e1.printStackTrace();}
 		return null;
 	}
-	
+
+    public static byte[] encryptPayloadWithChecksum(SecretKey secretKey, byte[] payload) throws IOException, GeneralSecurityException {
+        if(payload.length == 0)
+            throw new IllegalArgumentException("payload of size 0");
+        //Calculate the HMAC
+        Mac mac = Mac.getInstance("HmacSHA256");
+        mac.init(secretKey);
+        byte[] macbytes = mac.doFinal(payload);
+        //Concatenate it with the payload
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream( );
+        outputStream.write(payload);
+        outputStream.write(macbytes);
+        byte payloadWithChecksum[] = outputStream.toByteArray();
+
+        return encryptPayload(secretKey, payloadWithChecksum);
+    }
+
 	public static byte[] encryptPayload(SecretKey secretKey, byte[] payload) {
 		if(secretKey == null || payload == null || payload.length == 0)
 			throw new IllegalArgumentException("Illegal encryption parameters");
@@ -88,4 +112,26 @@ public class CryptoUtils {
 		catch (BadPaddingException e) { e.printStackTrace(); }
 		return null;
 	}
+
+    public static byte[] decryptPayloadWithChecksum(SecretKey secretKey, byte[] cipherBytes) throws GeneralSecurityException {
+        if(cipherBytes.length == 0)
+            throw new IllegalArgumentException("payload of size 0");
+
+        //Decrypt the payload
+        Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5PADDING");
+        cipher.init(Cipher.DECRYPT_MODE, secretKey);
+        //Split the payload into it's parts.
+        String payload = Hex.toHexString(cipher.doFinal(cipherBytes));
+        byte[] testpayload = Hex.decode(payload.substring(0,payload.length()-64));
+        byte[] hash = Hex.decode(payload.substring(payload.length()-64,payload.length()));
+
+        //Verify the HMAC
+        Mac mac = Mac.getInstance("HmacSHA256");
+        mac.init(secretKey);
+        byte[] macbytes = mac.doFinal(testpayload);
+        if (Arrays.equals(macbytes, hash))
+            return testpayload;
+        else
+            throw new GeneralSecurityException("Checksum was not verified");
+    }
 }

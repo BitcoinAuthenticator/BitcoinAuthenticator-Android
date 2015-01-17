@@ -16,6 +16,7 @@ import org.bitcoin.authenticator.PairingProtocol.PairingQRData;
 import org.bitcoin.authenticator.GcmUtil.GcmUtilGlobal;
 
 import com.google.zxing.integration.android.IntentIntegrator;
+import com.subgraph.orchid.encoders.Hex;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -198,7 +199,7 @@ public class Pair_wallet extends Activity {
     		
 
     		//Run pairing protocol
-            SecretKey secretkey = new SecretKeySpec(Utils.hexStringToByteArray(AESKey), "AES");
+            SecretKey secretkey = new SecretKeySpec(Hex.decode(AESKey), "AES");
             byte[] regID = (GcmUtilGlobal.gcmRegistrationToken).getBytes();
 			try {
 				pair2wallet.run(seed, 
@@ -272,7 +273,7 @@ public class Pair_wallet extends Activity {
     	    
     	    //Save the AES key to internal storage.
     	    String FILENAME = "AESKey" + walletIndex;
-    	    byte[] keyBytes = Utils.hexStringToByteArray(AESKey);
+    	    byte[] keyBytes = Hex.decode(AESKey);
     	    FileOutputStream outputStream = null;
     		try {outputStream = openFileOutput(FILENAME, Context.MODE_PRIVATE);} 
     		catch (FileNotFoundException e1) {e1.printStackTrace();}

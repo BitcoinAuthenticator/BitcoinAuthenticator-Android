@@ -2,6 +2,7 @@ package org.bitcoin.authenticator.tests.net;
 
 import junit.framework.TestCase;
 
+import org.apache.commons.io.IOUtils;
 import org.bitcoin.authenticator.net.Connection;
 import org.json.simple.JSONObject;
 import org.junit.Ignore;
@@ -12,6 +13,7 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketException;
@@ -72,76 +74,76 @@ public class ConnectionTest extends TestCase {
     }
 
     @Test
-    @Ignore
-    public void testGenerateSocketToAuthenticator() {
-//        byte[] payload = null;
-//        {
-//            JSONObject jo = new JSONObject();
-//            jo.put("WELCOME_BACK_AUTHENTICATOR","");
-//            // payload is {"WELCOME_BACK_AUTHENTICATOR":""}
-//            payload = jo.toJSONString().getBytes();
-//        }
-//        String[] ips = new String[] { "127.0.0.1", "127.0.0.2" };
-//        Socket s = Mockito.mock(Socket.class);
-//        try {
-//            Mockito.when(s.getSoTimeout()).thenReturn(1000);
-//
-//            InputStream in = Mockito.mock(InputStream.class);
-//            Mockito.when(in.read()).thenReturn((int)payload[0])
-//                                    .thenReturn((int)payload[1])
-//                                    .thenReturn((int)payload[2])
-//                                    .thenReturn((int)payload[3])
-//                                    .thenReturn((int)payload[4])
-//                                    .thenReturn((int)payload[5])
-//                                    .thenReturn((int)payload[6])
-//                                    .thenReturn((int)payload[7])
-//                                    .thenReturn((int)payload[8])
-//                                    .thenReturn((int)payload[9])
-//                                    .thenReturn((int)payload[10])
-//                                    .thenReturn((int)payload[11])
-//                                    .thenReturn((int)payload[12])
-//                                    .thenReturn((int)payload[13])
-//                                    .thenReturn((int)payload[14])
-//                                    .thenReturn((int)payload[15])
-//                                    .thenReturn((int)payload[16])
-//                                    .thenReturn((int)payload[17])
-//                                    .thenReturn((int)payload[18])
-//                                    .thenReturn((int)payload[19])
-//                                    .thenReturn((int)payload[20])
-//                                    .thenReturn((int)payload[21])
-//                                    .thenReturn((int)payload[22])
-//                                    .thenReturn((int)payload[23])
-//                                    .thenReturn((int)payload[24])
-//                                    .thenReturn((int)payload[25])
-//                                    .thenReturn((int)payload[26])
-//                                    .thenReturn((int)payload[27])
-//                                    .thenReturn((int)payload[28])
-//                                    .thenReturn((int)payload[29])
-//                                    .thenReturn((int)payload[30])
-//                                    .thenReturn((int)payload[31])
-//                                    .thenReturn((int)payload[32]);
-//
-//            Mockito.when(s.getInputStream()).thenReturn(in);
-//        } catch (SocketException e) {
-//            e.printStackTrace();
-//            assertTrue(false);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            assertTrue(false);
-//        }
-//
-//        /*
-//            Valid ips
-//         */
-//        try {
-//            Connection.getInstance().generateSockeToAuthenticator(s, ips);
-//            Mockito.verify(s, Mockito.atLeastOnce()).connect(new InetSocketAddress("127.0.0.1", Connection.PORT), 1000);
-//        } catch (Connection.CannotConnectToWalletException e) {
-//            e.printStackTrace();
-//            assertTrue(false);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            assertTrue(false);
-//        }
+    public void testReadAndClose() {
+        try {
+            Socket s = Mockito.mock(Socket.class);
+            Mockito.when(s.getSoTimeout()).thenReturn(300);
+
+            InputStream is = IOUtils.toInputStream("some test data for my input stream");
+            Mockito.when(s.getInputStream()).thenReturn(is);
+
+            Connection.getInstance().readAndClose(s);
+            // assert socket.close() was called
+            Mockito.verify(s, Mockito.atLeastOnce()).close();
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+            assertTrue(false);
+        }
+    }
+
+    @Test
+    public void testReadContinuous() {
+        try {
+            Socket s = Mockito.mock(Socket.class);
+            Mockito.when(s.getSoTimeout()).thenReturn(300);
+
+            InputStream is = IOUtils.toInputStream("some test data for my input stream");
+            Mockito.when(s.getInputStream()).thenReturn(is);
+
+            Connection.getInstance().readContinuous(s);
+            // assert socket.close() was called
+            Mockito.verify(s, Mockito.never()).close();
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+            assertTrue(false);
+        }
+    }
+
+    @Test
+    public void testGenerateSockeToAuthenticator() {
+        Connection conn = Mockito.spy(new Connection());
+        Socket s = Mockito.mock(Socket.class);
+
+        String validPongPayload = null;
+        {
+            JSONObject obj = new JSONObject();
+            obj.put("WELCOME_BACK_AUTHENTICATOR","");
+            validPongPayload = obj.toString();
+        }
+        String notValidPongPayload = "not pong payload";
+
+        // test valid
+        try {
+            Mockito.doReturn(validPongPayload.getBytes()).when(conn).readContinuous(Mockito.any(Socket.class));
+            Socket retSocket = conn.generateSockeToAuthenticator(s, new String[] { "" });
+            assertTrue(retSocket != null);
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertTrue(false);
+        }
+
+        // test not reachable IPs
+        boolean didThrow = false;
+        try {
+            Mockito.doReturn(notValidPongPayload.getBytes()).when(conn).readContinuous(Mockito.any(Socket.class));
+            Socket retSocket = conn.generateSockeToAuthenticator(s, new String[] { "127.0.0.1" });
+        } catch (Exception e) {
+            assertTrue(e instanceof Connection.CannotConnectToWalletException);
+            didThrow = true;
+        }
+        assertTrue(didThrow);
+
     }
 }

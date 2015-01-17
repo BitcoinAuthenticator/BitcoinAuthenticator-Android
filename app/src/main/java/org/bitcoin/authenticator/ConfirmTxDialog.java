@@ -39,6 +39,8 @@ import org.bitcoinj.params.MainNetParams;
 import org.bitcoinj.params.TestNet3Params;
 import org.bitcoinj.script.Script;
 import org.bitcoinj.script.ScriptBuilder;
+import org.spongycastle.util.encoders.Hex;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.primitives.Ints;
 
@@ -171,7 +173,7 @@ public class ConfirmTxDialog {
 							byte[] privKey = childKey.getPrivKeyBytes();
 							byte[] pubKey = childKey.getPubKey();
 							ECKey authenticatorKey = new ECKey(privKey, pubKey);
-							ECKey walletPubKey = new ECKey(null, Utils.hexStringToByteArray(walpubkeys.get(j))); 							
+							ECKey walletPubKey = new ECKey(null, Hex.decode(walpubkeys.get(j)));
 							List<ECKey> keys = ImmutableList.of(authenticatorKey, walletPubKey);
 							//Create the multisig script we will be using for signing. 
 							Script scriptpubkey = ScriptBuilder.createMultiSigOutputScript(2,keys);
@@ -179,7 +181,7 @@ public class ConfirmTxDialog {
 							TransactionSignature sig2 = unsignedTx.calculateSignature(j, authenticatorKey, scriptpubkey, Transaction.SigHash.ALL, false);
 							byte[] signature = sig2.encodeToBitcoin();
 							JSONObject sigobj = new JSONObject();
-							try {sigobj.put("signature", Utils.bytesToHex(signature));} 
+							try {sigobj.put("signature", Hex.toHexString(signature));}
 							catch (JSONException e) {e.printStackTrace();}
 							//Add key object to array
 							siglist.add(sigobj);					

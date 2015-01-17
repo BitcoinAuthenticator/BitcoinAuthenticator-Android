@@ -18,6 +18,8 @@ import android.util.Log;
 
 import org.bitcoinj.crypto.DeterministicKey;
 import org.bitcoinj.crypto.HDKeyDerivation;
+import org.spongycastle.util.encoders.Hex;
+
 import com.google.common.primitives.Ints;
  
 /**
@@ -54,8 +56,8 @@ public class PairingProtocol {
         	Log.i("asdf", "Pairing: creating payload");
         	Map obj=new LinkedHashMap();
         	obj.put("version", 1);
-    		obj.put("mpubkey", Utils.bytesToHex(mpubkey));
-    		obj.put("chaincode", Utils.bytesToHex(chaincode));
+    		obj.put("mpubkey", Hex.toHexString(mpubkey));
+    		obj.put("chaincode", Hex.toHexString(chaincode));
     		obj.put("gcmID", new String (regID));
     		StringWriter jsonOut = new StringWriter();
     		try {JSONValue.writeJSONString(obj, jsonOut);} 

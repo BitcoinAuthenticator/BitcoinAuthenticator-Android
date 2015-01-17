@@ -1,5 +1,7 @@
 package org.bitcoin.authenticator.tests.utils;
 
+import android.util.Log;
+
 import static org.junit.Assert.*;
 
 import javax.crypto.SecretKey;
@@ -10,6 +12,11 @@ import junit.framework.TestCase;
 import org.bitcoin.authenticator.utils.CryptoUtils;
 import org.junit.Test;
 import org.spongycastle.util.encoders.Hex;
+
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 
 public class CryptoUtilsTest extends TestCase {
 	@Test
@@ -41,7 +48,47 @@ public class CryptoUtilsTest extends TestCase {
 		}
 		assertTrue(e instanceof IllegalArgumentException);
 	}
-	
+
+    @Test
+    public void testEncryptPayloadWithChecksum() {
+        /* valide test */
+        String expected = "901611d3908460ebc2c4dae4a59d9690a59bf24c470a79986125574b74b66383bf6553955c9cd84dc7a1a3f08abe6003cb90993853ef7ff593fbadc0798e1271";
+        String result;
+
+        byte[] payload = "I am the payload".getBytes();
+        SecretKey sk = CryptoUtils.deriveSecretKeyFromPasswordString("password");
+
+        byte[] encryptedPayload = new byte[0];
+        try {
+            encryptedPayload = CryptoUtils.encryptPayloadWithChecksum(sk, payload);
+            result = Hex.toHexString(encryptedPayload);
+            assertTrue(expected.equals(result));
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertTrue(false);
+        }
+
+        try {
+            /* wrong password*/
+            sk = CryptoUtils.deriveSecretKeyFromPasswordString("passwor");
+            encryptedPayload = CryptoUtils.encryptPayloadWithChecksum(sk, payload);
+            result = Hex.toHexString(encryptedPayload);
+            assertFalse (expected.equals(result));
+        } catch (Exception e) {
+            e.printStackTrace();
+            assertTrue(false);
+        }
+
+		/* illegal arguments*/
+        Exception e = null;
+        try {
+            CryptoUtils.encryptPayload(sk, new byte[0]);
+        } catch (Exception ex) {
+            e = ex;
+        }
+        assertTrue(e instanceof IllegalArgumentException);
+    }
+
 	@Test
 	public void testEncryptPayload() {
 		/* valide test */
@@ -131,4 +178,42 @@ public class CryptoUtilsTest extends TestCase {
 		}
 		assertTrue(e instanceof IllegalArgumentException);
 	}
+
+    @Test
+    public void testDecryptPayloadWithChecksum() {
+        String expected = "I am the payload";
+        String pw = "password";
+        byte[] payload = expected.getBytes();
+        SecretKey sk = CryptoUtils.deriveSecretKeyFromPasswordString(pw);
+        byte[] encryptedPayload = Hex.decode("901611d3908460ebc2c4dae4a59d9690a59bf24c470a79986125574b74b66383bf6553955c9cd84dc7a1a3f08abe6003cb90993853ef7ff593fbadc0798e1271");
+
+        try {
+            byte[] decryptedPayload = CryptoUtils.decryptPayloadWithChecksum(sk, encryptedPayload);
+            assertTrue(expected.equals(new String(decryptedPayload)));
+        } catch (GeneralSecurityException e) {
+            e.printStackTrace();
+            assertTrue(false);
+        }
+
+        /* Wrong password */
+        boolean didThrow = false;
+        try {
+            sk = CryptoUtils.deriveSecretKeyFromPasswordString("passwor");
+            byte[]decryptedPayload = CryptoUtils.decryptPayloadWithChecksum(sk, encryptedPayload);
+        } catch (Exception e) {
+            didThrow = true;
+            assertTrue(e instanceof GeneralSecurityException);
+        }
+        assertTrue(didThrow);
+
+
+		/* illegal arguments */
+        Exception e = null;
+        try {
+            CryptoUtils.decryptPayload(sk, new byte[0]);
+        } catch (Exception ex) {
+            e = ex;
+        }
+        assertTrue(e instanceof IllegalArgumentException);
+    }
 }
