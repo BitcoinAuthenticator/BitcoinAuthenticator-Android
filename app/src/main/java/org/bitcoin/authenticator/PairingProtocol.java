@@ -141,7 +141,7 @@ public class PairingProtocol {
     }
     
     public static long getWalletIndexFromString(String hex) {
-    	return new BigInteger(EncodingUtils.hexStringToByteArray(hex)).longValue();
+    	return new BigInteger(Hex.decode(hex)).longValue();
     }
     
     /**
