@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
+import org.bitcoin.authenticator.BAPreferences.BAPreferences;
 import org.bitcoin.authenticator.core.WalletCore;
 import org.bitcoinj.crypto.MnemonicCode;
 
@@ -12,10 +12,8 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
-import android.view.View.OnFocusChangeListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
 public class Restore_Mnemonic extends Activity {
 	

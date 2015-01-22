@@ -1,4 +1,4 @@
-package org.bitcoin.authenticator.net.exceptions;
+package org.bitcoin.authenticator.core.net.exceptions;
 
 /**
  * Created by alonmuroch on 12/26/14.

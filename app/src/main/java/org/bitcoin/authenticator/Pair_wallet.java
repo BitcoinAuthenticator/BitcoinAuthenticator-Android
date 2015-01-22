@@ -10,10 +10,10 @@ import java.util.Set;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
+import org.bitcoin.authenticator.BAPreferences.BAPreferences;
 import org.bitcoin.authenticator.PairingProtocol.CouldNotPairToWalletException;
 import org.bitcoin.authenticator.PairingProtocol.PairingQRData;
-import org.bitcoin.authenticator.GcmUtil.GcmUtilGlobal;
+import org.bitcoin.authenticator.core.GcmUtil.GcmUtilGlobal;
 
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.subgraph.orchid.encoders.Hex;

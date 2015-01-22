@@ -1,22 +1,14 @@
 package org.bitcoin.authenticator.tests.utils;
 
-import android.util.Log;
-
-import static org.junit.Assert.*;
-
 import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 
 import junit.framework.TestCase;
 
-import org.bitcoin.authenticator.utils.CryptoUtils;
+import org.bitcoin.authenticator.core.utils.CryptoUtils;
 import org.junit.Test;
 import org.spongycastle.util.encoders.Hex;
 
-import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 
 public class CryptoUtilsTest extends TestCase {
 	@Test

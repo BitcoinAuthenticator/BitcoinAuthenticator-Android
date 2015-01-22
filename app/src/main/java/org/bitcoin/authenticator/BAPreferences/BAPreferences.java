@@ -1,9 +1,8 @@
-package org.bitcoin.authenticator.AuthenticatorPreferences;
+package org.bitcoin.authenticator.BAPreferences;
 
-import org.bitcoin.authenticator.AuthenticatorPreferences.Preferences.ConfigPreference;
-import org.bitcoin.authenticator.AuthenticatorPreferences.Preferences.WalletPreference;
+import org.bitcoin.authenticator.BAPreferences.Preferences.ConfigPreference;
+import org.bitcoin.authenticator.BAPreferences.Preferences.WalletPreference;
 
-import android.app.Activity;
 import android.content.Context;
 
 public class BAPreferences {

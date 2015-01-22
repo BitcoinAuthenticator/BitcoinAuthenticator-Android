@@ -2,7 +2,7 @@ package org.bitcoin.authenticator.tests.net;
 
 import junit.framework.TestCase;
 
-import org.bitcoin.authenticator.net.PongPayload;
+import org.bitcoin.authenticator.core.net.PongPayload;
 import org.json.simple.JSONObject;
 import org.junit.Test;
 

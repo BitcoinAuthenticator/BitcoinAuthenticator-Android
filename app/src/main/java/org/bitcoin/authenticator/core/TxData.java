@@ -1,4 +1,4 @@
-package org.bitcoin.authenticator;
+package org.bitcoin.authenticator.core;
 
 import com.subgraph.orchid.encoders.Hex;
 
@@ -13,12 +13,12 @@ import org.json.simple.parser.ParseException;
 /**Class creates an object that contains all the transaction data sent over from the wallet*/
 public class TxData {
 	
-	int version;
-	int numInputs;
-	boolean testnet;
-	ArrayList<Integer> ChildKeyIndex;
-	ArrayList<String> PublicKeys;
-	byte[] tx;
+	public int version;
+    public int numInputs;
+    public boolean testnet;
+    public ArrayList<Integer> ChildKeyIndex;
+    public ArrayList<String> PublicKeys;
+    public byte[] tx;
 	
 	/**Constructor takes in the message payload as a string and parses it into its relevant parts*/
 	public TxData(byte[] payload) throws ParseException{

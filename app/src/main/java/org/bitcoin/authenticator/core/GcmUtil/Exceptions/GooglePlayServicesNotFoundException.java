@@ -1,6 +1,4 @@
-package org.bitcoin.authenticator.GcmUtil.Exceptions;
-
-import android.util.Log;
+package org.bitcoin.authenticator.core.GcmUtil.Exceptions;
 
 public class GooglePlayServicesNotFoundException extends Exception {
 	public GooglePlayServicesNotFoundException(String message) {

@@ -1,10 +1,7 @@
-package org.bitcoin.authenticator.AuthenticatorPreferences.Preferences;
+package org.bitcoin.authenticator.BAPreferences.Preferences;
 
-import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferenceBase;
-import org.json.JSONArray;
-import org.json.JSONException;
+import org.bitcoin.authenticator.BAPreferences.BAPreferenceBase;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 

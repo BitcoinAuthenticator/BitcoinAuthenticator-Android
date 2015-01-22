@@ -1,16 +1,13 @@
-package org.bitcoin.authenticator.GcmUtil;
+package org.bitcoin.authenticator.core.GcmUtil;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import org.json.JSONObject;
 
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.content.WakefulBroadcastReceiver;
-import android.util.Log;
 
 public class GcmBroadcastReceiver extends WakefulBroadcastReceiver {
 	

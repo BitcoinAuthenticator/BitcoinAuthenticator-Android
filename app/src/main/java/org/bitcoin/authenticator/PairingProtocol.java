@@ -10,8 +10,7 @@ import java.util.Map;
 
 import javax.crypto.*;
 
-import org.bitcoin.authenticator.net.Connection;
-import org.bitcoin.authenticator.utils.EncodingUtils;
+import org.bitcoin.authenticator.core.net.Connection;
 import org.json.simple.JSONValue;
 
 import android.util.Log;

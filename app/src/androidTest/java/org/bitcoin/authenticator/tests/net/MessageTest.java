@@ -1,28 +1,15 @@
 package org.bitcoin.authenticator.tests.net;
 
-import com.google.common.collect.Lists;
-import com.googlecode.catchexception.CatchException;
-
 import junit.framework.TestCase;
 
-import static org.junit.Assert.*;
-
-import org.bitcoin.authenticator.TxData;
-import org.bitcoin.authenticator.net.Connection;
-import org.bitcoin.authenticator.net.Message;
-import org.bitcoin.authenticator.utils.CryptoUtils;
+import org.bitcoin.authenticator.core.TxData;
+import org.bitcoin.authenticator.core.net.Message;
+import org.bitcoin.authenticator.core.utils.CryptoUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
-import org.junit.Ignore;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
 import org.spongycastle.util.encoders.Hex;
 
-import java.io.IOException;
-import java.net.Socket;
-import java.security.GeneralSecurityException;
-import java.sql.DriverManager;
 import java.util.ArrayList;
 import java.util.Arrays;
 

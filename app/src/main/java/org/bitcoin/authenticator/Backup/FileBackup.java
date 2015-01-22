@@ -3,26 +3,15 @@ package org.bitcoin.authenticator.Backup;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.io.IOUtils;
 import org.bitcoin.authenticator.Backup.Exceptions.CannotBackupToFileException;
 import org.bitcoin.authenticator.Backup.Exceptions.CannotRestoreBackupFileException;
-import org.bitcoin.authenticator.utils.CryptoUtils;
+import org.bitcoin.authenticator.core.utils.CryptoUtils;
 
 import android.os.Environment;
 

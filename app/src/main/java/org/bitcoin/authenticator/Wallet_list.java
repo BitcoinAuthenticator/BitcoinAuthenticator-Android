@@ -7,17 +7,18 @@ import java.util.Set;
 import javax.crypto.SecretKey;
 
 import org.bitcoin.authenticator.ConfirmTxDialog.TxDialogResponse;
-import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
+import org.bitcoin.authenticator.BAPreferences.BAPreferences;
 import org.bitcoin.authenticator.Events.GlobalEvents;
-import org.bitcoin.authenticator.GcmUtil.ProcessGCMRequest;
+import org.bitcoin.authenticator.core.GcmUtil.ProcessGCMRequest;
+import org.bitcoin.authenticator.core.TxData;
 import org.bitcoin.authenticator.dialogs.BAAlertDialogBase;
 import org.bitcoin.authenticator.dialogs.BAAlertDialogBase.DeleteOnClickListener;
 import org.bitcoin.authenticator.dialogs.BAAlertDialogBase.SingleInputOnClickListener;
 import org.bitcoin.authenticator.dialogs.BADeleteDialog;
 import org.bitcoin.authenticator.dialogs.BAPopupMenu;
 import org.bitcoin.authenticator.dialogs.BASingleInputDialog;
-import org.bitcoin.authenticator.net.Message;
-import org.bitcoin.authenticator.net.exceptions.CouldNotSendRequestIDException;
+import org.bitcoin.authenticator.core.net.Message;
+import org.bitcoin.authenticator.core.net.exceptions.CouldNotSendRequestIDException;
 import org.json.JSONException;
 import org.json.JSONObject;
 

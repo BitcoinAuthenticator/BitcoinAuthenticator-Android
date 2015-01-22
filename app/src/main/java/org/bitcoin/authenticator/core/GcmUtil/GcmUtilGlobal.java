@@ -1,4 +1,4 @@
-package org.bitcoin.authenticator.GcmUtil;
+package org.bitcoin.authenticator.core.GcmUtil;
 
 public class GcmUtilGlobal {
 	public static final String EXTRA_MESSAGE = "message";

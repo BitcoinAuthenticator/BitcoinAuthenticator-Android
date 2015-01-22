@@ -1,15 +1,11 @@
 package org.bitcoin.authenticator;
 
-import org.bitcoin.authenticator.R;
-import org.bitcoin.authenticator.Wallet_list;
-import org.bitcoin.authenticator.Welcome;
-import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
-import org.bitcoin.authenticator.GcmUtil.GCMRegister;
-import org.bitcoin.authenticator.GcmUtil.GcmUtilGlobal;
+import org.bitcoin.authenticator.BAPreferences.BAPreferences;
+import org.bitcoin.authenticator.core.GcmUtil.GCMRegister;
+import org.bitcoin.authenticator.core.GcmUtil.GcmUtilGlobal;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 

@@ -1,24 +1,14 @@
-package org.bitcoin.authenticator.net;
+package org.bitcoin.authenticator.core.net;
 
-import java.io.ByteArrayOutputStream;
 import java.net.Socket;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.Mac;
-import javax.crypto.NoSuchPaddingException;
 import javax.crypto.SecretKey;
 
-import org.bitcoin.authenticator.TxData;
-import org.bitcoin.authenticator.Utils;
-import org.bitcoin.authenticator.net.exceptions.CouldNotGetTransactionException;
-import org.bitcoin.authenticator.net.exceptions.CouldNotSendEncryptedException;
-import org.bitcoin.authenticator.net.exceptions.CouldNotSendRequestIDException;
-import org.bitcoin.authenticator.utils.CryptoUtils;
+import org.bitcoin.authenticator.core.TxData;
+import org.bitcoin.authenticator.core.net.exceptions.CouldNotGetTransactionException;
+import org.bitcoin.authenticator.core.net.exceptions.CouldNotSendEncryptedException;
+import org.bitcoin.authenticator.core.net.exceptions.CouldNotSendRequestIDException;
+import org.bitcoin.authenticator.core.utils.CryptoUtils;
 import org.json.simple.JSONObject;
 
 /**

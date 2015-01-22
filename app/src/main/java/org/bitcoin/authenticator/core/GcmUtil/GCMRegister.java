@@ -1,10 +1,10 @@
-package org.bitcoin.authenticator.GcmUtil;
+package org.bitcoin.authenticator.core.GcmUtil;
 
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.bitcoin.authenticator.Main;
-import org.bitcoin.authenticator.GcmUtil.Exceptions.GooglePlayServicesNotFoundException;
+import org.bitcoin.authenticator.core.GcmUtil.Exceptions.GooglePlayServicesNotFoundException;
 
 import android.app.Activity;
 import android.content.Context;

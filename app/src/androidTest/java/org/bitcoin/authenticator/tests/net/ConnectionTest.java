@@ -3,22 +3,15 @@ package org.bitcoin.authenticator.tests.net;
 import junit.framework.TestCase;
 
 import org.apache.commons.io.IOUtils;
-import org.bitcoin.authenticator.net.Connection;
+import org.bitcoin.authenticator.core.net.Connection;
 import org.json.simple.JSONObject;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.SocketException;
-
-import javax.net.ServerSocketFactory;
 
 public class ConnectionTest extends TestCase {
 

@@ -1,10 +1,9 @@
-package org.bitcoin.authenticator.net;
+package org.bitcoin.authenticator.core.net;
 
 import android.util.Log;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 public class PongPayload extends JSONObject{
 	

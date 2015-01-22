@@ -14,8 +14,9 @@ import java.util.Map;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
-import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
-import org.bitcoin.authenticator.net.Message;
+import org.bitcoin.authenticator.BAPreferences.BAPreferences;
+import org.bitcoin.authenticator.core.TxData;
+import org.bitcoin.authenticator.core.net.Message;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.simple.JSONArray;
@@ -62,7 +63,7 @@ public class ConfirmTxDialog {
 	 * @throws InterruptedException
 	 */
 	public ConfirmTxDialog(final Socket s, 
-			final TxData tx, 
+			final TxData tx,
 			Activity activity, 
 			final long walletnum,
 			final TxDialogResponse responseListener) throws InterruptedException{

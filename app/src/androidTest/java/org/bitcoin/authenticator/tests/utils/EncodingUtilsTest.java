@@ -2,16 +2,13 @@ package org.bitcoin.authenticator.tests.utils;
 
 import junit.framework.TestCase;
 
-import org.bitcoin.authenticator.utils.EncodingUtils;
+import org.bitcoin.authenticator.core.utils.EncodingUtils;
 import org.bitcoinj.core.Address;
-import org.bitcoinj.core.AddressFormatException;
 import org.bitcoinj.core.Coin;
 import org.bitcoinj.core.Transaction;
-import org.bitcoinj.core.TransactionInput;
 import org.bitcoinj.core.TransactionOutput;
 import org.bitcoinj.params.MainNetParams;
 import org.junit.Test;
-import org.mockito.Mockito;
 
 /**
  * Created by alonmuroch on 1/17/15.

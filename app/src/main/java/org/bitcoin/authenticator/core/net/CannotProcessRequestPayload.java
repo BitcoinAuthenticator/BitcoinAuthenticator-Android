@@ -1,4 +1,4 @@
-package org.bitcoin.authenticator.net;
+package org.bitcoin.authenticator.core.net;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;

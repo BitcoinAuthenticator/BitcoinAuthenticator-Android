@@ -1,6 +1,5 @@
-package org.bitcoin.authenticator.utils;
+package org.bitcoin.authenticator.core.utils;
 
-import org.bitcoin.authenticator.Utils;
 import org.spongycastle.util.encoders.Hex;
 
 import java.io.ByteArrayOutputStream;

@@ -1,4 +1,4 @@
-package org.bitcoin.authenticator.GcmUtil;
+package org.bitcoin.authenticator.core.GcmUtil;
 
 public enum RequestType {
 	test 								( 1 ), // 1

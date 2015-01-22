@@ -1,57 +1,26 @@
 package org.bitcoin.authenticator;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
-import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.SecretKeySpec;
-
-import org.apache.commons.io.IOUtils;
-import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
+import org.bitcoin.authenticator.BAPreferences.BAPreferences;
 import org.bitcoin.authenticator.Backup.FileBackup;
 import org.bitcoin.authenticator.Backup.Exceptions.CannotRestoreBackupFileException;
 import org.bitcoin.authenticator.core.WalletCore;
-import org.bitcoin.authenticator.core.exceptions.NoSeedOrMnemonicsFound;
-import org.bitcoin.authenticator.dialogs.BAAlertDialogBase;
-import org.bitcoin.authenticator.dialogs.BAAlertDialogBase.ReadyToScanQROnClickListener;
-import org.bitcoin.authenticator.dialogs.ReadyToScanQRDialog;
 import org.bitcoinj.crypto.MnemonicCode;
 
-import com.google.zxing.integration.android.IntentIntegrator;
 import com.ipaulpro.afilechooser.utils.FileUtils;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.text.Editable;
 import android.text.InputType;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;

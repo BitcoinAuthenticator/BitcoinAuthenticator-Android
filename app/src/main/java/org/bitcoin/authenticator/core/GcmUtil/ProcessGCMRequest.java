@@ -1,9 +1,9 @@
-package org.bitcoin.authenticator.GcmUtil;
+package org.bitcoin.authenticator.core.GcmUtil;
 
 import java.util.Set;
 
 import org.bitcoin.authenticator.PairingProtocol;
-import org.bitcoin.authenticator.AuthenticatorPreferences.BAPreferences;
+import org.bitcoin.authenticator.BAPreferences.BAPreferences;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -18,11 +18,7 @@ public class ProcessGCMRequest {
 	
 	public ProcessReturnObject ProcessRequest(String msg){
 		ProcessReturnObject ret = new ProcessReturnObject();
-		//Wait for pending requests via GCM\
-    	
-//		SharedPreferences settings = mContext.getSharedPreferences("ConfigFile", 0);
-//		int numwallets = settings.getInt("numwallets", 0);
-//		
+
        	if(msg != null)
     	try {
     		req = new JSONObject(msg);//GcmIntentService.getMessage();

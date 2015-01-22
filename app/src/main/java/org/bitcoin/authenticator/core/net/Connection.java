@@ -1,4 +1,4 @@
-package org.bitcoin.authenticator.net;
+package org.bitcoin.authenticator.core.net;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;

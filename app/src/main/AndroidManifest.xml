@@ -30,7 +30,7 @@
 
         <!-- GCM -->
         <receiver
-            android:name=".GcmUtil.GcmBroadcastReceiver"
+            android:name=".core.GcmUtil.GcmBroadcastReceiver"
             android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
@@ -39,7 +39,7 @@
             </intent-filter>
         </receiver>
 
-        <service android:name=".GcmUtil.GcmIntentService" />
+        <service android:name=".core.GcmUtil.GcmIntentService" />
 
         <activity
             android:name=".Main"
