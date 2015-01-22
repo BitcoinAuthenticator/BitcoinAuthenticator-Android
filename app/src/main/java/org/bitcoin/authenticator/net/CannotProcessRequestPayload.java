@@ -16,19 +16,16 @@ public class CannotProcessRequestPayload {
 		String ret = "Cannot process operation";
 		try {
 			String strJson = new String(payload);
-			JSONParser parser=new JSONParser();	  
+			JSONParser parser = new JSONParser();
 			Object obj = parser.parse(strJson);
 			JSONObject jsonObject = (JSONObject) obj;
 			
 			if(jsonObject.containsKey("CANNOT_PROCESS_REQUEST")) {
-				ret = jsonObject.get("WHY").toString();
+				ret = jsonObject.containsKey("WHY")? jsonObject.get("WHY").toString():"Partial payload";
 			}
 			else
 				ret = null;
-		} catch (ParseException e) {
-			e.printStackTrace();
-			
-		}
+		} catch (ParseException e) { e.printStackTrace(); }
 		return ret;
 	}
 }
