@@ -24,30 +24,29 @@ public class ProcessGCMRequest {
     		req = new JSONObject(msg);//GcmIntentService.getMessage();
     		JSONObject reqPayload = new JSONObject();
     		reqPayload = req.getJSONObject("ReqPayload");
-    		ret.IPAddress =  reqPayload.getString("ExternalIP");
-    		ret.LocalIP = reqPayload.getString("LocalIP");
+    		ret.publicIP =  reqPayload.getString("ExternalIP");
+    		ret.localIP = reqPayload.getString("LocalIP");
     		String walletID = req.getString("WalletID");
     		
     		// search wallet index
     		Set<Long> wallets = BAPreferences.ConfigPreference().getWalletIndexList();
-    		ret.walletnum = PairingProtocol.getWalletIndexFromString(walletID);
+    		ret.walletIdx = PairingProtocol.getWalletIndexFromString(walletID);
     		
-    		SharedPreferences prefs = mContext.getSharedPreferences("WalletData" + ret.walletnum, 0);
+    		SharedPreferences prefs = mContext.getSharedPreferences("WalletData" + ret.walletIdx, 0);
     		SharedPreferences.Editor editor = prefs.edit();
-    		editor.putString("ExternalIP", ret.IPAddress);
-    		editor.putString("LocalIP", ret.LocalIP);
+    		editor.putString("ExternalIP", ret.publicIP);
+    		editor.putString("LocalIP", ret.localIP);
     		editor.commit();
-    		Log.v("ASDF", "Changed wallet ip address from GCM to: " + ret.IPAddress + "\n" +
-    				"Changed wallet local ip address from GCM to: " + ret.LocalIP);
+    		Log.v("ASDF", "Changed wallet ip address from GCM to: " + ret.publicIP + "\n" +
+                    "Changed wallet local ip address from GCM to: " + ret.localIP);
     	} catch (JSONException e) {e.printStackTrace();} 
     	
        	return ret;
 	}
 
 	public class ProcessReturnObject{
-		public  String PublicIP;
-		public  String LocalIP;
-		public  String IPAddress;
-		public long walletnum;
+		public  String localIP;
+		public  String publicIP;
+		public long walletIdx;
 	}
 }

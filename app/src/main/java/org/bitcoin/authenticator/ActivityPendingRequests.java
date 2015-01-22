@@ -208,10 +208,10 @@ public class ActivityPendingRequests extends Activity {
         		String reqString = BAPreferences.ConfigPreference().getPendingRequestAsString(data.getReqID());
         		ProcessGCMRequest processor = new ProcessGCMRequest(getApplicationContext());
         		ret = processor.ProcessRequest(reqString);
-        		String[] ips = new String[] { ret.IPAddress, ret.LocalIP};
+        		String[] ips = new String[] { ret.publicIP, ret.localIP};
             	
             	//Receive Tx
-            	SecretKey sharedsecret = Utils.getAESSecret(getApplicationContext(), ret.walletnum); 
+            	SecretKey sharedsecret = Utils.getAESSecret(getApplicationContext(), ret.walletIdx);
             	//Create a new message object for receiving the transaction.
             	Message msg = null;
             	persistentSocketForTheProcess = null;
@@ -260,7 +260,7 @@ public class ActivityPendingRequests extends Activity {
 				new ConfirmTxDialog(persistentSocketForTheProcess,
 						tx, 
 						ActivityPendingRequests.this, 
-						ret.walletnum, 
+						ret.walletIdx,
 						new TxDialogResponse(){
 								@Override
 								public void onAuthorizedTx() {

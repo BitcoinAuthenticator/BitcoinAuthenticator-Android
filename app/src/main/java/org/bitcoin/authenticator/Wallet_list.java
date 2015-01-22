@@ -484,9 +484,9 @@ public class Wallet_list extends Activity {
                 		BAPreferences.ConfigPreference().setRequest(false);
                     	
                 		//Open a new connection
-                    	String[] ips = new String[] { ret.IPAddress, ret.LocalIP};
+                    	String[] ips = new String[] { ret.publicIP, ret.localIP};
                     	
-                    	SecretKey sharedsecret = Utils.getAESSecret(getApplicationContext(), ret.walletnum); 
+                    	SecretKey sharedsecret = Utils.getAESSecret(getApplicationContext(), ret.walletIdx);
                     	
                     	//Create a new message object for receiving the transaction.
                     	Message msg = null;
@@ -514,7 +514,7 @@ public class Wallet_list extends Activity {
                  * 
                  */
                 if(tx != null)
-                	launchDialog(persistentSocketForTheProcess, tx, ret.walletnum);                
+                	launchDialog(persistentSocketForTheProcess, tx, ret.walletIdx);
     		}
     		
     		private void launchDialog(final Socket s, final TxData tx, final long walletNum) {

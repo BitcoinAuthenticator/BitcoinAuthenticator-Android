@@ -1,4 +1,4 @@
-package org.bitcoin.authenticator.tests.utils;
+package org.bitcoin.authenticator.tests.core.utils;
 
 import junit.framework.TestCase;
 
