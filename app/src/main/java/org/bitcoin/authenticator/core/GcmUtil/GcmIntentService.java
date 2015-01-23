@@ -2,15 +2,11 @@ package org.bitcoin.authenticator.core.GcmUtil;
 
 import java.io.InputStream;
 import java.util.Date;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import org.bitcoin.authenticator.Main;
-import org.bitcoin.authenticator.PairingProtocol;
 import org.bitcoin.authenticator.R;
 import org.bitcoin.authenticator.BAPreferences.BAPreferences;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -19,13 +15,11 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 public class GcmIntentService extends IntentService {
@@ -56,18 +50,20 @@ public class GcmIntentService extends IntentService {
         // The getMessageType() intent parameter must be the intent you received
         // in your BroadcastReceiver.
         try {
-		    if (!extras.isEmpty()) { 
-		    	RequestType messageType = GcmUtilGlobal.getRequestTypeFromJsonPayload(extras.getString("data"));
+		    if (!extras.isEmpty()) {
+                JSONObject obj = new JSONObject(extras.getString("data"));
+                int idx = obj.getInt("RequestType");
+		    	GCMRequestType messageType = GCMRequestType.fromInt(idx);
 
-		        if (messageType == RequestType.signTx) {
+		        if (messageType == GCMRequestType.signTx) {
 		        	processNewSigningNotification(extras.getString("data"));
 		            Log.v(GcmUtilGlobal.TAG, "Received: " + extras.getString("data"));
 		        }
-		        else if(messageType == RequestType.updateIpAddressesForPreviousMessage){
+		        else if(messageType == GCMRequestType.updateIpAddressesForPreviousMessage){
 		        	processUpdateIpAddresses(extras.getString("data"));
 		        	Log.v(GcmUtilGlobal.TAG, "Received: " + extras.getString("data"));
 		        }
-		        else if(messageType == RequestType.CoinsReceived){
+		        else if(messageType == GCMRequestType.CoinsReceived){
 		        	processCoinsReceived(extras.getString("data"));
 		        	Log.v(GcmUtilGlobal.TAG, "Received: " + extras.getString("data"));
 		        }

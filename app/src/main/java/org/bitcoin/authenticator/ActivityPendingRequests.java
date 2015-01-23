@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import javax.crypto.SecretKey;
 
 import org.bitcoin.authenticator.ConfirmTxDialog.TxDialogResponse;
+import org.bitcoin.authenticator.core.GcmUtil.GCMRequestType;
 import org.bitcoin.authenticator.core.TxData;
 import org.bitcoin.authenticator.dialogs.BAPopupMenu;
 import org.bitcoin.authenticator.core.net.Connection;
@@ -14,7 +15,6 @@ import org.bitcoin.authenticator.core.net.Message;
 import org.bitcoin.authenticator.BAPreferences.BAPreferences;
 import org.bitcoin.authenticator.Events.GlobalEvents;
 import org.bitcoin.authenticator.core.GcmUtil.ProcessGCMRequest;
-import org.bitcoin.authenticator.core.GcmUtil.RequestType;
 import org.bitcoin.authenticator.core.net.exceptions.CouldNotGetTransactionException;
 import org.bitcoin.authenticator.core.net.exceptions.CouldNotSendRequestIDException;
 import org.json.JSONException;
@@ -303,7 +303,7 @@ public class ActivityPendingRequests extends Activity {
 		public String tmp;
 		public String WalletID;
 		public String reqID;
-		public RequestType ReqType;
+		public GCMRequestType ReqType;
 		public String customMsg;
 		public int index;
 		
@@ -312,11 +312,11 @@ public class ActivityPendingRequests extends Activity {
 			this.WalletID = jObj.getString("WalletID");
 			this.reqID = jObj.getString("RequestID");
 			// type
-			if(Integer.parseInt( jObj.getString("RequestType") ) == RequestType.test.getValue()){
+			if(Integer.parseInt( jObj.getString("RequestType") ) == GCMRequestType.test.getValue()){
 				
 			}
-			else if(Integer.parseInt( jObj.getString("RequestType") ) == RequestType.signTx.getValue()){
-				this.ReqType = RequestType.signTx;
+			else if(Integer.parseInt( jObj.getString("RequestType") ) == GCMRequestType.signTx.getValue()){
+				this.ReqType = GCMRequestType.signTx;
 			}
 			//
 			this.customMsg =  jObj.getString("CustomMsg");
@@ -326,7 +326,7 @@ public class ActivityPendingRequests extends Activity {
 		public String getTmp(){ return this.tmp; }
 		public String getWalletID(){ return this.WalletID; }
 		public String getReqID(){ return this.reqID; }
-		public RequestType getRequestType(){ return this.ReqType; }
+		public GCMRequestType getRequestType(){ return this.ReqType; }
 		public String getCustomMsg(){ return this.customMsg; }
 		public int getIndex(){ return this.index; }
 		public String getIndexString(){ return Integer.toString(getIndex()); }
