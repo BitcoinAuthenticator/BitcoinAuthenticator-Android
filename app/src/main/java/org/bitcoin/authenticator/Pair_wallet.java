@@ -11,8 +11,11 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.bitcoin.authenticator.BAPreferences.BAPreferences;
-import org.bitcoin.authenticator.PairingProtocol.CouldNotPairToWalletException;
-import org.bitcoin.authenticator.PairingProtocol.PairingQRData;
+import org.bitcoin.authenticator.BAPreferences.Preferences.ConfigPreference;
+import org.bitcoin.authenticator.BAPreferences.Preferences.WalletPreference;
+import org.bitcoin.authenticator.core.net.PairingProtocol;
+import org.bitcoin.authenticator.core.net.PairingProtocol.CouldNotPairToWalletException;
+import org.bitcoin.authenticator.core.net.PairingProtocol.PairingQRData;
 import org.bitcoin.authenticator.core.GcmUtil.GcmUtilGlobal;
 
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -166,7 +169,7 @@ public class Pair_wallet extends Activity {
 		private int networkType;
 		
 		public connectTask(PairingQRData qrData){
-			this.IPAddress 		= qrData.IPAddress;
+			this.IPAddress 		= qrData.PublicIP;
 			this.walletType		= qrData.walletType;
 			this.LocalIP 		= qrData.LocalIP;
 			this.AESKey 		= qrData.AESKey;
@@ -245,14 +248,16 @@ public class Pair_wallet extends Activity {
     			String walletType, 
     			String pairingName,
     			long walletIndex, 
-    			int networkType) {	
+    			int networkType) {
+            ConfigPreference cp = BAPreferences.getInstance().ConfigPreference();
+            WalletPreference wp = BAPreferences.getInstance().WalletPreference();
 			/*
 			 * check the pairing name does not exist, if it does add a (2) ending to the name
 			 */
-			Set<Long> walletIndexSet= BAPreferences.ConfigPreference().getWalletIndexList();
+			Set<Long> walletIndexSet= cp.getWalletIndexList();
 			for (Long i:walletIndexSet) {
-				String name = BAPreferences.WalletPreference().getName(Long.toString(i), null);
-				boolean isDeleted = BAPreferences.WalletPreference().getDeleted(Long.toString(i), true);
+				String name = wp.getName(Long.toString(i), null);
+				boolean isDeleted = wp.getDeleted(Long.toString(i), true);
 				if(name.equals(pairingName) && isDeleted == false) {
 					pairingName = pairingName + " (2)";
 					break;
@@ -260,7 +265,7 @@ public class Pair_wallet extends Activity {
 			}
 			
     	    String walletData = Long.toString(walletIndex);
-    	    BAPreferences.WalletPreference().setWallet(walletData,
+            wp.setWallet(walletData,
     	    		pairingName, 
     	    		walletType, 
     	    		IPAddress, 
@@ -268,8 +273,8 @@ public class Pair_wallet extends Activity {
     	    		networkType,
     	    		false);
     	    //
-    	    BAPreferences.ConfigPreference().addWalletIndex(walletIndex);
-    	    BAPreferences.ConfigPreference().setPaired(true);
+            cp.addWalletIndex(walletIndex);
+            cp.setPaired(true);
     	    
     	    //Save the AES key to internal storage.
     	    String FILENAME = "AESKey" + walletIndex;

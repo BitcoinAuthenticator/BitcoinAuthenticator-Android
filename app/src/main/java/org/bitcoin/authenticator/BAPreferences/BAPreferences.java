@@ -6,19 +6,28 @@ import org.bitcoin.authenticator.BAPreferences.Preferences.WalletPreference;
 import android.content.Context;
 
 public class BAPreferences {
-	static private WalletPreference mWalletPreference;
-	static private ConfigPreference mConfigPreference;
+	private WalletPreference mWalletPreference;
+	private ConfigPreference mConfigPreference;
 	
-	public BAPreferences(Context context){
+	BAPreferences(Context context){
 		mWalletPreference = new WalletPreference(context);
 		mConfigPreference = new ConfigPreference(context);
 	}
+
+    static BAPreferences instance;
+    public static void init(Context context) {
+        instance = new BAPreferences(context);
+    }
+
+    public static BAPreferences getInstance() {
+        return instance;
+    }
 	
-	public static WalletPreference WalletPreference(){
+	public  WalletPreference WalletPreference(){
 		return mWalletPreference;
 	}
 	
-	public static ConfigPreference ConfigPreference(){
+	public  ConfigPreference ConfigPreference(){
 		return mConfigPreference;
 	}
 }

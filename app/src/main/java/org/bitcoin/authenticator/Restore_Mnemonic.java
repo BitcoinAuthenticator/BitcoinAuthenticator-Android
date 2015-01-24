@@ -39,7 +39,7 @@ public class Restore_Mnemonic extends Activity {
 					WalletCore wc = new WalletCore();
 					wc.saveSeedBytes(Restore_Mnemonic.this, mc.toSeed(words, ""));
 					wc.saveMnemonic(Restore_Mnemonic.this, inputstring);
-					BAPreferences.ConfigPreference().setInitialized(true);
+					BAPreferences.getInstance().ConfigPreference().setInitialized(true);
 					startActivity (new Intent(Restore_Mnemonic.this, Pair_wallet.class));
 				}
 			}

@@ -6,10 +6,13 @@ import java.util.Set;
 
 import javax.crypto.SecretKey;
 
+import org.bitcoin.authenticator.BAPreferences.Preferences.ConfigPreference;
+import org.bitcoin.authenticator.BAPreferences.Preferences.WalletPreference;
 import org.bitcoin.authenticator.ConfirmTxDialog.TxDialogResponse;
 import org.bitcoin.authenticator.BAPreferences.BAPreferences;
 import org.bitcoin.authenticator.Events.GlobalEvents;
-import org.bitcoin.authenticator.core.GcmUtil.ProcessGCMRequest;
+import org.bitcoin.authenticator.core.GcmUtil.ParseSignTxNotification;
+import org.bitcoin.authenticator.core.net.PairingProtocol;
 import org.bitcoin.authenticator.core.TxData;
 import org.bitcoin.authenticator.dialogs.BAAlertDialogBase;
 import org.bitcoin.authenticator.dialogs.BAAlertDialogBase.DeleteOnClickListener;
@@ -197,7 +200,7 @@ public class Wallet_list extends Activity {
 						Object o = lv1.getItemAtPosition(index);
 		    			WalletItem Data = (WalletItem) o;		    			
 		    			String wdata = Data.getWalletIDString();
-		    			BAPreferences.WalletPreference().setName(wdata, input);
+		    			BAPreferences.getInstance().WalletPreference().setName(wdata, input);
 		    			updateListViewData();
 					}
 					else {
@@ -223,8 +226,8 @@ public class Wallet_list extends Activity {
         	WalletItem wi = (WalletItem)lv1.getItemAtPosition(index);
         	i.putExtra("walletName", wi.getWalletLabel());
         	i.putExtra("accountID", wi.getWalletIDString());
-        	i.putExtra("externalIP", BAPreferences.WalletPreference().getExternalIP(wi.getWalletIDString(), ""));
-        	i.putExtra("internalIP", BAPreferences.WalletPreference().getLocalIP(wi.getWalletIDString(), ""));
+        	i.putExtra("externalIP", BAPreferences.getInstance().WalletPreference().getExternalIP(wi.getWalletIDString(), ""));
+        	i.putExtra("internalIP", BAPreferences.getInstance().WalletPreference().getLocalIP(wi.getWalletIDString(), ""));
         	i.putExtra("icon", wi.getIcon());
         	startActivity (i);
     	}
@@ -241,7 +244,7 @@ public class Wallet_list extends Activity {
 					Object o = lv1.getItemAtPosition(index);
         			WalletItem Data = (WalletItem) o;
         			String wdata = Data.getWalletIDString();
-        			BAPreferences.WalletPreference().setDeleted(wdata, true);
+        			BAPreferences.getInstance().WalletPreference().setDeleted(wdata, true);
         	        try { setListView(false); } catch (InterruptedException e) { e.printStackTrace(); } catch (JSONException e) { e.printStackTrace(); }
 				}
     		});
@@ -270,7 +273,7 @@ public class Wallet_list extends Activity {
 
 	@SuppressWarnings("unchecked")
 	public void removePendingRequestFromListAndThenUpdate(String requestID) throws JSONException{
-		BAPreferences.ConfigPreference().removePendingRequestFromListAndThenUpdate(requestID);
+		BAPreferences.getInstance().ConfigPreference().removePendingRequestFromListAndThenUpdate(requestID);
 	
 		// update adapter
 		try {
@@ -281,12 +284,12 @@ public class Wallet_list extends Activity {
 	@SuppressWarnings("unchecked")
 	private ArrayList addGCMPendingRequestsToWallets(ArrayList wallets) throws InterruptedException, JSONException{
 		
-		ArrayList<String> pending = BAPreferences.ConfigPreference().getPendingList();
+		ArrayList<String> pending = BAPreferences.getInstance().ConfigPreference().getPendingList();
 		for(WalletItem walletData:(ArrayList<WalletItem>)wallets){
 			walletData.pendingGCMRequests = new ArrayList<JSONObject>();
 			// Load pending request
 			for(String req:pending){
-				JSONObject o = BAPreferences.ConfigPreference().getPendingRequestAsJsonObject(req);
+				JSONObject o = BAPreferences.getInstance().ConfigPreference().getPendingRequestAsJsonObject(req);
 				String pendingReqWalletID = Long.toString(PairingProtocol.getWalletIndexFromString(o.getString("WalletID")));
 				String walletID = walletData.getWalletIDString();
 				if(pendingReqWalletID.equals(walletID))
@@ -302,24 +305,27 @@ public class Wallet_list extends Activity {
 	 * @throws JSONException */
     @SuppressWarnings("unchecked")
 	private ArrayList getListData() throws InterruptedException, JSONException {
-	    Set<Long> walletIndexSet= BAPreferences.ConfigPreference().getWalletIndexList();
-	    boolean isTestnet = BAPreferences.ConfigPreference().getTestnet(false);
+        ConfigPreference cp = BAPreferences.getInstance().ConfigPreference();
+        WalletPreference wp = BAPreferences.getInstance().WalletPreference();
+
+	    Set<Long> walletIndexSet= cp.getWalletIndexList();
+	    boolean isTestnet = cp.getTestnet(false);
     	ArrayList results = new ArrayList();
     	
     	//Load the data for each wallet and add it to a WalletItem object
     	for (Long i:walletIndexSet) {
     		String wdata = Long.toString(i);
     		WalletItem walletData = new WalletItem();
-    		Boolean deleted = BAPreferences.WalletPreference().getDeleted(wdata, false);
-    		int networkType = BAPreferences.WalletPreference().getNetworkType(wdata, 1);// default main net
+    		Boolean deleted = wp.getDeleted(wdata, false);
+    		int networkType = wp.getNetworkType(wdata, 1);// default main net
     		if(deleted) continue;
     		if((isTestnet && networkType == 1) || (isTestnet == false && networkType == 0)) // get only current network type wallets
     			continue;
     		
     		walletData.setWalletID(i);
-    		walletData.setWalletLabel(BAPreferences.WalletPreference().getName(wdata, "Null"));
+    		walletData.setWalletLabel(wp.getName(wdata, "Null"));
     		//Decide which icon to display
-    		String typ = BAPreferences.WalletPreference().getType(wdata, "Null");
+    		String typ = wp.getType(wdata, "Null");
     		if (	 typ.equals("blockchain"	))	{walletData.setIcon(R.drawable.ic_blockchain_logo);}
     		else if (typ.equals("electrum"		))	{walletData.setIcon(R.drawable.ic_electrum_logo);} 
     		else if (typ.equals("hive"			))	{walletData.setIcon(R.drawable.ic_hive_logo);}
@@ -461,8 +467,11 @@ public class Wallet_list extends Activity {
     	new Thread() {
     		@Override
     		public void run() {
+                ConfigPreference cp = BAPreferences.getInstance().ConfigPreference();
+                WalletPreference wp = BAPreferences.getInstance().WalletPreference();
+
     			TxData tx = null;
-    	    	ProcessGCMRequest.ProcessReturnObject ret = null;
+    	    	ParseSignTxNotification.SignTxNotificationPayload ret = null;
     	    	Socket persistentSocketForTheProcess = null;
     			
     	    	/**
@@ -470,18 +479,17 @@ public class Wallet_list extends Activity {
     	    	 */
         		//Load the GCM settings from shared preferences
                 //SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
-                Boolean GCM = BAPreferences.ConfigPreference().getGCM(true);//settings.getBoolean("GCM", true);
+                Boolean GCM = cp.getGCM(true);//settings.getBoolean("GCM", true);
                 if(GCM){
                 	// Handle a request that was pressed by the user
                 	String reqString = null;
                 	if(getIntent().getStringExtra("RequestID") != null){
                 		//SharedPreferences settings2 = getSharedPreferences("ConfigFile", 0);
-                		reqString = BAPreferences.ConfigPreference().getPendingRequestAsString(getIntent().getStringExtra("RequestID"));//settings2.getString(getIntent().getStringExtra("RequestID"), null);
-                		ProcessGCMRequest processor = new ProcessGCMRequest(getApplicationContext());
-                		ret = processor.ProcessRequest(reqString);
+                		reqString = cp.getPendingRequestAsString(getIntent().getStringExtra("RequestID"));//settings2.getString(getIntent().getStringExtra("RequestID"), null);
+                		ret = ParseSignTxNotification.ProcessRequest(BAPreferences.getInstance(), reqString);
                 		
                 		// Connect
-                		BAPreferences.ConfigPreference().setRequest(false);
+                        cp.setRequest(false);
                     	
                 		//Open a new connection
                     	String[] ips = new String[] { ret.publicIP, ret.localIP};
@@ -544,9 +552,9 @@ public class Wallet_list extends Activity {
 	    													
 	    													public void proccessReq(){
 	    														try {
-	    															JSONObject jo = BAPreferences.ConfigPreference().getPendingRequestAsJsonObject(getIntent().getStringExtra("RequestID"));
+	    															JSONObject jo = BAPreferences.getInstance().ConfigPreference().getPendingRequestAsJsonObject(getIntent().getStringExtra("RequestID"));
 	    															jo.put("seen", true);
-	    															BAPreferences.ConfigPreference().setPendingRequest(jo.getString("RequestID"), jo);
+	    															BAPreferences.getInstance().ConfigPreference().setPendingRequest(jo.getString("RequestID"), jo);
 	    											    		   // remove from pending requests
 	    											    		   removePendingRequestFromListAndThenUpdate(getIntent().getStringExtra("RequestID"));
 	    														} catch (JSONException e) { e.printStackTrace(); }

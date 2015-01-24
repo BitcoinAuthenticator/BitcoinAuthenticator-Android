@@ -69,12 +69,12 @@ public class ConfirmTxDialog {
 			final TxDialogResponse responseListener) throws InterruptedException{
 	
 		//Load walletID from Shared Preferences
-		String name = BAPreferences.WalletPreference().getName(Long.toString(walletnum),"Null");//data.getString("ID", "null");
+		String name = BAPreferences.getInstance().WalletPreference().getName(Long.toString(walletnum),"Null");//data.getString("ID", "null");
 		
 		//load wallet's ips
 		final String[] ips = new String[] 
-				{ BAPreferences.WalletPreference().getExternalIP(Long.toString(walletnum),"Null"),
-				  BAPreferences.WalletPreference().getLocalIP(Long.toString(walletnum),"Null")};
+				{ BAPreferences.getInstance().WalletPreference().getExternalIP(Long.toString(walletnum),"Null"),
+				  BAPreferences.getInstance().WalletPreference().getLocalIP(Long.toString(walletnum),"Null")};
 		
 		
 		//Load AES Key from internal storage
@@ -114,7 +114,7 @@ public class ConfirmTxDialog {
 		}
 		final byte[] authseed = seed;
 		//Load network parameters from shared preferences
-        Boolean testnet = BAPreferences.ConfigPreference().getTestnet(false);
+        Boolean testnet = BAPreferences.getInstance().ConfigPreference().getTestnet(false);
         NetworkParameters params = null;
         if (testnet==false){
         	params = MainNetParams.get();

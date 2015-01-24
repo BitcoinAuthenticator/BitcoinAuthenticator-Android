@@ -20,10 +20,10 @@ public class Main extends Activity {
 		gcmInit();
 		
 		// init preferencess
-		new BAPreferences(this.getApplicationContext());
+		BAPreferences.init(getApplicationContext());
 		
 		//SharedPreferences settings = getSharedPreferences("ConfigFile", 0);
-	    Boolean paired = BAPreferences.ConfigPreference().getPaired(false);//settings.getBoolean("paired", false);
+	    Boolean paired = BAPreferences.getInstance().ConfigPreference().getPaired(false);//settings.getBoolean("paired", false);
 	    Boolean pendingReq = false;
 	    
 		{

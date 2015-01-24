@@ -40,6 +40,7 @@ repositories {
 
 
 dependencies {
+    androidTestCompile 'junit:junit-dep:4.11'
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.googlecode.json-simple:json-simple:1.1'
     compile 'org.bitcoinj:bitcoinj-core:0.12'
@@ -51,20 +52,16 @@ dependencies {
     compile 'com.google.android.gms:play-services:3.2.65'
     compile project(':aFileChooser')
     compile project(':library')
-
-    androidTestCompile 'junit:junit-dep:4.11'
-    androidTestCompile'org.mockito:mockito-core:1.9.5'
+    androidTestCompile 'org.mockito:mockito-core:1.9.5'
     androidTestCompile 'com.google.dexmaker:dexmaker:1.0'
     androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.0'
-
-//    androidTestCompile('org.powermock:powermock-api-mockito:1.5.5'){
-//        exclude group: 'org.hamcrest'
-//        exclude group: 'junit'
-//    }
-//    androidTestCompile('org.powermock:powermock-module-junit4:1.5.5'){
-//        exclude group: 'org.hamcrest'
-//        exclude group: 'junit'
-//    }
-
-    androidTestCompile'com.googlecode.catch-exception:catch-exception:1.2.0'
+    //    androidTestCompile('org.powermock:powermock-api-mockito:1.5.5'){
+    //        exclude group: 'org.hamcrest'
+    //        exclude group: 'junit'
+    //    }
+    //    androidTestCompile('org.powermock:powermock-module-junit4:1.5.5'){
+    //        exclude group: 'org.hamcrest'
+    //        exclude group: 'junit'
+    //    }
+    androidTestCompile 'com.googlecode.catch-exception:catch-exception:1.2.0'
 }

@@ -1,8 +1,8 @@
 package org.bitcoin.authenticator;
 
 import org.bitcoin.authenticator.BAPreferences.BAPreferences;
-import org.bitcoin.authenticator.Backup.FileBackup;
-import org.bitcoin.authenticator.Backup.Exceptions.CannotBackupToFileException;
+import org.bitcoin.authenticator.core.Backup.FileBackup;
+import org.bitcoin.authenticator.core.Backup.Exceptions.CannotBackupToFileException;
 import org.bitcoin.authenticator.core.WalletCore;
 import org.bitcoin.authenticator.core.exceptions.NoSeedOrMnemonicsFound;
 
@@ -44,7 +44,7 @@ public class Show_seed extends Activity {
 		setupConfirmationCheckbox();
 		setupContinueButton();
 		
-	    Boolean initialized = BAPreferences.ConfigPreference().getInitialized(false);//settings.getBoolean("initialized", false);
+	    Boolean initialized = BAPreferences.getInstance().ConfigPreference().getInitialized(false);//settings.getBoolean("initialized", false);
 	    if (initialized == false){
 	    	generateSeed();
 	    }
@@ -166,7 +166,7 @@ public class Show_seed extends Activity {
 		            btn.setEnabled(true);
 					
 					displaySeed();
-					BAPreferences.ConfigPreference().setInitialized(true);
+					BAPreferences.getInstance().ConfigPreference().setInitialized(true);
 				} catch (NoSeedOrMnemonicsFound e) {
 					e.printStackTrace();
 					
@@ -230,7 +230,7 @@ public class Show_seed extends Activity {
 		ContinueButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-			    Boolean paired = BAPreferences.ConfigPreference().getPaired(false);
+			    Boolean paired = BAPreferences.getInstance().ConfigPreference().getPaired(false);
 			    if (paired == false){
 			    	startActivity (new Intent(Show_seed.this, Pair_wallet.class));
 			    	}

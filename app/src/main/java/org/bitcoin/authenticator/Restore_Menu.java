@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bitcoin.authenticator.BAPreferences.BAPreferences;
-import org.bitcoin.authenticator.Backup.FileBackup;
-import org.bitcoin.authenticator.Backup.Exceptions.CannotRestoreBackupFileException;
+import org.bitcoin.authenticator.core.Backup.FileBackup;
+import org.bitcoin.authenticator.core.Backup.Exceptions.CannotRestoreBackupFileException;
 import org.bitcoin.authenticator.core.WalletCore;
 import org.bitcoinj.crypto.MnemonicCode;
 
@@ -127,7 +127,7 @@ public class Restore_Menu extends Activity {
     					WalletCore wc2 = new WalletCore();
     					wc2.saveSeedBytes(Restore_Menu.this, mc.toSeed(words, ""));
     					wc2.saveMnemonic(Restore_Menu.this, inputstring);
-    					BAPreferences.ConfigPreference().setInitialized(true);
+    					BAPreferences.getInstance().ConfigPreference().setInitialized(true);
     					startActivity (new Intent(Restore_Menu.this, Pair_wallet.class));
     				}
 	        	} 

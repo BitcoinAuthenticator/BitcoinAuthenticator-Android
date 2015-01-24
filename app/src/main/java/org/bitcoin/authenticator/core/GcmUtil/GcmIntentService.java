@@ -45,7 +45,7 @@ public class GcmIntentService extends IntentService {
             GcmUtilGlobal.API_CONSOLE_PROJECT_NUMBER = this.getResources().getString(R.attr.api_console_project_number);
         
         // init preferencess
-     	new BAPreferences(this.getApplicationContext());
+     	BAPreferences.init(getApplicationContext());
         
         // The getMessageType() intent parameter must be the intent you received
         // in your BroadcastReceiver.
@@ -106,7 +106,7 @@ public class GcmIntentService extends IntentService {
 //        notif.flags |= Notification.FLAG_AUTO_CANCEL;
 //        mNotificationManager.notify((int)uniqueId, notif);
 
-        Notification notif = PrepareUiNotification.forCoinsReceivedRemoteNotification(this, msg, logo);
+        Notification notif = PrepareUiNotification.getInstance().forCoinsReceivedRemoteNotification(this, BAPreferences.getInstance(), msg, logo);
         if(notif != null) {
             Date now = new Date();
             uniqueId = now.getTime();//use date to generate an unique id to differentiate the notifications.
@@ -180,7 +180,7 @@ public class GcmIntentService extends IntentService {
 //	        mNotificationManager.notify((int)uniqueId, notif);
 //		}
 
-        Notification notif = PrepareUiNotification.forUpdateIpAddressesRemoteNotification(this, msg, logo);
+        Notification notif = PrepareUiNotification.getInstance().forUpdateIpAddressesRemoteNotification(this, BAPreferences.getInstance(), msg, logo);
         if(notif != null) {
             Date now = new Date();
             uniqueId = now.getTime();//use date to generate an unique id to differentiate the notifications.
@@ -246,7 +246,7 @@ public class GcmIntentService extends IntentService {
 //        Log.v(GcmUtilGlobal.TAG, "Added pending request: " + obj.getString("RequestID"));
 
 
-        Notification notif = PrepareUiNotification.forSigningRequestRemoteNotification(this, getQueue(), msg, logo);
+        Notification notif = PrepareUiNotification.getInstance().forSigningRequestRemoteNotification(this, BAPreferences.getInstance(), getQueue(), msg, logo);
         if(notif != null) {
             Date now = new Date();
             uniqueId = now.getTime();//use date to generate an unique id to differentiate the notifications.

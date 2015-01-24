@@ -29,7 +29,7 @@ public class How_it_works extends Activity {
 		// Set the ViewPager adapter
 		ExplanationPagerAdapter adapter = new ExplanationPagerAdapter();
 	    ViewPager pager = (ViewPager) findViewById(R.id.how_it_works_pager);
-	    paired = BAPreferences.ConfigPreference().getPaired(false);
+	    paired = BAPreferences.getInstance().ConfigPreference().getPaired(false);
 	    pager.setOffscreenPageLimit(5);
 	    pager.setAdapter(adapter);
 	    

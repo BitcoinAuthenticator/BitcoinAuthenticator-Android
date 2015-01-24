@@ -8,13 +8,14 @@ import javax.crypto.SecretKey;
 
 import org.bitcoin.authenticator.ConfirmTxDialog.TxDialogResponse;
 import org.bitcoin.authenticator.core.GcmUtil.GCMRequestType;
+import org.bitcoin.authenticator.core.GcmUtil.ParseSignTxNotification;
+import org.bitcoin.authenticator.core.net.PairingProtocol;
 import org.bitcoin.authenticator.core.TxData;
 import org.bitcoin.authenticator.dialogs.BAPopupMenu;
 import org.bitcoin.authenticator.core.net.Connection;
 import org.bitcoin.authenticator.core.net.Message;
 import org.bitcoin.authenticator.BAPreferences.BAPreferences;
 import org.bitcoin.authenticator.Events.GlobalEvents;
-import org.bitcoin.authenticator.core.GcmUtil.ProcessGCMRequest;
 import org.bitcoin.authenticator.core.net.exceptions.CouldNotGetTransactionException;
 import org.bitcoin.authenticator.core.net.exceptions.CouldNotSendRequestIDException;
 import org.json.JSONException;
@@ -117,9 +118,9 @@ public class ActivityPendingRequests extends Activity {
 		ArrayList<JSONObject> pending = new ArrayList<JSONObject>();
 		ArrayList<String> allPending = new ArrayList<String>();
     	//load from preference
-		allPending = BAPreferences.ConfigPreference().getPendingList();
+		allPending = BAPreferences.getInstance().ConfigPreference().getPendingList();
 		for(String req:allPending){
-			JSONObject o = BAPreferences.ConfigPreference().getPendingRequestAsJsonObject(req);
+			JSONObject o = BAPreferences.getInstance().ConfigPreference().getPendingRequestAsJsonObject(req);
 			String pendingReqWalletID = Long.toString(PairingProtocol.getWalletIndexFromString(o.getString("WalletID")));
 			if(pendingReqWalletID.equals(walletID))
 			if(o.getBoolean("seen") == false)
@@ -133,9 +134,9 @@ public class ActivityPendingRequests extends Activity {
 	   //SharedPreferences settings2 = getSharedPreferences("ConfigFile", 0);
 	   //String req = settings2.getString(reqID, null);
 	   //SharedPreferences.Editor editor = settings2.edit();
-	   JSONObject jo = BAPreferences.ConfigPreference().getPendingRequestAsJsonObject(reqID);//new JSONObject(req);
+	   JSONObject jo = BAPreferences.getInstance().ConfigPreference().getPendingRequestAsJsonObject(reqID);//new JSONObject(req);
 	   jo.put("seen", true);
-	   BAPreferences.ConfigPreference().setPendingRequest(reqID, jo);
+	   BAPreferences.getInstance().ConfigPreference().setPendingRequest(reqID, jo);
 	   //editor.putString(jo.getString("RequestID"), jo.toString());
 	   //editor.commit();
 	   
@@ -190,7 +191,7 @@ public class ActivityPendingRequests extends Activity {
     	}
     	int index;
     	TxData tx;
-    	ProcessGCMRequest.ProcessReturnObject ret;
+    	ParseSignTxNotification.SignTxNotificationPayload ret;
     	Connection conn = null;
     	dataClass data;
 		@Override
@@ -202,12 +203,11 @@ public class ActivityPendingRequests extends Activity {
 				}
 			});
 			
-            Boolean GCM = BAPreferences.ConfigPreference().getGCM(true);
+            Boolean GCM = BAPreferences.getInstance().ConfigPreference().getGCM(true);
             data = (dataClass)lv1.getItemAtPosition(index);
             if(GCM){
-        		String reqString = BAPreferences.ConfigPreference().getPendingRequestAsString(data.getReqID());
-        		ProcessGCMRequest processor = new ProcessGCMRequest(getApplicationContext());
-        		ret = processor.ProcessRequest(reqString);
+        		String reqString = BAPreferences.getInstance().ConfigPreference().getPendingRequestAsString(data.getReqID());
+        		ret = ParseSignTxNotification.ProcessRequest(BAPreferences.getInstance(), reqString);
         		String[] ips = new String[] { ret.publicIP, ret.localIP};
             	
             	//Receive Tx

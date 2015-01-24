@@ -24,13 +24,13 @@ public class Settings extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_settings);
-		GCM = BAPreferences.ConfigPreference().getGCM(true);
+		GCM = BAPreferences.getInstance().ConfigPreference().getGCM(true);
 		
 		// GCM
 		CheckBox GCMChkBx = ( CheckBox ) findViewById( R.id.chkGCM );
 		if (GCM){GCMChkBx.setChecked(true);}
 	    else{GCMChkBx.setChecked(false);}
-	    Testnet = BAPreferences.ConfigPreference().getTestnet(false);
+	    Testnet = BAPreferences.getInstance().ConfigPreference().getTestnet(false);
 	    
 	    Button btnResetGCM = ( Button ) findViewById( R.id.btn_reset_gcm );
 	    btnResetGCM.setOnClickListener(new OnClickListener() {
@@ -67,10 +67,10 @@ public class Settings extends Activity {
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
 			{    
 				if ( isChecked ) {
-					BAPreferences.ConfigPreference().setGCM(true);
+					BAPreferences.getInstance().ConfigPreference().setGCM(true);
 				}
 				else {
-					BAPreferences.ConfigPreference().setGCM(false);
+					BAPreferences.getInstance().ConfigPreference().setGCM(false);
 				}
 			}	
 		});
@@ -82,10 +82,10 @@ public class Settings extends Activity {
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked)
 			{    
 				if ( isChecked ) {
-					BAPreferences.ConfigPreference().setTestnet(true);
+					BAPreferences.getInstance().ConfigPreference().setTestnet(true);
 				}
 				else {
-					BAPreferences.ConfigPreference().setTestnet(false);
+					BAPreferences.getInstance().ConfigPreference().setTestnet(false);
 				}
 			}	
 		});
