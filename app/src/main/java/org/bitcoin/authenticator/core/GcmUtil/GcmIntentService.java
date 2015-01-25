@@ -42,7 +42,7 @@ public class GcmIntentService extends IntentService {
         logo = BitmapFactory.decodeStream(is);
 
         if(GcmUtilGlobal.API_CONSOLE_PROJECT_NUMBER == null)
-            GcmUtilGlobal.API_CONSOLE_PROJECT_NUMBER = this.getResources().getString(R.attr.api_console_project_number);
+            GcmUtilGlobal.API_CONSOLE_PROJECT_NUMBER = this.getResources().getString(R.string.api_console_project_number);
         
         // init preferencess
      	BAPreferences.init(getApplicationContext());

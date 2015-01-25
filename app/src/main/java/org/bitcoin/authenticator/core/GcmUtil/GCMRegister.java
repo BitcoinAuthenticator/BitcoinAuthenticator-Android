@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.bitcoin.authenticator.Main;
+import org.bitcoin.authenticator.R;
 import org.bitcoin.authenticator.core.GcmUtil.Exceptions.GooglePlayServicesNotFoundException;
 
 import android.app.Activity;
@@ -29,6 +30,9 @@ public class GCMRegister {
     public GCMRegister(Context context)
     {
     	mContext = context;
+
+        if(GcmUtilGlobal.API_CONSOLE_PROJECT_NUMBER == null)
+            GcmUtilGlobal.API_CONSOLE_PROJECT_NUMBER = context.getResources().getString(R.string.api_console_project_number);
     }
     
     public void runRegistrationSequence() throws GooglePlayServicesNotFoundException
