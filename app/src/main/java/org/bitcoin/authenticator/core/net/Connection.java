@@ -60,7 +60,6 @@ public class Connection {
                 if(!PongPayload.isValidPongPayload(readContinuous(s))) {
                     try { s.close(); }
                     catch(IOException e) { e.printStackTrace(); }
-                    s = null;
 
                     throw new CannotConnectToWalletException("Returned pong message is not valid");
                 }
@@ -173,7 +172,7 @@ public class Connection {
 			s.setSoTimeout(3000);
 
 			DataInputStream in = new DataInputStream(s.getInputStream());
-			int size = in.available();
+			int size = in.readInt();
             readBytes = new byte[size];
 			in.read(readBytes);
 		}

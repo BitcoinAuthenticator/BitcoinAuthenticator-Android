@@ -102,6 +102,11 @@ public class ActivityPendingRequests extends Activity {
         mProgressDialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
 	}
 
+    @Override
+    protected void onPause() {
+        mProgressDialog.dismiss();
+    }
+
 	private ArrayList<dataClass> getData(ArrayList<JSONObject> jsonobj) throws JSONException{
 		ArrayList<dataClass> ret = new ArrayList<dataClass>();
 		int index = 1;
@@ -253,7 +258,8 @@ public class ActivityPendingRequests extends Activity {
 		/**On finish show the transaction in a dialog box*/
         protected void onPostExecute(Connection result) {
         	mProgressDialog.hide();
-        	
+            mProgressDialog.dismiss();
+
         	// Show Tx dialog
         	if(tx != null)
 			try {
