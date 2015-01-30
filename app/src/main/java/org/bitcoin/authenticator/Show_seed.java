@@ -1,8 +1,8 @@
 package org.bitcoin.authenticator;
 
 import org.bitcoin.authenticator.BAPreferences.BAPreferences;
-import org.bitcoin.authenticator.core.Backup.FileBackup;
-import org.bitcoin.authenticator.core.Backup.Exceptions.CannotBackupToFileException;
+import org.bitcoin.authenticator.core.backup.FileBackup;
+import org.bitcoin.authenticator.core.backup.Exceptions.CannotBackupToFileException;
 import org.bitcoin.authenticator.core.WalletCore;
 import org.bitcoin.authenticator.core.exceptions.NoSeedOrMnemonicsFound;
 

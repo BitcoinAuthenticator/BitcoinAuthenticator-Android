@@ -1,12 +1,12 @@
-package org.bitcoin.authenticator.Backup;
+package org.bitcoin.authenticator.core.backup;
 
 import java.io.File;
 
 import junit.framework.TestCase;
 
-import org.bitcoin.authenticator.core.Backup.FileBackup;
-import org.bitcoin.authenticator.core.Backup.Exceptions.CannotBackupToFileException;
-import org.bitcoin.authenticator.core.Backup.Exceptions.CannotRestoreBackupFileException;
+import org.bitcoin.authenticator.core.backup.FileBackup;
+import org.bitcoin.authenticator.core.backup.Exceptions.CannotBackupToFileException;
+import org.bitcoin.authenticator.core.backup.Exceptions.CannotRestoreBackupFileException;
 import org.junit.Test;
 import org.spongycastle.util.encoders.Hex;
 

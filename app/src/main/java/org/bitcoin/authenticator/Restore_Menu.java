@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.bitcoin.authenticator.BAPreferences.BAPreferences;
-import org.bitcoin.authenticator.core.Backup.FileBackup;
-import org.bitcoin.authenticator.core.Backup.Exceptions.CannotRestoreBackupFileException;
+import org.bitcoin.authenticator.core.backup.FileBackup;
+import org.bitcoin.authenticator.core.backup.Exceptions.CannotRestoreBackupFileException;
 import org.bitcoin.authenticator.core.WalletCore;
 import org.bitcoinj.crypto.MnemonicCode;
 

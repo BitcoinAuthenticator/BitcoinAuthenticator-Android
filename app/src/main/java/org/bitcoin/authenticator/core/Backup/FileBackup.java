@@ -1,4 +1,4 @@
-package org.bitcoin.authenticator.core.Backup;
+package org.bitcoin.authenticator.core.backup;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -9,8 +9,8 @@ import java.io.InputStream;
 import javax.crypto.SecretKey;
 
 import org.apache.commons.io.IOUtils;
-import org.bitcoin.authenticator.core.Backup.Exceptions.CannotBackupToFileException;
-import org.bitcoin.authenticator.core.Backup.Exceptions.CannotRestoreBackupFileException;
+import org.bitcoin.authenticator.core.backup.Exceptions.CannotBackupToFileException;
+import org.bitcoin.authenticator.core.backup.Exceptions.CannotRestoreBackupFileException;
 import org.bitcoin.authenticator.core.utils.CryptoUtils;
 
 import android.os.Environment;

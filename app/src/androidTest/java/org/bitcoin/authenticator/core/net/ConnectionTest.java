@@ -68,47 +68,43 @@ public class ConnectionTest extends TestCase {
         }
     }
 
-    @Test
-    @Ignore
-    public void testReadAndClose() {
-        try {
-            Socket s = Mockito.mock(Socket.class);
-            Mockito.when(s.getSoTimeout()).thenReturn(300);
+//    @Test
+//    public void testReadAndClose() {
+//        try {
+//            Socket s = Mockito.mock(Socket.class);
+//            Mockito.when(s.getSoTimeout()).thenReturn(300);
+//
+//            InputStream is = IOUtils.toInputStream("some test data for my input stream");
+//            Mockito.when(s.getInputStream()).thenReturn(is);
+//
+//            Connection.getInstance().readAndClose(s);
+//            // assert socket.close() was called
+//            Mockito.verify(s, Mockito.atLeastOnce()).close();
+//        }
+//        catch(Exception e) {
+//            e.printStackTrace();
+//            assertTrue(false);
+//        }
+//    }
 
-            InputStream is = IOUtils.toInputStream("some test data for my input stream");
-            Mockito.when(s.getInputStream()).thenReturn(is);
-
-            Connection.getInstance().readAndClose(s);
-            // assert socket.close() was called
-            Mockito.verify(s, Mockito.atLeastOnce()).close();
-        }
-        catch(Exception e) {
-            e.printStackTrace();
-            assertTrue(false);
-        }
-    }
-
-    @Test
-    @Ignore
-    public void testReadContinuous() {
-        try {
-            Socket s = Mockito.mock(Socket.class);
-            Mockito.when(s.getSoTimeout()).thenReturn(300);
-
-            InputStream is = new ByteArrayInputStream("some test data for my input stream".getBytes());
-
-
-
-            Mockito.when(s.getInputStream()).thenReturn(is);
-
-            Connection.getInstance().readContinuous(s);
-            Mockito.verify(s, Mockito.never()).close();
-        }
-        catch(Exception e) {
-            e.printStackTrace();
-            assertTrue(false);
-        }
-    }
+//    @Test
+//    public void testReadContinuous() {
+//        try {
+//            Socket s = Mockito.mock(Socket.class);
+//            Mockito.when(s.getSoTimeout()).thenReturn(300);
+//
+//            InputStream is = new ByteArrayInputStream("some test data for my input stream".getBytes());
+//
+//            Mockito.when(s.getInputStream()).thenReturn(is);
+//
+//            Connection.getInstance().readContinuous(s);
+//            Mockito.verify(s, Mockito.never()).close();
+//        }
+//        catch(Exception e) {
+//            e.printStackTrace();
+//            assertTrue(false);
+//        }
+//    }
 
     @Test
     public void testGenerateSockeToAuthenticator() {
